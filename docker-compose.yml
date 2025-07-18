@@ -6,5 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8085:80" # Porta externa:interna
+      - "8085:80"
     restart: unless-stopped
+    environment:
+      - NODE_ENV=production
