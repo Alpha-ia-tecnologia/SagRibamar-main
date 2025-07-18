@@ -1,4 +1,4 @@
-# Etapa 1: Build da aplicação
+# Etapa 1 - build do projeto com Vite
 FROM node:18 AS build
 
 WORKDIR /app
@@ -9,15 +9,17 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# Etapa 2: Servir com Nginx
+# Etapa 2 - servir com Nginx
 FROM nginx:stable-alpine
 
-# Copia os arquivos de build para a pasta do Nginx
-COPY --from=build /app/build /usr/share/nginx/html
+# Remove arquivos padrão do Nginx
+RUN rm -rf /usr/share/nginx/html/*
 
-# Copia configuração personalizada do Nginx (opcional)
-# COPY nginx.conf /etc/nginx/nginx.conf
+# Copia os arquivos estáticos gerados pelo Vite
+COPY --from=build /app/dist /usr/share/nginx/html
 
+# Expõe a porta 80
 EXPOSE 80
 
+# Comando padrão
 CMD ["nginx", "-g", "daemon off;"]
