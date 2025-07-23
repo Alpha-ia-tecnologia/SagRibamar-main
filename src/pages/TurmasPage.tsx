@@ -21,7 +21,7 @@ export default function TurmasPage() {
   useEffect(() => {
     const fetchEscolas = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/escolas`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/escolas?page=1&limit=200`);
         const data = await res.json();
         const lista = Array.isArray(data) ? data : data.data;
         setEscolas(Array.isArray(lista) ? lista : []);

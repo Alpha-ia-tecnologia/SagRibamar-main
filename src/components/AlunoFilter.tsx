@@ -23,7 +23,7 @@ export const AlunoFilter = ({ onFilter }: AlunoFilterProps) => {
 
   useEffect(() => {
     const fetchEscolas = async () => {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/escolas`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/escolas?page=1&limit=200'`);
       const data = await res.json();
       setEscolas(Array.isArray(data.data) ? data.data : data);
     };
