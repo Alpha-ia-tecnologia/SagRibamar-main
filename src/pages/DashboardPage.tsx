@@ -31,7 +31,7 @@ export const DashboardPage = () => {
       document.body.appendChild(a);
       a.click();
       a.remove();
-      window.URL.revokeObjectURL(url); // limpa a memória
+      window.URL.revokeObjectURL(url); 
 
     } catch (err) {
       console.error(err);

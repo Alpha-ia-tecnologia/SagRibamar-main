@@ -22,12 +22,15 @@ const nomeSerieLegivel: Record<string, string> = {
   "EJA": "EJA",
 };
 
+// todas as séries disponíveis no sistema
+const TODAS_AS_SERIES = Object.keys(nomeSerieLegivel);
+
 export const SelectSerie = ({ escolaId, value, onChange }: Props) => {
-  const [series, setSeries] = useState<string[]>([]);
+  const [series, setSeries] = useState<string[]>(TODAS_AS_SERIES);
 
   useEffect(() => {
     if (!escolaId) {
-      setSeries([]);
+      setSeries(TODAS_AS_SERIES); // reset para todas
       return;
     }
 
@@ -38,11 +41,11 @@ export const SelectSerie = ({ escolaId, value, onChange }: Props) => {
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
-        console.log("Séries carregadas:", data);
+        console.log("Séries da escola carregadas:", data);
         setSeries(Array.isArray(data) ? data : []);
       })
       .catch((err) => {
-        console.error("Erro ao carregar séries:", err);
+        console.error("Erro ao carregar séries da escola:", err);
         setSeries([]);
       });
   }, [escolaId]);
@@ -54,7 +57,6 @@ export const SelectSerie = ({ escolaId, value, onChange }: Props) => {
         className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-white text-gray-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        disabled={!series.length}
       >
         <option value="">Selecione uma série</option>
         {series.map((serie) => (
