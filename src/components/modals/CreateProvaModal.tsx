@@ -73,8 +73,13 @@ export const CreateProvaModal = ({ provaId, onClose, onSuccess }: ProvaModalProp
       </div>
 
       {mostrarQuestoesModal && novaProvaId && (
-        <CreateQuestoesModal provaId={novaProvaId} onClose={handleQuestoesFinalizadas} />
-      )}
+  <CreateQuestoesModal
+    key={novaProvaId} 
+    provaId={novaProvaId}
+    onClose={handleQuestoesFinalizadas}
+  />
+)}
+
     </>
   );
 };
