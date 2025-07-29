@@ -77,34 +77,35 @@ export const EditarQuestaoModal = ({
       .then((data) => setComponentes(data || []));
   }, [questaoId]);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
+  const formData = new FormData();
+  formData.append("imagem", file); 
 
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/upload/questao-imagem`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/upload/questao-imagem`, {
+      method: "POST",
+      body: formData,
+    });
 
-      const data = await res.json();
-      if (data.success) {
-        setImagemUrl(data.imagePath);
-        setImagemPreview(`${import.meta.env.VITE_API_URL}/${data.imagePath}`);
-      } else {
-        alert("Erro no upload");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Erro ao enviar imagem");
+    const data = await res.json(); 
+
+    if (!res.ok || !data.success) {
+      console.error("Erro ao enviar imagem:", data.message || res.statusText);
+      alert("Erro ao enviar imagem.");
+      return;
     }
-  };
+    setImagemUrl(data.imagePath);
+    setImagemPreview(`${import.meta.env.VITE_API_URL}/${data.imagePath}`);
+  } catch (err) {
+    console.error("Erro inesperado:", err);
+    alert("Erro inesperado ao enviar imagem.");
+  }
+};
+
+
 
   const marcarCorreta = (index: number) => {
     const novas = alternativas.map((alt, i) => ({
@@ -163,15 +164,17 @@ export const EditarQuestaoModal = ({
           className="w-full p-3 border border-gray-300 rounded-xl mb-4"
         />
 
-        <label className="block mb-4">
-          <span className="text-sm font-medium text-gray-700">Imagem</span>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="w-full file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-          />
-        </label>
+       <label className="block mb-4">
+  <span className="text-sm font-medium text-gray-700">
+    {imagemPreview ? "Inserir outro arquivo" : "Adicionar imagem"}
+  </span>
+  <input
+    type="file"
+    accept="image/*"
+    onChange={handleImageUpload}
+    className="w-full file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+  />
+</label>
 
         {imagemPreview && (
           <div className="mb-4">
