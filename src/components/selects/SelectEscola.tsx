@@ -16,15 +16,14 @@ export const SelectEscola = ({ regiaoId, grupoId, value, onChange }: Props) => {
   const [escolas, setEscolas] = useState<Escola[]>([]);
 
   useEffect(() => {
-    let url = `${import.meta.env.VITE_API_URL}/api/escolas?page=1&limit=200`;
-
     const params = new URLSearchParams();
+    params.append("page", "1");
+    params.append("limit", "200");
+
     if (regiaoId) params.append("regiao_id", regiaoId);
     if (grupoId) params.append("grupo_id", grupoId);
 
-    if (params.toString()) {
-      url += `?${params.toString()}`;
-    }
+    const url = `${import.meta.env.VITE_API_URL}/api/escolas?${params.toString()}`;
 
     fetch(url)
       .then(res => res.json())
