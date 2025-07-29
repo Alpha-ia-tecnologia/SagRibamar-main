@@ -29,7 +29,6 @@ export const SelectEscola = ({ regiaoId, grupoId, value, onChange }: Props) => {
     fetch(url)
       .then(res => res.json())
       .then(data => {
-        console.log("Escolas filtradas:", data);
         const lista = Array.isArray(data?.data) ? data.data : [];
         setEscolas(lista);
       })

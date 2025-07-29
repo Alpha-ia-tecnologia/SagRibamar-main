@@ -35,7 +35,7 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
   const [componentes, setComponentes] = useState<ComponenteCurricular[]>([]);
   const [codigosBNCC, setCodigosBNCC] = useState<number[]>([]);
   const [showModalBNCC, setShowModalBNCC] = useState(false);
-  const [foiSalva, setFoiSalva] = useState(false); // controle de fluxo
+  const [foiSalva, setFoiSalva] = useState(false);
 
   const niveis = ["ANOS_INICIAIS", "ANOS_FINAIS", "ENSINO_MEDIO"];
   const series = [
@@ -52,46 +52,46 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
       .then(data => setComponentes(data || []));
   }, []);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
+  const formData = new FormData();
+  formData.append("imagem", file); 
 
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/upload/questao-imagem`, {
-        method: "POST",
-        body: formData,
-      });
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/upload/questao-imagem`, {
+      method: "POST",
+      body: formData,
+    });
 
-      const contentType = res.headers.get("content-type");
+    const contentType = res.headers.get("content-type");
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Erro ao enviar imagem:", errorText);
-        alert("Erro ao enviar imagem.");
-        return;
-      }
-
-      if (contentType?.includes("application/json")) {
-        const data = await res.json();
-        if (data.success) {
-          setImagemUrl(data.imagePath);
-          setImagemPreview(`${import.meta.env.VITE_API_URL}/${data.imagePath}`);
-        } else {
-          alert("Erro no upload: " + data.message);
-        }
-      } else {
-        const text = await res.text();
-        console.error("Resposta inesperada:", text);
-        alert("Resposta inesperada ao enviar imagem.");
-      }
-    } catch (err) {
-      console.error("Erro no upload da imagem:", err);
-      alert("Erro inesperado ao enviar imagem.");
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Erro ao enviar imagem:", errorText);
+      alert("Erro ao enviar imagem.");
+      return;
     }
-  };
+
+    if (contentType?.includes("application/json")) {
+      const data = await res.json();
+      if (data.success && data.imagePath) {
+        setImagemUrl(data.imagePath);
+        setImagemPreview(`${import.meta.env.VITE_API_URL}/${data.imagePath}`);
+      } else {
+        alert("Erro no upload: " + (data.message || "Resposta inválida"));
+      }
+    } else {
+      const text = await res.text();
+      console.error("Resposta inesperada:", text);
+      alert("Resposta inesperada ao enviar imagem.");
+    }
+  } catch (err) {
+    console.error("Erro no upload da imagem:", err);
+    alert("Erro inesperado ao enviar imagem.");
+  }
+};
 
   const limparFormulario = () => {
     setEnunciado("");
@@ -140,7 +140,7 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
         return;
       }
 
-      setFoiSalva(true); // questão salva com sucesso
+      setFoiSalva(true);
 
     } catch (err) {
       alert("Erro ao salvar questão. Veja o console para mais informações.");
