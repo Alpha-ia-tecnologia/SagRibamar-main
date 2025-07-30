@@ -25,6 +25,7 @@ interface AlunoListProps {
   onEdit?: (id: number) => void;
   searchNome: string;
   escolaId: number | null;
+  turmaId: number | null; // ⬅️ Adicionado
 }
 
 export const AlunoList = ({
@@ -33,6 +34,7 @@ export const AlunoList = ({
   onEdit,
   searchNome,
   escolaId,
+  turmaId,
 }: AlunoListProps) => {
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [page, setPage] = useState(1);
@@ -47,6 +49,7 @@ export const AlunoList = ({
 
       if (searchNome.trim() !== "") queryParams.append("nome", searchNome);
       if (escolaId !== null) queryParams.append("escola_id", String(escolaId));
+      if (turmaId !== null) queryParams.append("turma_id", String(turmaId));
 
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/api/alunos?${queryParams.toString()}`
@@ -63,7 +66,7 @@ export const AlunoList = ({
 
   useEffect(() => {
     fetchAlunos();
-  }, [page, searchNome, escolaId]);
+  }, [page, searchNome, escolaId, turmaId]); 
 
   useEffect(() => {
     if (reload) {

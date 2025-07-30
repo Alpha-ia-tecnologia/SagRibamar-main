@@ -12,6 +12,7 @@ export default function AlunosPage() {
 
   const [searchNome, setSearchNome] = useState("");
   const [escolaId, setEscolaId] = useState<number | null>(null);
+  const [turmaId, setTurmaId] = useState<number | null>(null); // ⬅️ Adicionado
 
   const handleSuccess = () => {
     setShowModal(false);
@@ -24,9 +25,14 @@ export default function AlunosPage() {
     setShowModal(true);
   };
 
-  const handleFilter = (nome: string, escolaId: number | null) => {
+  const handleFilter = (
+    nome: string,
+    escolaId: number | null,
+    turmaId: number | null
+  ) => {
     setSearchNome(nome);
     setEscolaId(escolaId);
+    setTurmaId(turmaId); // ⬅️ Aplicar turma também
   };
 
   return (
@@ -51,6 +57,7 @@ export default function AlunosPage() {
           onEdit={handleEdit}
           searchNome={searchNome}
           escolaId={escolaId}
+          turmaId={turmaId} // ⬅️ Passado para listagem
         />
       </div>
 
