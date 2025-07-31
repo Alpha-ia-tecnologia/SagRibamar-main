@@ -82,7 +82,7 @@ export const GraficoRankingRegioes = () => {
     scales: {
       y: {
         beginAtZero: true,
-        max: 100,
+        max: 10,
         title: { display: true, text: "Desempenho (%)" },
       },
       x: {
