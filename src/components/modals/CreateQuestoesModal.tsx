@@ -16,6 +16,46 @@ interface ComponenteCurricular {
   nome: string;
 }
 
+const formatarTextoSelect = (texto: string) => {
+  const mapaSeries: Record<string, string> = {
+    PRIMEIRO_ANO: "1° ano",
+    SEGUNDO_ANO: "2° ano",
+    TERCEIRO_ANO: "3° ano",
+    QUARTO_ANO: "4° ano",
+    QUINTO_ANO: "5° ano",
+    SEXTO_ANO: "6° ano",
+    SETIMO_ANO: "7° ano",
+    OITAVO_ANO: "8° ano",
+    NONO_ANO: "9° ano",
+    PRIMEIRA_SERIE: "1ª série",
+    SEGUNDA_SERIE: "2ª série",
+    TERCEIRA_SERIE: "3ª série",
+    PRIMEIRO_E_SEGUNDO_ANOS: "1° e 2° anos",
+    TERCEIRO_AO_QUINTO_ANO: "3° ao 5° ano",
+    PRIMEIRO_AO_QUINTO_ANO: "1° ao 5° ano",
+    EJA: "EJA"
+  };
+
+  const mapaNiveis: Record<string, string> = {
+    ANOS_INICIAIS: "Anos iniciais",
+    ANOS_FINAIS: "Anos finais",
+    ENSINO_MEDIO: "Ensino médio"
+  };
+
+  const mapaDificuldades: Record<string, string> = {
+    FACIL: "Fácil",
+    MEDIA: "Média",
+    DIFICIL: "Difícil"
+  };
+
+  return (
+    mapaSeries[texto] ||
+    mapaNiveis[texto] ||
+    mapaDificuldades[texto] ||
+    texto.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+  );
+};
+
 export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalProps) => {
   const [enunciado, setEnunciado] = useState("");
   const [imagemUrl, setImagemUrl] = useState("");
@@ -52,46 +92,46 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
       .then(data => setComponentes(data || []));
   }, []);
 
- const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  const formData = new FormData();
-  formData.append("imagem", file); 
+    const formData = new FormData();
+    formData.append("imagem", file);
 
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/upload/questao-imagem`, {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/upload/questao-imagem`, {
+        method: "POST",
+        body: formData,
+      });
 
-    const contentType = res.headers.get("content-type");
+      const contentType = res.headers.get("content-type");
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error("Erro ao enviar imagem:", errorText);
-      alert("Erro ao enviar imagem.");
-      return;
-    }
-
-    if (contentType?.includes("application/json")) {
-      const data = await res.json();
-      if (data.success && data.imagePath) {
-        setImagemUrl(data.imagePath);
-        setImagemPreview(`${import.meta.env.VITE_API_URL}/${data.imagePath}`);
-      } else {
-        alert("Erro no upload: " + (data.message || "Resposta inválida"));
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Erro ao enviar imagem:", errorText);
+        alert("Erro ao enviar imagem.");
+        return;
       }
-    } else {
-      const text = await res.text();
-      console.error("Resposta inesperada:", text);
-      alert("Resposta inesperada ao enviar imagem.");
+
+      if (contentType?.includes("application/json")) {
+        const data = await res.json();
+        if (data.success && data.imagePath) {
+          setImagemUrl(data.imagePath);
+          setImagemPreview(`${import.meta.env.VITE_API_URL}/${data.imagePath}`);
+        } else {
+          alert("Erro no upload: " + (data.message || "Resposta inválida"));
+        }
+      } else {
+        const text = await res.text();
+        console.error("Resposta inesperada:", text);
+        alert("Resposta inesperada ao enviar imagem.");
+      }
+    } catch (err) {
+      console.error("Erro no upload da imagem:", err);
+      alert("Erro inesperado ao enviar imagem.");
     }
-  } catch (err) {
-    console.error("Erro no upload da imagem:", err);
-    alert("Erro inesperado ao enviar imagem.");
-  }
-};
+  };
 
   const limparFormulario = () => {
     setEnunciado("");
@@ -186,15 +226,15 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
 
         <div className="grid grid-cols-2 gap-4 mb-6">
           <select value={nivelEnsino} onChange={(e) => setNivelEnsino(e.target.value)} className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
-            {niveis.map(n => <option key={n} value={n}>{n}</option>)}
+            {niveis.map(n => <option key={n} value={n}>{formatarTextoSelect(n)}</option>)}
           </select>
 
           <select value={serie} onChange={(e) => setSerie(e.target.value)} className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
-            {series.map(s => <option key={s} value={s}>{s}</option>)}
+            {series.map(s => <option key={s} value={s}>{formatarTextoSelect(s)}</option>)}
           </select>
 
           <select value={dificuldade} onChange={(e) => setDificuldade(e.target.value)} className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
-            {dificuldades.map(d => <option key={d} value={d}>{d}</option>)}
+            {dificuldades.map(d => <option key={d} value={d}>{formatarTextoSelect(d)}</option>)}
           </select>
 
           <select value={componenteId} onChange={(e) => setComponenteId(Number(e.target.value))} className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
