@@ -9,9 +9,10 @@ interface HabilidadeBNCC {
 }
 
 interface ModalBNCCEditProps {
-  habilidadeId: number;
+  questaoId: number;
+  codigosSelecionados: number[];
   onClose: () => void;
-  onSave: () => void;
+  onSave: (novosCodigos: number[]) => void;
 }
 
 const series = [
@@ -22,111 +23,127 @@ const series = [
 ];
 
 export const ModalBNCCEdit = ({
-  habilidadeId,
+  questaoId,
+  codigosSelecionados,
   onClose,
-  onSave
+  onSave,
 }: ModalBNCCEditProps) => {
-  const [habilidade, setHabilidade] = useState<HabilidadeBNCC | null>(null);
+  const [habilidades, setHabilidades] = useState<HabilidadeBNCC[]>([]);
+  const [selecionadas, setSelecionadas] = useState<number[]>([]);
+  const [serieFiltro, setSerieFiltro] = useState("");
+  const [saebFiltro, setSaebFiltro] = useState("");
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/bncc/${habilidadeId}`)
-      .then((res) => res.json())
-      .then((data) => setHabilidade(data))
-      .catch((err) => {
-        console.error("Erro ao carregar habilidade:", err);
-        alert("Erro ao carregar habilidade.");
-        onClose();
-      });
-  }, [habilidadeId]);
+    const fetchTodas = async () => {
+      try {
+        const allParams = new URLSearchParams();
+        if (serieFiltro) allParams.append("serie", serieFiltro);
+        if (saebFiltro) allParams.append("saeb", saebFiltro);
 
-  const handleUpdate = async () => {
-    if (!habilidade) return;
+        const [resSelecionadas, resTodas] = await Promise.all([
+          fetch(`${import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`),
+          fetch(`${import.meta.env.VITE_API_URL}/api/bncc?${allParams.toString()}`),
+        ]);
 
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/bncc/${habilidadeId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(habilidade),
-      });
+        const dataSelecionadas = await resSelecionadas.json();
+        const dataTodas = await resTodas.json();
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Erro ao atualizar habilidade:", errorText);
-        alert("Erro ao atualizar habilidade.");
-        return;
+        const selecionadasIds = dataSelecionadas.map((h: HabilidadeBNCC) => h.id);
+        const habilidadesUnificadas = [
+          ...dataSelecionadas,
+          ...dataTodas.filter((h: HabilidadeBNCC) => !selecionadasIds.includes(h.id)),
+        ];
+
+        setHabilidades(habilidadesUnificadas);
+        setSelecionadas(selecionadasIds);
+      } catch (error) {
+        console.error("Erro ao buscar habilidades BNCC:", error);
+        alert("Erro ao carregar habilidades.");
       }
+    };
 
-      alert("Habilidade atualizada com sucesso!");
-      onSave();
-      onClose();
-    } catch (err) {
-      console.error("Erro ao salvar:", err);
-      alert("Erro ao salvar habilidade.");
-    }
+    fetchTodas();
+  }, [questaoId, serieFiltro, saebFiltro]);
+
+  const toggleSelecionada = (id: number) => {
+    setSelecionadas((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
   };
 
-  if (!habilidade) return null;
+  const confirmarSelecao = () => {
+    onSave(selecionadas);
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div className="bg-white w-full max-w-2xl p-6 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Editar Habilidade BNCC</h2>
+      <div className="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl p-8">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+          Editar Habilidades da BNCC
+        </h2>
 
-        <div className="mb-4">
-          <label className="text-sm font-medium text-gray-700 block mb-1">Código</label>
-          <input
-            type="text"
-            value={habilidade.codigo}
-            onChange={(e) => setHabilidade({ ...habilidade, codigo: e.target.value })}
-            className="w-full p-3 border border-gray-300 rounded-xl"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="text-sm font-medium text-gray-700 block mb-1">Descrição</label>
-          <textarea
-            value={habilidade.descricao}
-            onChange={(e) => setHabilidade({ ...habilidade, descricao: e.target.value })}
-            className="w-full p-3 border border-gray-300 rounded-xl"
-            rows={4}
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="text-sm font-medium text-gray-700 block mb-1">Componente Curricular</label>
-          <input
-            type="text"
-            value={habilidade.componente_curricular}
-            onChange={(e) => setHabilidade({ ...habilidade, componente_curricular: e.target.value })}
-            className="w-full p-3 border border-gray-300 rounded-xl"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label className="text-sm font-medium text-gray-700 block mb-1">Série</label>
+        <div className="grid grid-cols-2 gap-4 mb-6">
           <select
-            value={habilidade.serie}
-            onChange={(e) => setHabilidade({ ...habilidade, serie: e.target.value })}
-            className="w-full p-3 border border-gray-300 rounded-xl"
+            value={serieFiltro}
+            onChange={(e) => setSerieFiltro(e.target.value)}
+            className="p-3 border border-gray-300 rounded-xl text-sm"
           >
+            <option value="">Todas as Séries</option>
             {series.map((s) => (
               <option key={s} value={s}>{s}</option>
             ))}
           </select>
+
+          <select
+            value={saebFiltro}
+            onChange={(e) => setSaebFiltro(e.target.value)}
+            className="p-3 border border-gray-300 rounded-xl text-sm"
+          >
+            <option value="">SAEB e BNCC</option>
+            <option value="true">Somente SAEB</option>
+            <option value="false">Somente BNCC</option>
+          </select>
         </div>
 
-        <div className="flex justify-end gap-4">
+        <div className="border border-gray-200 rounded-xl overflow-y-auto max-h-[300px] mb-6">
+          {habilidades.length === 0 ? (
+            <p className="text-gray-500 text-sm text-center py-6">
+              Nenhuma habilidade encontrada.
+            </p>
+          ) : (
+            habilidades.map((h) => (
+              <div
+                key={h.id}
+                className="p-4 border-b last:border-b-0 flex items-start gap-3 hover:bg-gray-50 transition"
+              >
+                <input
+                  type="checkbox"
+                  checked={selecionadas.includes(h.id)}
+                  onChange={() => toggleSelecionada(h.id)}
+                  className="mt-1 accent-blue-600"
+                />
+                <div>
+                  <p className="font-medium text-sm text-gray-800">{h.codigo}</p>
+                  <p className="text-sm text-gray-600">{h.descricao}</p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700"
+            className="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm transition"
           >
             Cancelar
           </button>
           <button
-            onClick={handleUpdate}
-            className="px-5 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700"
+            onClick={confirmarSelecao}
+            className="px-5 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 text-sm transition"
           >
-            Salvar Alterações
+            Salvar Seleção
           </button>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ModalBNCC } from "./ModalBNCC";
+import { ModalBNCCEdit } from "./ModalBNCCEdit";
 
 interface EditarQuestaoModalProps {
   questaoId: number;
@@ -285,15 +285,18 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         </div>
       </div>
 
-      {showModalBNCC && (
-        <ModalBNCC
-          componenteCurricularId={componenteId}
-          onClose={() => setShowModalBNCC(false)}
-          onSelect={(habilidades) =>
-            setCodigosBNCC(habilidades.map((h) => h.id))
-          }
-        />
-      )}
+    {showModalBNCC && (
+  <ModalBNCCEdit
+    questaoId={questaoId}
+    codigosSelecionados={codigosBNCC}
+    onClose={() => setShowModalBNCC(false)}
+    onSave={(novosCodigos) => {
+      setCodigosBNCC(novosCodigos);
+      setShowModalBNCC(false);
+    }}
+  />
+)}
+
     </div>
   );
 };
