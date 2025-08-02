@@ -24,7 +24,6 @@ const series = [
 
 export const ModalBNCCEdit = ({
   questaoId,
-  codigosSelecionados,
   onClose,
   onSave,
 }: ModalBNCCEditProps) => {
@@ -71,9 +70,29 @@ export const ModalBNCCEdit = ({
     );
   };
 
-  const confirmarSelecao = () => {
-    onSave(selecionadas);
-    onClose();
+  const confirmarSelecao = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/questoes/${questaoId}/vincular-bncc`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ codigos_bncc: selecionadas }),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error("Erro ao atualizar habilidades BNCC:", errText);
+        alert("Erro ao salvar seleção de habilidades.");
+        return;
+      }
+
+      onSave(selecionadas);
+      onClose();
+    } catch (error) {
+      console.error("Erro ao enviar dados:", error);
+      alert("Erro inesperado ao salvar seleção.");
+    }
   };
 
   return (
