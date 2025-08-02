@@ -10,7 +10,8 @@ export const LoginForm = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     const success = await login(email, senha);
     if (success) {
       navigate("/dashboard");
@@ -18,7 +19,10 @@ export const LoginForm = () => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm"
+    >
       <h1 className="text-2xl font-bold text-center text-blue-600 mb-1">SAG (Ribamar)</h1>
       <p className="text-center text-sm text-gray-600 mb-6">
         Sistema de Avaliação e Gerenciamento
@@ -38,7 +42,8 @@ export const LoginForm = () => {
         value={senha}
         onChange={(e) => setSenha(e.target.value)}
       />
-      <Button label="Entrar" onClick={handleSubmit} />
-    </div>
+
+      <Button label="Entrar" />
+    </form>
   );
 };
