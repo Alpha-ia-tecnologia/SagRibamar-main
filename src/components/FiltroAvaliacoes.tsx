@@ -13,11 +13,12 @@ export const FiltroAvaliacoes = () => {
   const [escolaId, setEscolaId] = useState("");
   const [serie, setSerie] = useState("");
   const [turmaId, setTurmaId] = useState("");
+  const [filtro, setFiltro] = useState("acertos");
 
   const { setFiltros } = useFiltroDashboard();
 
   const handleAplicarFiltros = () => {
-    setFiltros({ regiaoId, grupoId, escolaId, serie, turmaId });
+    setFiltros({ regiaoId, grupoId, escolaId, serie, turmaId, filtro });
   };
 
   return (
@@ -29,7 +30,7 @@ export const FiltroAvaliacoes = () => {
         <SelectEscola regiaoId={regiaoId} grupoId={grupoId} value={escolaId} onChange={setEscolaId} />
         <SelectSerie escolaId={escolaId} value={serie} onChange={setSerie} />
         <SelectTurma escolaId={escolaId} serie={serie} value={turmaId} onChange={setTurmaId} />
-        <SelectResultado value="" onChange={() => {}} />
+        <SelectResultado value={filtro} onChange={setFiltro} />
       </div>
       <div className="flex justify-end">
         <button

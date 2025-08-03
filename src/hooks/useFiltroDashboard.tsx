@@ -6,7 +6,9 @@ interface Filtros {
   escolaId?: string;
   serie?: string;
   turmaId?: string;
+  filtro?: string; 
 }
+
 
 interface FiltroContextType {
   filtros: Filtros;

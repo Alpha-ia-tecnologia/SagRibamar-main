@@ -8,13 +8,25 @@ import { GraficoComponentesCurriculares } from "../components/GraficoComponentes
 import { GraficoRankingRegioes } from "../components/GraficoRankingRegioes";
 import { TabelaHabilidadesBNCC } from "../components/TabelaHabilidadesBNCC";
 import { RankingAlunos } from "../components/RankingAlunos";
-
-const EXPORT_URL = `${import.meta.env.VITE_API_URL}/api/dashboard/export-xlsx`;
+import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
 
 export const DashboardPage = () => {
+  const { filtros } = useFiltroDashboard();
+
   const handleExport = async () => {
     try {
-      const response = await fetch(EXPORT_URL, {
+      const params = new URLSearchParams();
+
+      if (filtros.regiaoId) params.append("regiao_id", filtros.regiaoId);
+      if (filtros.grupoId) params.append("grupo_id", filtros.grupoId);
+      if (filtros.escolaId) params.append("escola_id", filtros.escolaId);
+      if (filtros.serie) params.append("serie", filtros.serie);
+      if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
+      if (filtros.filtro) params.append("filtro", filtros.filtro);
+
+      const url = `${import.meta.env.VITE_API_URL}/api/dashboard/export-xlsx?${params.toString()}`;
+
+      const response = await fetch(url, {
         method: "GET",
       });
 
@@ -23,16 +35,14 @@ export const DashboardPage = () => {
       }
 
       const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-
+      const fileURL = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url;
+      a.href = fileURL;
       a.download = "dados-dashboard.xlsx";
       document.body.appendChild(a);
       a.click();
       a.remove();
-      window.URL.revokeObjectURL(url); 
-
+      window.URL.revokeObjectURL(fileURL);
     } catch (err) {
       console.error(err);
       alert("Erro ao exportar o arquivo");
