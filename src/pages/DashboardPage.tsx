@@ -22,7 +22,8 @@ export const DashboardPage = () => {
       if (filtros.escolaId) params.append("escola_id", filtros.escolaId);
       if (filtros.serie) params.append("serie", filtros.serie);
       if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
-      if (filtros.filtro) params.append("filtro", filtros.filtro);
+      if (filtros.filtro) params.append("tipo_filtro", filtros.filtro); 
+      if (filtros.provaId) params.append("prova_id", filtros.provaId);   
 
       const url = `${import.meta.env.VITE_API_URL}/api/dashboard/export-xlsx?${params.toString()}`;
 

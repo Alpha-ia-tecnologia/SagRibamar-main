@@ -31,6 +31,7 @@ export const DashboardResumo = () => {
     if (filtros.escolaId) queryParams.append("escola_id", filtros.escolaId);
     if (filtros.serie) queryParams.append("serie", filtros.serie);
     if (filtros.turmaId) queryParams.append("turma_id", filtros.turmaId);
+    if (filtros.provaId) queryParams.append("prova_id", filtros.provaId); 
 
     setLoading(true);
 
@@ -51,44 +52,43 @@ export const DashboardResumo = () => {
   }
 
   const cards = [
-  {
-    label: "Escolas",
-    valor: stats.total_escolas ?? 0,
-    icon: <BuildingLibraryIcon className="w-6 h-6 text-blue-700" />,
-    bg: "bg-blue-100"
-  },
-  {
-    label: "Turmas",
-    valor: stats.total_turmas ?? 0,
-    icon: <UsersIcon className="w-6 h-6 text-green-700" />,
-    bg: "bg-green-100"
-  },
-  {
-    label: "Alunos",
-    valor: stats.total_alunos ?? 0,
-    icon: <AcademicCapIcon className="w-6 h-6 text-purple-700" />,
-    bg: "bg-purple-100"
-  },
-  {
-    label: "Provas",
-    valor: stats.total_provas ?? 0,
-    icon: <DocumentTextIcon className="w-6 h-6 text-yellow-700" />,
-    bg: "bg-yellow-100"
-  },
-  {
-    label: "Participação",
-    valor: typeof stats.participacao === "number" ? `${stats.participacao.toFixed(2)}%` : "0%",
-    icon: <ChartPieIcon className="w-6 h-6 text-red-700" />,
-    bg: "bg-red-100"
-  },
-  {
-    label: "Média Geral",
-    valor: typeof stats.media_geral === "number" ? stats.media_geral.toFixed(2) : "0.00",
-    icon: <CalculatorIcon className="w-6 h-6 text-indigo-700" />,
-    bg: "bg-indigo-100"
-  }
-];
-
+    {
+      label: "Escolas",
+      valor: stats.total_escolas ?? 0,
+      icon: <BuildingLibraryIcon className="w-6 h-6 text-blue-700" />,
+      bg: "bg-blue-100"
+    },
+    {
+      label: "Turmas",
+      valor: stats.total_turmas ?? 0,
+      icon: <UsersIcon className="w-6 h-6 text-green-700" />,
+      bg: "bg-green-100"
+    },
+    {
+      label: "Alunos",
+      valor: stats.total_alunos ?? 0,
+      icon: <AcademicCapIcon className="w-6 h-6 text-purple-700" />,
+      bg: "bg-purple-100"
+    },
+    {
+      label: "Provas",
+      valor: stats.total_provas ?? 0,
+      icon: <DocumentTextIcon className="w-6 h-6 text-yellow-700" />,
+      bg: "bg-yellow-100"
+    },
+    {
+      label: "Participação",
+      valor: typeof stats.participacao === "number" ? `${stats.participacao.toFixed(2)}%` : "0%",
+      icon: <ChartPieIcon className="w-6 h-6 text-red-700" />,
+      bg: "bg-red-100"
+    },
+    {
+      label: "Média Geral",
+      valor: typeof stats.media_geral === "number" ? stats.media_geral.toFixed(2) : "0.00",
+      icon: <CalculatorIcon className="w-6 h-6 text-indigo-700" />,
+      bg: "bg-indigo-100"
+    }
+  ];
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 my-6">

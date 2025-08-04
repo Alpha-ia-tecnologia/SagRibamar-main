@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-interface Regiao {
+interface Prova {
   id: number;
   nome: string;
 }
@@ -11,13 +11,13 @@ interface Props {
 }
 
 export const SelectProvas = ({ value, onChange }: Props) => {
-  const [regioes, setRegioes] = useState<Regiao[]>([]);
+  const [provas, setProvas] = useState<Prova[]>([]);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/provas`)
       .then((res) => res.json())
-      .then((data) => setRegioes(data || []))
-      .catch(() => setRegioes([]));
+      .then((data) => setProvas(data || []))
+      .catch(() => setProvas([]));
   }, []);
 
   return (
@@ -29,9 +29,9 @@ export const SelectProvas = ({ value, onChange }: Props) => {
         onChange={(e) => onChange(e.target.value)}
       >
         <option value="">Todas as Provas</option>
-        {regioes.map((r) => (
-          <option key={r.id} value={r.id.toString()}>
-            {r.nome}
+        {provas.map((prova) => (
+          <option key={prova.id} value={prova.id.toString()}>
+            {prova.nome}
           </option>
         ))}
       </select>
