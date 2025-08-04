@@ -1,4 +1,5 @@
 import { Plus } from "lucide-react";
+import { ImportAlunosModal } from "../components/modals/ImportAlunosModal ";
 
 interface PageHeaderProps {
   title: string;
@@ -6,6 +7,7 @@ interface PageHeaderProps {
   actionLabel?: string;
   onActionClick?: () => void;
   icon?: React.ReactNode;
+  actionsRight?: React.ReactNode;
 }
 
 export const PageHeader = ({
@@ -14,9 +16,10 @@ export const PageHeader = ({
   actionLabel = "Novo",
   onActionClick,
   icon = <Plus size={16} />,
+  actionsRight,
 }: PageHeaderProps) => {
   return (
-    <div className="flex items-center justify-between bg-white p-6 rounded-lg shadow-sm mb-4">
+    <div className="w-full flex items-center justify-between bg-white p-6 rounded-lg shadow-sm mb-6">
       <div>
         <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
         {description && (
@@ -24,15 +27,18 @@ export const PageHeader = ({
         )}
       </div>
 
-      {onActionClick && (
-        <button
-          onClick={onActionClick}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md transition"
-        >
-          {icon}
-          {actionLabel}
-        </button>
-      )}
+      <div className="flex items-center gap-3">
+        {onActionClick && (
+          <button
+            onClick={onActionClick}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md transition"
+          >
+            {icon}
+            {actionLabel}
+          </button>
+        )}
+        {actionsRight}
+      </div>
     </div>
   );
 };
