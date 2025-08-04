@@ -44,7 +44,8 @@ export const RankingAlunos = () => {
         if (filtros.grupoId) params.append("grupo_id", filtros.grupoId);
         if (filtros.escolaId) params.append("escola_id", filtros.escolaId);
         if (filtros.serie) params.append("serie", filtros.serie);
-        if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
+        if (filtros.turmaId) params.append("turma_id", filtros.turmaId); 
+        if (filtros.provaId) params.append("prova_id", filtros.provaId); 
 
         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/dashboard/student-ranking?${params.toString()}`);
         const json: ApiResponse = await res.json();
@@ -152,7 +153,7 @@ export const RankingAlunos = () => {
                   <td className="px-4 py-3">{aluno.escola_nome}</td>
                   <td className="px-4 py-3">{aluno.turma_nome}</td>
                   <td className="px-4 py-3 text-blue-700 font-semibold">
-                    {parseFloat(aluno.media_geral.toString()).toFixed(1)}%
+                    {aluno.media_geral.toFixed(1)}%
                     <span className="text-gray-400 text-xs ml-1">
                       ({aluno.total_desempenhos} avaliações)
                     </span>

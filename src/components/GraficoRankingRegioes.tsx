@@ -46,6 +46,7 @@ export const GraficoRankingRegioes = () => {
         if (filtros.escolaId) params.append("escola_id", filtros.escolaId);
         if (filtros.serie) params.append("serie", filtros.serie);
         if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
+        if (filtros.provaId) params.append("prova_id", filtros.provaId); // ✅ corrigido
 
         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/dashboard/regional-performance?${params.toString()}`);
         const data = await res.json();
@@ -112,7 +113,9 @@ export const GraficoRankingRegioes = () => {
         </div>
         <div className="bg-gray-50 border rounded-xl p-4 text-center">
           <p className="text-gray-500">Melhor Região</p>
-          <p className="text-lg font-semibold text-blue-700">{estatisticas.melhor_regiao || "—"}</p>
+          <p className="text-lg font-semibold text-blue-700">
+            {estatisticas.melhor_regiao || "—"}
+          </p>
         </div>
       </div>
     </div>
