@@ -6,6 +6,7 @@ import { SelectEscola } from "./selects/SelectEscola";
 import { SelectSerie } from "./selects/SelectSerie";
 import { SelectTurma } from "./selects/SelectTurma";
 import { SelectResultado } from "./selects/SelectResultado";
+import {SelectProvas} from "./selects/SelectProvas"
 
 export const FiltroAvaliacoes = () => {
   const [regiaoId, setRegiaoId] = useState("");
@@ -13,6 +14,7 @@ export const FiltroAvaliacoes = () => {
   const [escolaId, setEscolaId] = useState("");
   const [serie, setSerie] = useState("");
   const [turmaId, setTurmaId] = useState("");
+  const [provaId, setprovaId] = useState("");
   const [filtro, setFiltro] = useState("acertos");
 
   const { setFiltros } = useFiltroDashboard();
@@ -31,8 +33,7 @@ export const FiltroAvaliacoes = () => {
         <SelectSerie escolaId={escolaId} value={serie} onChange={setSerie} />
         <SelectTurma escolaId={escolaId} serie={serie} value={turmaId} onChange={setTurmaId} />
         <SelectResultado value={filtro} onChange={setFiltro} />
-      </div>
-      <div className="flex justify-end">
+        <SelectProvas value={provaId} onChange={setprovaId} />
         <button
           onClick={handleAplicarFiltros}
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
