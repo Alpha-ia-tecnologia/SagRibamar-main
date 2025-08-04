@@ -7,6 +7,7 @@ interface Filtros {
   serie?: string;
   turmaId?: string;
   filtro?: string; 
+   provaId?: string;
 }
 
 
