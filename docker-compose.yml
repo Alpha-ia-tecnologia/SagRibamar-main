@@ -10,6 +10,7 @@ services:
       - NODE_ENV=production
     networks:
       - sag-front-network
+      - easypanel
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.front-sag-ribamar.rule=Host('localhost')"
