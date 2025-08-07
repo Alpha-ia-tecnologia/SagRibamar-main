@@ -15,10 +15,10 @@ services:
       - NODE_ENV=production
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.salf-front.rule=Host('localhost')"
-      - "traefik.http.routers.salf-front.entrypoint=websecure"
-      - traefik.http.routers.salf-front.tls=true
-      - traefik.http.routers.salf-front.tls.certresolver=letsencrypt
+      - "traefik.http.routers.front-sag-ribamar.rule=Host('localhost')"
+      - "traefik.http.routers.front-sag-ribamar.entrypoint=websecure"
+      - traefik.http.routers.front-sag-ribamar.tls=true
+      - traefik.http.routers.front-sag-ribamar.tls.certresolver=letsencrypt
   volumes:
   nginx_data:
     driver:
