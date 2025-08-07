@@ -9,6 +9,8 @@ services:
     environment:
       - NODE_ENV=production
     labels:
-      - "traefik.enable=true"  # Habilita o Traefik para esse serviço
-      - "traefik.http.routers.front-sag-ribamar.rule=Host(`144.126.137.156`)"  # Defina o IP ou domínio de acesso
-      - "traefik.http.services.front-sag-ribamar.loadbalancer.server.port=80"
+      - "traefik.enable=true"
+      - "traefik.http.routers.salf-front.rule=Host('localhost')"
+      - "traefik.http.routers.salf-front.entrypoint=websecure"
+      - traefik.http.routers.salf-front.tls=true
+      - traefik.http.routers.salf-front.tls.certresolver=letsencrypt
