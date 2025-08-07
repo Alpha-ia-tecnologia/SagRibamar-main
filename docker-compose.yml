@@ -3,41 +3,21 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: front-sag-ribamar
     ports:
       - "8085:80"
-    volumes:
-      - nginx_data:/var/www/html/sag
-    networks:
-      - sag-front-network
     restart: unless-stopped
     environment:
       - NODE_ENV=production
+    networks:
+      - sag-front-network
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.front-sag-ribamar.rule=Host('localhost')"
-      - "traefik.http.routers.front-sag-ribamar.entrypoint=websecure"
-      - traefik.http.routers.front-sag-ribamar.tls=true
+      - "traefik.http.routers.front-sag-ribamar.entrypoint=https"
+      - traefik.http.services.salf-api.loadbalancer.server.port=8085
+      - traefik.http.routers.sfront-sag-ribamar.tls=true
       - traefik.http.routers.front-sag-ribamar.tls.certresolver=letsencrypt
-
-  nginx-service:
-    build:
-      context: .
-      dockerfile: Dockerfile.nginx  # Referência ao novo Dockerfile para o serviço Nginx
-    container_name: nginx-service
-    ports:
-      - "8086:80"  # Altere a porta conforme necessário
-    volumes:
-      - nginx_data:/usr/share/nginx/html  # Volume compartilhado para os dados do Nginx
-    networks:
-      - sag-front-network
-    restart: unless-stopped
-
-volumes:
-  nginx_data:  # Removido o 'driver: local', agora usa o driver padrão
-
 networks:
   sag-front-network:
-    driver: bridge
-  easypanel:
+easypanel:
     external: true
