@@ -1,5 +1,4 @@
 import { Plus } from "lucide-react";
-import { ImportAlunosModal } from "../components/modals/ImportAlunosModal ";
 
 interface PageHeaderProps {
   title: string;
