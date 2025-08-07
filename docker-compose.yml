@@ -8,3 +8,7 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
+    labels:
+      - "traefik.enable=true"  # Habilita o Traefik para esse serviço
+      - "traefik.http.routers.front-sag-ribamar.rule=Host(`144.126.137.156`)"  # Defina o IP ou domínio de acesso
+      - "traefik.http.services.front-sag-ribamar.loadbalancer.server.port=80"
