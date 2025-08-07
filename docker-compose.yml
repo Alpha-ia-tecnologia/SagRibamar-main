@@ -20,5 +20,5 @@ services:
       - traefik.http.routers.front-sag-ribamar.tls.certresolver=letsencrypt
 networks:
   sag-front-network:
-easypanel:
+  easypanel:
     external: true
