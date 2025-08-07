@@ -3,8 +3,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+     container_name: front-sag-ribamar
     ports:
       - "8085:80"
+    volumes:
+      - nginx_data:/var/www/html/sag
+    networks:
+      - sag-front-network
     restart: unless-stopped
     environment:
       - NODE_ENV=production
@@ -14,3 +19,13 @@ services:
       - "traefik.http.routers.salf-front.entrypoint=websecure"
       - traefik.http.routers.salf-front.tls=true
       - traefik.http.routers.salf-front.tls.certresolver=letsencrypt
+  volumes:
+  nginx_data:
+    driver:
+      local
+
+networks:
+  sag-front-network:
+    driver: bridge
+  easypanel:
+    external: true
