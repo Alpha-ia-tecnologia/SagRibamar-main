@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-     container_name: front-sag-ribamar
+    container_name: front-sag-ribamar
     ports:
       - "8085:80"
     volumes:
@@ -19,13 +19,25 @@ services:
       - "traefik.http.routers.front-sag-ribamar.entrypoint=websecure"
       - traefik.http.routers.front-sag-ribamar.tls=true
       - traefik.http.routers.front-sag-ribamar.tls.certresolver=letsencrypt
-  volumes:
-  nginx_data:
-    driver:
-      local
+
+  nginx-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx  # Referência ao novo Dockerfile para o serviço Nginx
+    container_name: nginx-service
+    ports:
+      - "8080:80"  # Altere a porta conforme necessário
+    volumes:
+      - nginx_data:/usr/share/nginx/html  # Volume compartilhado para os dados do Nginx
+    networks:
+      - sag-front-network
+    restart: unless-stopped
+
+volumes:
+  nginx_data:  # Removido o 'driver: local', agora usa o driver padrão
 
 networks:
   sag-front-network:
     driver: bridge
   easypanel:
-    external: true
+    external: true
