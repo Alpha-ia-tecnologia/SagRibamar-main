@@ -11,12 +11,26 @@ export const ImportAlunosModal = ({ onClose, onSuccess }: ImportAlunosModalProps
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleDownloadModelo = () => {
-    const link = document.createElement("a");
-    link.href = "/modelo-importacao.xlsx"; 
-    link.download = "modelo-importacao.xlsx";
+  const handleDownloadModelo = async () => {
+  const apiUrl = import.meta.env.VITE_API_URL; // Obtém a URL da API
+  const response = await fetch(`${apiUrl}/api/export/template-importacao`, {
+    method: 'GET',
+    headers: {
+      'accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    }
+  });
+
+  if (response.ok) {
+    const blob = await response.blob();
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'modelo-importacao.xlsx';
     link.click();
-  };
+  } else {
+    console.error('Erro ao baixar o modelo:', response.statusText);
+  }
+};
+
 
   const handleSubmit = async () => {
     if (!file) {
