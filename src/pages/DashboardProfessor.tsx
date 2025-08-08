@@ -1,6 +1,5 @@
 import { Header } from "../components/Header";
 import { PageHeader } from "../ui/PageHeader";
-
 export default function DashboardProfessor() {
   return (
     <>
