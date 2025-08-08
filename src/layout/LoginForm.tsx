@@ -2,13 +2,13 @@ import { InputField } from "../ui/InputField";
 import { Button } from "../components/Button";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../hooks/useAuth"; 
 
 export const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, loading, error } = useAuth(); 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +43,9 @@ export const LoginForm = () => {
         onChange={(e) => setSenha(e.target.value)}
       />
 
-      <Button label="Entrar" />
+      {error && <p className="text-red-600 text-center mb-4">{error}</p>} 
+
+      <Button label={loading ? "Carregando..." : "Entrar"} disabled={loading} />
     </form>
   );
 };
