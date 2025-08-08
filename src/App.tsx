@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { LoginPage } from "./pages/Login";
 import { DashboardPage } from "./pages/DashboardPage";
+import DashboardProfessor from "./pages/DashboardProfessor";
 import EscolasPage from "./pages/EscolasPage";
 import TurmasPage from "./pages/TurmasPage";
 import AlunosPage from "./pages/AlunosPage";
@@ -23,6 +24,7 @@ function App() {
 
   const isAdmin = user.tipo_usuario === "ADMINISTRADOR";
   const isGestor = user.tipo_usuario === "GESTOR";
+  const isProfessor = user.tipo_usuario === "PROFESSOR"
 
   return (
     <Routes>
@@ -46,7 +48,8 @@ function App() {
           <Route path="/gabaritos" element={<GabaritoPage />} />
         </>
       )}
-
+        {/* Só PROFESSOR tem acesso a dashboard */}
+      {isProfessor && <Route path="/dashboardprofessor" element={<DashboardProfessor/>}/>}
       {/* Só ADMINISTRADOR tem acesso a usuários */}
       {isAdmin && <Route path="/usuarios" element={<UsuariosPage />} />}
     </Routes>
