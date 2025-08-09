@@ -1,6 +1,19 @@
 import { Header } from "../components/Header";
 import { PageHeader } from "../ui/PageHeader";
 import { BuildingLibraryIcon, UsersIcon, DocumentTextIcon, ChartPieIcon, CalculatorIcon } from "@heroicons/react/24/solid";
+import { Bar } from "react-chartjs-2";
+import { useState, useEffect } from "react";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+} from "chart.js";
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export default function DashboardProfessor() {
   // Dados fakes
@@ -45,6 +58,56 @@ export default function DashboardProfessor() {
     }
   ];
 
+  // Dados falsos para o gráfico
+  const [dados, setDados] = useState([
+    { prova_nome: "Prova 1", percentual_acertos: 72 },
+    { prova_nome: "Prova 2", percentual_acertos: 76 },
+    { prova_nome: "Prova 3", percentual_acertos: 70 },
+  ]);
+
+  const chartData = {
+    labels: dados.map((item) => item.prova_nome),
+    datasets: [
+      {
+        label: "Percentual de Acertos (%)",
+        data: dados.map((item) => item.percentual_acertos),
+        backgroundColor: "rgba(139, 92, 246, 0.5)",
+        borderColor: "rgba(139, 92, 246, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true,
+        position: "top" as const,
+      },
+      title: {
+        display: false,
+        text: "Desempenho por Avaliação",
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 100,
+        title: {
+          display: true,
+          text: "Percentual de acertos (%)",
+        },
+      },
+      x: {
+        title: {
+          display: true,
+          text: "Avaliações",
+        },
+      },
+    },
+  };
+
   return (
     <>
       <Header />
@@ -72,6 +135,18 @@ export default function DashboardProfessor() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Gráfico de Desempenho das Avaliações */}
+        <div className="bg-white p-6 rounded-xl shadow mt-6">
+          <h2 className="text-lg font-semibold mb-4 text-gray-800">
+            Notas Médias por Avaliação
+          </h2>
+          {dados.length === 0 ? (
+            <p className="text-gray-500 text-sm">Nenhum dado encontrado com os filtros aplicados.</p>
+          ) : (
+            <Bar data={chartData} options={options} />
+          )}
         </div>
       </div>
     </>
