@@ -167,6 +167,13 @@ const alunosFakes = Array.from({ length: 100 }, (_, index) => ({
 export default function DashboardProfessor() {
   const [selecionada, setSelecionada] = useState(null);
   const [filtroOrdem, setFiltroOrdem] = useState<"acertos" | "erros">("acertos");
+
+  // Filtros
+  const [escolaId, setEscolaId] = useState("");
+  const [turmaId, setTurmaId] = useState("");
+  const [alunoId, setAlunoId] = useState("");
+  const [provaId, setProvaId] = useState("");
+
   const [page, setPage] = useState(1);
   const itemsPerPage = 10; // Altere o número de alunos por página, se necessário
   const startIndex = (page - 1) * itemsPerPage;
@@ -196,6 +203,15 @@ export default function DashboardProfessor() {
     return buttons;
   };
 
+  const handleAplicarFiltros = () => {
+    console.log("Filtros aplicados:", {
+      escolaId,
+      turmaId,
+      alunoId,
+      provaId,
+    });
+  };
+
   return (
     <>
       <Header />
@@ -204,7 +220,80 @@ export default function DashboardProfessor() {
           title="Dashboard"
           description="Visão geral do Sistema de Avaliação e Gerenciamento"
         />
-        
+
+        {/* Filtros Fake Implementados Aqui */}
+        <div className="bg-white p-6 rounded-xl shadow-md space-y-4">
+          <h3 className="text-lg font-semibold mb-2">Filtro de Avaliações</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Filtro de Escola */}
+            <div>
+              <label className="text-sm text-gray-600 mb-1 block">Escola</label>
+              <select
+                className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-white text-gray-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                value={escolaId}
+                onChange={(e) => setEscolaId(e.target.value)}
+              >
+                <option value="">Selecione uma escola</option>
+                <option value="1">Escola A</option>
+                <option value="2">Escola B</option>
+              </select>
+            </div>
+
+            {/* Filtro de Turma */}
+            <div>
+              <label className="text-sm text-gray-600 mb-1 block">Turma</label>
+              <select
+                className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-white text-gray-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                value={turmaId}
+                onChange={(e) => setTurmaId(e.target.value)}
+              >
+                <option value="">Selecione uma turma</option>
+                <option value="1">Turma A</option>
+                <option value="2">Turma B</option>
+              </select>
+            </div>
+
+            {/* Filtro de Alunos */}
+            <div>
+              <label className="text-sm text-gray-600 mb-1 block">Aluno</label>
+              <select
+                className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-white text-gray-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                value={alunoId}
+                onChange={(e) => setAlunoId(e.target.value)}
+              >
+                <option value="">Selecione um aluno</option>
+                {alunosFakes.map((aluno) => (
+                  <option key={aluno.aluno_id} value={aluno.aluno_id}>
+                    {aluno.aluno_nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Filtro de Provas */}
+            <div>
+              <label className="text-sm text-gray-600 mb-1 block">Prova</label>
+              <select
+                className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-white text-gray-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                value={provaId}
+                onChange={(e) => setProvaId(e.target.value)}
+              >
+                <option value="">Selecione uma prova</option>
+                <option value="1">Prova 1</option>
+                <option value="2">Prova 2</option>
+              </select>
+            </div>
+          </div>
+
+          <button
+            onClick={handleAplicarFiltros}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Aplicar Filtros
+          </button>
+        </div>
+
         {/* Seção de resumo (Turmas, Alunos, Provas, Participação, Média Geral) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 my-6">
           {[
@@ -233,20 +322,6 @@ export default function DashboardProfessor() {
         <div className="p-6 bg-white rounded-xl shadow-md mt-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold">Habilidades BNCC / SAEB</h2>
-            <div className="flex gap-2">
-              <button
-                onClick={() => { setFiltroOrdem("erros"); }}
-                className={`px-3 py-1 text-sm rounded ${filtroOrdem === "erros" ? "bg-red-500 text-white" : "bg-red-100 text-red-600 hover:bg-red-200"}`}
-              >
-                Mais Críticas
-              </button>
-              <button
-                onClick={() => { setFiltroOrdem("acertos"); }}
-                className={`px-3 py-1 text-sm rounded ${filtroOrdem === "acertos" ? "bg-green-500 text-white" : "bg-green-100 text-green-600 hover:bg-green-200"}`}
-              >
-                Melhores Resultados
-              </button>
-            </div>
           </div>
 
           {/* Cards de habilidades BNCC */}
