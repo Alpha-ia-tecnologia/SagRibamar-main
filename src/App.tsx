@@ -26,19 +26,12 @@ function App() {
   const isGestor = user.tipo_usuario === "GESTOR";
   const isProfessor = user.tipo_usuario === "PROFESSOR"
 
-  return (
+ return (
+  <FiltroDashboardProvider>
     <Routes>
       <Route path="/" element={<LoginPage />} />
-      <Route
-        path="/dashboard"
-        element={
-          <FiltroDashboardProvider>
-            <DashboardPage />
-          </FiltroDashboardProvider>
-        }
-      />
+      <Route path="/dashboard" element={<DashboardPage />} />
 
-      {/* Apenas ADMINISTRADOR e outros tipos (exceto GESTOR) */}
       {(isAdmin || !isGestor) && (
         <>
           <Route path="/escolas" element={<EscolasPage />} />
@@ -48,12 +41,15 @@ function App() {
           <Route path="/gabaritos" element={<GabaritoPage />} />
         </>
       )}
-        {/* Só PROFESSOR tem acesso a dashboard */}
-      {isProfessor && <Route path="/dashboardprofessor" element={<DashboardProfessor/>}/>}
-      {/* Só ADMINISTRADOR tem acesso a usuários */}
+
+      {isProfessor && (
+        <Route path="/dashboardprofessor" element={<DashboardProfessor />} />
+      )}
+
       {isAdmin && <Route path="/usuarios" element={<UsuariosPage />} />}
     </Routes>
-  );
-}
+  </FiltroDashboardProvider>
+);
 
+}
 export default App;
