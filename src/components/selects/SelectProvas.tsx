@@ -14,7 +14,7 @@ export const SelectProvas = ({ value, onChange }: Props) => {
   const [provas, setProvas] = useState<Prova[]>([]);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/provas`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/provas?page=1&limit=200`)
       .then((res) => res.json())
       .then((data) => setProvas(data || []))
       .catch(() => setProvas([]));

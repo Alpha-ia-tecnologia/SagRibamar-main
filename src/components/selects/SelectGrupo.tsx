@@ -17,7 +17,7 @@ export const SelectGrupo = ({ regiaoId, value, onChange }: Props) => {
   useEffect(() => {
     const endpoint = regiaoId
       ? `${import.meta.env.VITE_API_URL}/api/grupos?regiao_id=${regiaoId}`
-      : `${import.meta.env.VITE_API_URL}/api/grupos`;
+      : `${import.meta.env.VITE_API_URL}/api/grupos?page=1&limit=200`;
 
     fetch(endpoint)
       .then((res) => res.json())

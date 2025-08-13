@@ -23,7 +23,7 @@ export const SelectEscola = ({ regiaoId, grupoId, value, onChange }: Props) => {
     if (regiaoId) params.append("regiao_id", regiaoId);
     if (grupoId) params.append("grupo_id", grupoId);
 
-    const url = `${import.meta.env.VITE_API_URL}/api/escolas?${params.toString()}`;
+    const url = `${import.meta.env.VITE_API_URL}/api/escolas?page=1&limit=200${params.toString()}`;
 
     fetch(url)
       .then(res => res.json())

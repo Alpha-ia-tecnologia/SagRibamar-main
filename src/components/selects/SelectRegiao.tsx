@@ -14,7 +14,7 @@ export const SelectRegiao = ({ value, onChange }: Props) => {
   const [regioes, setRegioes] = useState<Regiao[]>([]);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/regioes`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/regioes?page=1&limit=200`)
       .then((res) => res.json())
       .then((data) => setRegioes(data || []))
       .catch(() => setRegioes([]));
