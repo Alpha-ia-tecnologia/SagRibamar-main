@@ -46,7 +46,7 @@ export const ImportAlunosModal = ({ onClose, onSuccess }: ImportAlunosModalProps
     formData.append("file", file);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/import-csv/import`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/importacao/alunos-excel`, {
         method: "POST",
         body: formData,
       });
