@@ -84,7 +84,7 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
     "SEGUNDA_SERIE", "TERCEIRA_SERIE", "PRIMEIRO_E_SEGUNDO_ANOS",
     "TERCEIRO_AO_QUINTO_ANO", "PRIMEIRO_AO_QUINTO_ANO", "EJA"
   ];
-  const dificuldades = ["FACIL", "MEDIA", "DIFICIL"];
+  const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/componentes-curriculares`)
