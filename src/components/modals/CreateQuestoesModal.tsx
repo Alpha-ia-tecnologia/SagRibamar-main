@@ -44,7 +44,7 @@ const formatarTextoSelect = (texto: string) => {
 
   const mapaDificuldades: Record<string, string> = {
     FACIL: "Fácil",
-    MEDIA: "Média",
+    MEDIO: "Média",
     DIFICIL: "Difícil"
   };
 
