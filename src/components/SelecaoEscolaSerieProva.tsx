@@ -90,7 +90,7 @@ export const SelecaoEscolaSerieProva = () => {
     };
 
     try {
-      const res = await fetch("https://gerador-gabarito-gerador-gabarito.lh6c5d.easypanel.host/api/gerar-gabarito/", {
+      const res = await fetch("https://gerador-gabarito-corretor-experimental.lh6c5d.easypanel.host/api/leitor/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
