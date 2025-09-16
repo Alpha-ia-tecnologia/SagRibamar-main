@@ -34,6 +34,7 @@ export const EditarQuestaoModal = ({
   const [componentes, setComponentes] = useState<ComponenteCurricular[]>([]);
   const [codigosBNCC, setCodigosBNCC] = useState<number[]>([]);
   const [showModalBNCC, setShowModalBNCC] = useState(false);
+  const [habilidadesSelecionadas, setHabilidadesSelecionadas] = useState<{ id: number; codigo: string }[]>([]);
 
   const niveis = ["ANOS_INICIAIS", "ANOS_FINAIS", "ENSINO_MEDIO"];
   const series = [
@@ -75,6 +76,16 @@ export const EditarQuestaoModal = ({
     fetch(`${import.meta.env.VITE_API_URL}/api/componentes-curriculares`)
       .then((res) => res.json())
       .then((data) => setComponentes(data || []));
+
+    // Carrega habilidades BNCC já vinculadas para exibição/remoção
+    fetch(`${import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`)
+      .then((res) => res.json())
+      .then((lista) => {
+        if (Array.isArray(lista)) {
+          setHabilidadesSelecionadas(lista.map((h: { id: number; codigo: string }) => ({ id: h.id, codigo: h.codigo })));
+        }
+      })
+      .catch(() => {});
   }, [questaoId]);
 
 const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -243,8 +254,37 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           onClick={() => setShowModalBNCC(true)}
           className="w-full mb-6 px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 hover:bg-gray-100 text-sm"
         >
-          + Selecionar Habilidades BNCC/SAEB
+          {habilidadesSelecionadas.length > 0
+            ? (() => {
+                const maxToShow = 2;
+                const shown = habilidadesSelecionadas.slice(0, maxToShow).map(h => h.codigo).join(", ");
+                const remaining = habilidadesSelecionadas.length - maxToShow;
+                return remaining > 0 ? `${shown} +${remaining}` : shown;
+              })()
+            : '+ Selecionar Habilidades BNCC/SAEB'}
         </button>
+
+        {habilidadesSelecionadas.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-6">
+            {habilidadesSelecionadas.map((h) => (
+              <span key={h.id} className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-full text-xs bg-blue-50 text-blue-700 border border-blue-200">
+                {h.codigo}
+                <button
+                  type="button"
+                  onClick={() => {
+                    // Remoção local
+                    setHabilidadesSelecionadas(prev => prev.filter(x => x.id !== h.id));
+                    setCodigosBNCC(prev => prev.filter(id => id !== h.id));
+                  }}
+                  className="ml-1 text-blue-600 hover:text-blue-800"
+                  aria-label={`Remover ${h.codigo}`}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
 
         {alternativas.map((alt, i) => (
           <div key={i} className="flex items-center gap-3 mb-3">
@@ -293,6 +333,15 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     onSave={(novosCodigos) => {
       setCodigosBNCC(novosCodigos);
       setShowModalBNCC(false);
+      // Recarrega habilidades para refletir chips e botão
+      fetch(`${import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`)
+        .then((res) => res.json())
+        .then((lista) => {
+          if (Array.isArray(lista)) {
+            setHabilidadesSelecionadas(lista.map((h: { id: number; codigo: string }) => ({ id: h.id, codigo: h.codigo })));
+          }
+        })
+        .catch(() => {});
     }}
   />
 )}

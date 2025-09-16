@@ -74,8 +74,10 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
   const [componenteId, setComponenteId] = useState(0);
   const [componentes, setComponentes] = useState<ComponenteCurricular[]>([]);
   const [codigosBNCC, setCodigosBNCC] = useState<number[]>([]);
+  const [habilidadesSelecionadas, setHabilidadesSelecionadas] = useState<{ id: number; codigo: string }[]>([]);
   const [showModalBNCC, setShowModalBNCC] = useState(false);
   const [foiSalva, setFoiSalva] = useState(false);
+  const [proficienciaSaebId, setProficienciaSaebId] = useState<number | null>(null);
 
   const niveis = ["ANOS_INICIAIS", "ANOS_FINAIS", "ENSINO_MEDIO"];
   const series = [
@@ -149,6 +151,8 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
     setPontos(1);
     setComponenteId(0);
     setCodigosBNCC([]);
+    setHabilidadesSelecionadas([]);
+    setProficienciaSaebId(null);
     setFoiSalva(false);
   };
 
@@ -161,10 +165,13 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
       serie,
       pontos,
       prova_id: provaId,
+      proficiencia_saeb_id: proficienciaSaebId,
       componente_curricular_id: componenteId,
       codigos_bncc: codigosBNCC,
       alternativas
     };
+
+    
 
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/questoes`, {
@@ -249,8 +256,36 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
           onClick={() => setShowModalBNCC(true)}
           className="w-full mb-6 px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 hover:bg-gray-100 text-sm text-gray-700 transition-all"
         >
-          + Selecionar Habilidades BNCC/SAEB
+          {habilidadesSelecionadas.length > 0
+            ? (() => {
+                const maxToShow = 2;
+                const shown = habilidadesSelecionadas.slice(0, maxToShow).map(h => h.codigo).join(", ");
+                const remaining = habilidadesSelecionadas.length - maxToShow;
+                return remaining > 0 ? `${shown} +${remaining}` : shown;
+              })()
+            : '+ Selecionar Habilidades BNCC/SAEB'}
         </button>
+
+        {habilidadesSelecionadas.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-6">
+            {habilidadesSelecionadas.map((h) => (
+              <span key={h.id} className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-full text-xs bg-blue-50 text-blue-700 border border-blue-200">
+                {h.codigo}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setHabilidadesSelecionadas(prev => prev.filter(x => x.id !== h.id));
+                    setCodigosBNCC(prev => prev.filter(id => id !== h.id));
+                  }}
+                  className="ml-1 text-blue-600 hover:text-blue-800"
+                  aria-label={`Remover ${h.codigo}`}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
 
         {alternativas.map((alt, i) => (
           <div key={i} className="flex items-center gap-3 mb-3">
@@ -306,7 +341,13 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
         <ModalBNCC
           componenteCurricularId={componenteId}
           onClose={() => setShowModalBNCC(false)}
-          onSelect={(habilidades) => setCodigosBNCC(habilidades.map(h => h.id))}
+          onSelect={(habilidades, profId) => {
+            const selecionadas = habilidades.map(h => ({ id: h.id, codigo: h.codigo }));
+            setHabilidadesSelecionadas(selecionadas);
+            setCodigosBNCC(selecionadas.map(h => h.id));
+            setProficienciaSaebId(profId ?? null);
+            setShowModalBNCC(false);
+          }}
         />
       )}
     </div>
