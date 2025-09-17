@@ -10,7 +10,8 @@ export const LoginForm = () => {
   const navigate = useNavigate();
   const { login, loading, error } = useAuth(); 
 
- 
+  const appName = import.meta.env.VITE_APP_NAME ?? "SAG";
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +26,7 @@ export const LoginForm = () => {
       onSubmit={handleSubmit}
       className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm"
     >
-      <h1 className="text-2xl font-bold text-center text-blue-600 mb-1">SAG (Ribamar)</h1>
+      <h1 className="text-2xl font-bold text-center text-blue-600 mb-1">{appName}</h1>
       <p className="text-center text-sm text-gray-600 mb-6">
         Sistema de Avaliação e Gerenciamento
       </p>
