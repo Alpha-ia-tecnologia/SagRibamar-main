@@ -51,7 +51,7 @@ export const EditarQuestaoModal = ({
     "SEGUNDA_SERIE",
     "TERCEIRA_SERIE",
   ];
-  const dificuldades = ["FACIL", "MEDIA", "DIFICIL"];
+  const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/questoes/${questaoId}`)

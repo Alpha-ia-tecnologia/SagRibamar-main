@@ -60,7 +60,7 @@ export const ProvaList = ({
   }, [reload]);
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Deseja realmente excluir esta prova?")) return;
+    if (!confirm("Deseja realmente excluir esta prova?")) return;
 
     try {
       const res = await fetch(
@@ -79,7 +79,6 @@ export const ProvaList = ({
         return;
       }
 
-      alert("Prova excluída com sucesso!");
       fetchProvas();
     } catch (err) {
       console.error("Erro inesperado ao excluir prova:", err);

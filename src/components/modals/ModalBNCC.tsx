@@ -201,13 +201,15 @@ export const ModalBNCC = ({
             habilidades.map((h) => (
               <div
                 key={h.id}
-                className="p-4 border-b last:border-b-0 flex items-start gap-3 hover:bg-gray-300 transition"
+                className="p-4 border-b last:border-b-0 flex items-start gap-3 hover:bg-gray-300 transition cursor-pointer"
+                onClick={() => toggleSelecionada(h.id)}
               >
                 <input
                   type="radio"
                   name="bncc-habilidade"
                   checked={selecionada === h.id}
                   onChange={() => toggleSelecionada(h.id)}
+                  onClick={(e) => e.stopPropagation()}
                   className="mt-1 accent-blue-600"
                 />
                 <div>

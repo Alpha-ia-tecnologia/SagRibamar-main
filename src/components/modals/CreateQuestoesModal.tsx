@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { ModalBNCC } from "./ModalBNCC";
 
 interface CreateQuestoesModalProps {
-  provaId: number;
+  provaId?: number;
+  tituloProva?: string;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 interface Alternativa {
@@ -44,7 +46,7 @@ const formatarTextoSelect = (texto: string) => {
 
   const mapaDificuldades: Record<string, string> = {
     FACIL: "Fácil",
-    MEDIA: "Média",
+    MEDIO: "Média",
     DIFICIL: "Difícil"
   };
 
@@ -56,7 +58,7 @@ const formatarTextoSelect = (texto: string) => {
   );
 };
 
-export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalProps) => {
+export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }: CreateQuestoesModalProps) => {
   const [enunciado, setEnunciado] = useState("");
   const [imagemUrl, setImagemUrl] = useState("");
   const [imagemPreview, setImagemPreview] = useState("");
@@ -74,10 +76,11 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
   const [componenteId, setComponenteId] = useState(0);
   const [componentes, setComponentes] = useState<ComponenteCurricular[]>([]);
   const [codigosBNCC, setCodigosBNCC] = useState<number[]>([]);
-  const [habilidadesSelecionadas, setHabilidadesSelecionadas] = useState<{ id: number; codigo: string }[]>([]);
+  const [habilidadesSelecionadas, setHabilidadesSelecionadas] = useState<{ id: number; codigo: string; nivel?: string }[]>([]);
   const [showModalBNCC, setShowModalBNCC] = useState(false);
   const [foiSalva, setFoiSalva] = useState(false);
   const [proficienciaSaebId, setProficienciaSaebId] = useState<number | null>(null);
+  const [provaCriada, setProvaCriada] = useState<number | null>(provaId || null);
 
   const niveis = ["ANOS_INICIAIS", "ANOS_FINAIS", "ENSINO_MEDIO"];
   const series = [
@@ -86,7 +89,7 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
     "SEGUNDA_SERIE", "TERCEIRA_SERIE", "PRIMEIRO_E_SEGUNDO_ANOS",
     "TERCEIRO_AO_QUINTO_ANO", "PRIMEIRO_AO_QUINTO_ANO", "EJA"
   ];
-  const dificuldades = ["FACIL", "MEDIA", "DIFICIL"];
+  const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/componentes-curriculares`)
@@ -154,9 +157,38 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
     setHabilidadesSelecionadas([]);
     setProficienciaSaebId(null);
     setFoiSalva(false);
+    // Não resetar provaCriada para manter a prova já criada
   };
 
   const handleSubmit = async () => {
+    let provaIdAtual = provaCriada;
+
+    // Se não há prova criada ainda, criar uma nova
+    if (!provaIdAtual && tituloProva) {
+      try {
+        const provaRes = await fetch(`${import.meta.env.VITE_API_URL}/api/provas`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nome: tituloProva }),
+        });
+
+        if (!provaRes.ok) {
+          const errorText = await provaRes.text();
+          console.error("Erro ao criar prova:", provaRes.status, errorText);
+          alert("Erro ao criar prova.");
+          return;
+        }
+
+        const provaSalva = await provaRes.json();
+        provaIdAtual = provaSalva.id;
+        setProvaCriada(provaIdAtual);
+      } catch (err) {
+        alert("Erro ao criar prova. Veja o console para mais informações.");
+        console.error(err);
+        return;
+      }
+    }
+
     const payload = {
       enunciado,
       imagem_url: imagemUrl,
@@ -164,14 +196,12 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
       dificuldade,
       serie,
       pontos,
-      prova_id: provaId,
+      prova_id: provaIdAtual,
       proficiencia_saeb_id: proficienciaSaebId,
       componente_curricular_id: componenteId,
       codigos_bncc: codigosBNCC,
       alternativas
     };
-
-    
 
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/questoes`, {
@@ -270,7 +300,7 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
           <div className="flex flex-wrap gap-2 mb-6">
             {habilidadesSelecionadas.map((h) => (
               <span key={h.id} className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-full text-xs bg-blue-50 text-blue-700 border border-blue-200">
-                {h.codigo}
+                {h.codigo}{h.nivel && ` (${h.nivel})`}
                 <button
                   type="button"
                   onClick={() => {
@@ -328,7 +358,10 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
               Adicionar Nova Questão
             </button>
             <button
-              onClick={onClose}
+              onClick={() => {
+                onClose();
+                if (onSuccess) onSuccess();
+              }}
               className="px-5 py-2.5 rounded-xl bg-gray-600 text-white hover:bg-gray-700 transition-all"
             >
               Finalizar
@@ -341,8 +374,30 @@ export const CreateQuestoesModal = ({ provaId, onClose }: CreateQuestoesModalPro
         <ModalBNCC
           componenteCurricularId={componenteId}
           onClose={() => setShowModalBNCC(false)}
-          onSelect={(habilidades, profId) => {
-            const selecionadas = habilidades.map(h => ({ id: h.id, codigo: h.codigo }));
+          onSelect={async (habilidades, profId) => {
+            let nivelDescricao = "";
+            
+            // Se há um ID de proficiência, buscar a descrição do nível
+            if (profId) {
+              try {
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/bncc/${habilidades[0]?.id}/proficiencias`);
+                if (res.ok) {
+                  const data = await res.json();
+                  const proficiencia = data.find((p: any) => p.id === profId);
+                  if (proficiencia) {
+                    nivelDescricao = `${proficiencia.nivel ?? ""}${proficiencia.nivel ? " - " : ""}${proficiencia.descricao ?? ""}`.trim();
+                  }
+                }
+              } catch (error) {
+                console.error("Erro ao buscar descrição do nível:", error);
+              }
+            }
+            
+            const selecionadas = habilidades.map(h => ({ 
+              id: h.id, 
+              codigo: h.codigo, 
+              nivel: nivelDescricao || undefined 
+            }));
             setHabilidadesSelecionadas(selecionadas);
             setCodigosBNCC(selecionadas.map(h => h.id));
             setProficienciaSaebId(profId ?? null);

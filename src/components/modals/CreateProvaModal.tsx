@@ -9,38 +9,23 @@ interface ProvaModalProps {
 
 export const CreateProvaModal = ({ provaId, onClose, onSuccess }: ProvaModalProps) => {
   const [titulo, setTitulo] = useState("");
-  const [novaProvaId, setNovaProvaId] = useState<number | null>(null);
   const [mostrarQuestoesModal, setMostrarQuestoesModal] = useState(false);
 
-  const handleSubmit = async () => {
-    try {
-      const payload = { nome: titulo };
-
-      const provaRes = await fetch(`${import.meta.env.VITE_API_URL}/api/provas`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!provaRes.ok) {
-        const errorText = await provaRes.text();
-        console.error("Erro ao criar prova:", provaRes.status, errorText);
-        throw new Error("Erro ao salvar prova");
-      }
-
-      const provaSalva = await provaRes.json();
-      console.log("Prova criada com sucesso:", provaSalva);
-      setNovaProvaId(provaSalva.id);
-      setMostrarQuestoesModal(true);
-    } catch (err) {
-      alert("Erro ao salvar prova. Veja o console para mais informações.");
-      console.error(err);
+  const handleSubmit = () => {
+    if (!titulo.trim()) {
+      alert("Por favor, digite um nome para a prova.");
+      return;
     }
+    setMostrarQuestoesModal(true);
   };
 
   const handleQuestoesFinalizadas = () => {
     setMostrarQuestoesModal(false);
     onSuccess();
+  };
+
+  const handleCancelarQuestoes = () => {
+    setMostrarQuestoesModal(false);
   };
 
   return (
@@ -72,13 +57,13 @@ export const CreateProvaModal = ({ provaId, onClose, onSuccess }: ProvaModalProp
         </div>
       </div>
 
-      {mostrarQuestoesModal && novaProvaId && (
-  <CreateQuestoesModal
-    key={novaProvaId} 
-    provaId={novaProvaId}
-    onClose={handleQuestoesFinalizadas}
-  />
-)}
+      {mostrarQuestoesModal && (
+        <CreateQuestoesModal
+          tituloProva={titulo}
+          onClose={handleCancelarQuestoes}
+          onSuccess={handleQuestoesFinalizadas}
+        />
+      )}
 
     </>
   );
