@@ -10,7 +10,7 @@ export const LoginForm = () => {
   const navigate = useNavigate();
   const { login, loading, error } = useAuth(); 
 
-  const appName = import.meta.env.VITE_APP_NAME;
+ 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
