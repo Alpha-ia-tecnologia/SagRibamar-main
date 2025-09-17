@@ -12,7 +12,6 @@ export const LoginForm = () => {
 
   const appName = import.meta.env.VITE_APP_NAME ?? "SAG";
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const success = await login(email, senha);
