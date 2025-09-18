@@ -33,13 +33,13 @@ export const CreateSchoolModal = ({
 
   useEffect(() => {
     const fetchRegioes = async () => {
-      const res = await fetch(`${window.__ENV__?.API_URL}/api/regioes`);
+      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/regioes`);
       const data = await res.json();
       setRegioes(data);
     };
 
     const fetchGrupos = async () => {
-      const res = await fetch(`${window.__ENV__?.API_URL}/api/grupos`);
+      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/grupos`);
       const data = await res.json();
       setGrupos(data);
     };
@@ -54,7 +54,7 @@ export const CreateSchoolModal = ({
     const fetchEscola = async () => {
       try {
         const res = await fetch(
-          `${window.__ENV__?.API_URL}/api/escolas/${escolaId}`
+          `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas/${escolaId}`
         );
         if (!res.ok) throw new Error("Erro ao buscar escola");
         const data = await res.json();
@@ -83,8 +83,8 @@ export const CreateSchoolModal = ({
     try {
       const res = await fetch(
         escolaId
-          ? `${window.__ENV__?.API_URL}/api/escolas/${escolaId}`
-          : `${window.__ENV__?.API_URL}/api/escolas`,
+          ? `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas/${escolaId}`
+          : `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas`,
         {
           method: escolaId ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },

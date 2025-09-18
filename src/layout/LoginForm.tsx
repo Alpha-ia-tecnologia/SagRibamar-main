@@ -10,9 +10,9 @@ export const LoginForm = () => {
   const navigate = useNavigate();
   const { login, loading, error } = useAuth(); 
 
-  const appName = window.__ENV__?.APP_NAME ?? "SAG";
+  const appName = window.__ENV__?.APP_NAME ?? import.meta.env.VITE_APP_NAME ?? "SAG";
 
-  console.log("🔎 VITE_API_URL:", window.__ENV__?.API_URL);
+  console.log("🔎 VITE_API_URL:", window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL);
   console.log("🔎 VITE_APP_NAME:", appName);
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -29,7 +29,7 @@ export const SelectTurma = ({ escolaId, serie, value, onChange }: Props) => {
       serie: serie,
     });
 
-    const url = `${window.__ENV__?.API_URL}/api/turmas?${params.toString()}`;
+    const url = `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/turmas?${params.toString()}`;
 
     fetch(url)
       .then((res) => res.json())

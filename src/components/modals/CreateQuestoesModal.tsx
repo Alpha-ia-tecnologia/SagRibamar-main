@@ -92,7 +92,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
   const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
 
   useEffect(() => {
-    fetch(`${window.__ENV__?.API_URL}/api/componentes-curriculares`)
+    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/componentes-curriculares`)
       .then(res => res.json())
       .then(data => setComponentes(data || []));
   }, []);
@@ -105,7 +105,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     formData.append("imagem", file);
 
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL}/api/upload/questao-imagem`, {
+      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/upload/questao-imagem`, {
         method: "POST",
         body: formData,
       });
@@ -123,7 +123,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
         const data = await res.json();
         if (data.success && data.imagePath) {
           setImagemUrl(data.imagePath);
-          setImagemPreview(`${window.__ENV__?.API_URL}/${data.imagePath}`);
+          setImagemPreview(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${data.imagePath}`);
         } else {
           alert("Erro no upload: " + (data.message || "Resposta inválida"));
         }
@@ -166,7 +166,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     // Se não há prova criada ainda, criar uma nova
     if (!provaIdAtual && tituloProva) {
       try {
-        const provaRes = await fetch(`${window.__ENV__?.API_URL}/api/provas`, {
+        const provaRes = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/provas`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ nome: tituloProva }),
@@ -204,7 +204,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     };
 
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL}/api/questoes`, {
+      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/questoes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -380,7 +380,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
             // Se há um ID de proficiência, buscar a descrição do nível
             if (profId) {
               try {
-                const res = await fetch(`${window.__ENV__?.API_URL}/api/bncc/${habilidades[0]?.id}/proficiencias`);
+                const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${habilidades[0]?.id}/proficiencias`);
                 if (res.ok) {
                   const data = await res.json();
                   const proficiencia = data.find((p: any) => p.id === profId);

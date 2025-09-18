@@ -34,7 +34,7 @@ export const ProvaList = ({
         queryParams.append("titulo", (searchTitulo ?? "").trim());
 
       const res = await fetch(
-        `${window.__ENV__?.API_URL}/api/provas?${queryParams.toString()}`
+        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/provas?${queryParams.toString()}`
       );
 
       const data = await res.json();
@@ -64,7 +64,7 @@ export const ProvaList = ({
 
     try {
       const res = await fetch(
-        `${window.__ENV__?.API_URL}/api/provas/${id}`,
+        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/provas/${id}`,
         {
           method: "DELETE",
         }

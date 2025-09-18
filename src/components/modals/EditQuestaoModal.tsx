@@ -54,14 +54,14 @@ export const EditarQuestaoModal = ({
   const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
 
   useEffect(() => {
-    fetch(`${window.__ENV__?.API_URL}/api/questoes/${questaoId}`)
+    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/questoes/${questaoId}`)
       .then((res) => res.json())
       .then((data) => {
         setEnunciado(data.enunciado || "");
         setImagemUrl(data.imagem_url || "");
         setImagemPreview(
           data.imagem_url
-            ? `${window.__ENV__?.API_URL}/${data.imagem_url}`
+            ? `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${data.imagem_url}`
             : ""
         );
         setAlternativas(data.alternativas || []);
@@ -73,12 +73,12 @@ export const EditarQuestaoModal = ({
         setCodigosBNCC(data.codigos_bncc || []);
       });
 
-    fetch(`${window.__ENV__?.API_URL}/api/componentes-curriculares`)
+    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/componentes-curriculares`)
       .then((res) => res.json())
       .then((data) => setComponentes(data || []));
 
     // Carrega habilidades BNCC já vinculadas para exibição/remoção
-    fetch(`${window.__ENV__?.API_URL}/api/bncc?questao_id=${questaoId}`)
+    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`)
       .then((res) => res.json())
       .then((lista) => {
         if (Array.isArray(lista)) {
@@ -96,7 +96,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
   formData.append("imagem", file); 
 
   try {
-    const res = await fetch(`${window.__ENV__?.API_URL}/api/upload/questao-imagem`, {
+    const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/upload/questao-imagem`, {
       method: "POST",
       body: formData,
     });
@@ -109,7 +109,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       return;
     }
     setImagemUrl(data.imagePath);
-    setImagemPreview(`${window.__ENV__?.API_URL}/${data.imagePath}`);
+    setImagemPreview(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${data.imagePath}`);
   } catch (err) {
     console.error("Erro inesperado:", err);
     alert("Erro inesperado ao enviar imagem.");
@@ -141,7 +141,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
     try {
       const res = await fetch(
-        `${window.__ENV__?.API_URL}/api/questoes/${questaoId}`,
+        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/questoes/${questaoId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -334,7 +334,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       setCodigosBNCC(novosCodigos);
       setShowModalBNCC(false);
       // Recarrega habilidades para refletir chips e botão
-      fetch(`${window.__ENV__?.API_URL}/api/bncc?questao_id=${questaoId}`)
+      fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`)
         .then((res) => res.json())
         .then((lista) => {
           if (Array.isArray(lista)) {

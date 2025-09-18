@@ -61,7 +61,7 @@ export const ModalBNCC = ({
 
     try {
       const res = await fetch(
-        `${window.__ENV__?.API_URL}/api/bncc?${params.toString()}`
+        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?${params.toString()}`
       );
       if (!res.ok) throw new Error("Erro ao buscar habilidades BNCC");
       const data: unknown = await res.json();
@@ -86,7 +86,7 @@ export const ModalBNCC = ({
       }
       try {
         const res = await fetch(
-          `${window.__ENV__?.API_URL}/api/bncc/${selecionada}/proficiencias`
+          `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${selecionada}/proficiencias`
         );
         if (!res.ok) {
           setNiveis([]);
