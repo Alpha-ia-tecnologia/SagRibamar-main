@@ -14,7 +14,7 @@ export const SelectProvas = ({ value, onChange }: Props) => {
   const [provas, setProvas] = useState<Prova[]>([]);
 
   useEffect(() => {
-    fetch(${window.__ENV__?.API_URL}/api/provas`)
+    fetch(`${window.__ENV__?.API_URL}/api/provas`)
       .then((res) => res.json())
       .then((data) => setProvas(data || []))
       .catch(() => setProvas([]));

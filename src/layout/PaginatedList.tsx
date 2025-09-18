@@ -21,7 +21,7 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
   const itemsPerPage = 5;
 
   const fetchUsuarios = async () => {
-    const res = await fetch(${window.__ENV__?.API_URL}/api/usuarios`);
+    const res = await fetch(`${window.__ENV__?.API_URL}/api/usuarios`);
     const data = await res.json();
     setUsuarios(data);
   };
@@ -41,7 +41,7 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
     if (!confirm) return;
 
     try {
-      const res = await fetch(${window.__ENV__?.API_URL}/api/usuarios/${id}`, {
+      const res = await fetch(`${window.__ENV__?.API_URL}/api/usuarios/${id}`, {
         method: "DELETE",
       });
 

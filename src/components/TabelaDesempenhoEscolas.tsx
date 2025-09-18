@@ -36,7 +36,7 @@ export const TabelaDesempenhoEscolas = () => {
     
     try {
       const res = await fetch(
-        ${window.__ENV__?.API_URL}/api/dashboard/school-performance?${params.toString()}`
+        `${window.__ENV__?.API_URL}/api/dashboard/school-performance?${params.toString()}`
       );
       const json = await res.json();
 

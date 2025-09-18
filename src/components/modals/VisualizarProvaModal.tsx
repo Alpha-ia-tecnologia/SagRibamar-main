@@ -35,7 +35,7 @@ export const VisualizarProvaModal = ({ provaId, onClose }: VisualizarProvaModalP
 
   const carregarQuestoes = () => {
     setLoading(true);
-    fetch(${window.__ENV__?.API_URL}/api/provas/${provaId}/questoes-detalhadas`)
+    fetch(`${window.__ENV__?.API_URL}/api/provas/${provaId}/questoes-detalhadas`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data?.questoes)) {
@@ -105,7 +105,7 @@ export const VisualizarProvaModal = ({ provaId, onClose }: VisualizarProvaModalP
 
                   {questao.imagem_url && (
                     <img
-                      src={${window.__ENV__?.API_URL}/${questao.imagem_url}`}
+                      src={`${window.__ENV__?.API_URL}/${questao.imagem_url}`}
                       alt="Imagem da questão"
                       className="mb-4 max-h-48 rounded-lg border"
                     />

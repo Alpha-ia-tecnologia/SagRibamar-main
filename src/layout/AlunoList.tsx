@@ -52,7 +52,7 @@ export const AlunoList = ({
       if (turmaId !== null) queryParams.append("turma_id", String(turmaId));
 
       const res = await fetch(
-        ${window.__ENV__?.API_URL}/api/alunos?${queryParams.toString()}`
+        `${window.__ENV__?.API_URL}/api/alunos?${queryParams.toString()}`
       );
 
       const data = await res.json();
@@ -79,7 +79,7 @@ export const AlunoList = ({
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(${window.__ENV__?.API_URL}/api/alunos/${id}`, {
+      const res = await fetch(`${window.__ENV__?.API_URL}/api/alunos/${id}`, {
         method: "DELETE",
       });
 
