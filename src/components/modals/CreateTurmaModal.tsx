@@ -42,7 +42,7 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
 
   useEffect(() => {
     const fetchEscolas = async () => {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/escolas?limit=200`);
+      const res = await fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/escolas?limit=200`);
       const data = await res.json();
       const lista = Array.isArray(data) ? data : data.data;
       setEscolas(Array.isArray(lista) ? lista : []);
@@ -66,7 +66,7 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
     };
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/turmas${turmaId ? `/${turmaId}` : ""}`, {
+      const res = await fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/turmas${turmaId ? `/${turmaId}` : ""}`, {
         method: turmaId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

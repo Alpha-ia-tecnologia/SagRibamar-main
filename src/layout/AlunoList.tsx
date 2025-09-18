@@ -52,7 +52,7 @@ export const AlunoList = ({
       if (turmaId !== null) queryParams.append("turma_id", String(turmaId));
 
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/alunos?${queryParams.toString()}`
+        `https://ribamar-sag-api.gkgtsp.easypanel.host/api/alunos?${queryParams.toString()}`
       );
 
       const data = await res.json();
@@ -79,7 +79,7 @@ export const AlunoList = ({
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/alunos/${id}`, {
+      const res = await fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/alunos/${id}`, {
         method: "DELETE",
       });
 

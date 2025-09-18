@@ -47,7 +47,7 @@ export const RankingAlunos = () => {
         if (filtros.turmaId) params.append("turma_id", filtros.turmaId); 
         if (filtros.provaId) params.append("prova_id", filtros.provaId); 
 
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/dashboard/student-ranking?${params.toString()}`);
+        const res = await fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/dashboard/student-ranking?${params.toString()}`);
         const json: ApiResponse = await res.json();
 
         setAlunos(json.data);

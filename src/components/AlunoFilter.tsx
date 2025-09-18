@@ -23,7 +23,7 @@ export const AlunoFilter = ({ onFilter }: AlunoFilterProps) => {
 
   useEffect(() => {
     const fetchEscolas = async () => {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/escolas?page=1&limit=200`);
+      const res = await fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/escolas?page=1&limit=200`);
       const data = await res.json();
       setEscolas(Array.isArray(data.data) ? data.data : data);
     };
@@ -39,7 +39,7 @@ export const AlunoFilter = ({ onFilter }: AlunoFilterProps) => {
     }
 
     const fetchTurmas = async () => {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/turmas?escola_id=${escolaId}`);
+      const res = await fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/turmas?escola_id=${escolaId}`);
       const data = await res.json();
       setTurmas(Array.isArray(data.data) ? data.data : data);
     };

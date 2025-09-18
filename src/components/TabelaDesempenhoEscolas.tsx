@@ -36,7 +36,7 @@ export const TabelaDesempenhoEscolas = () => {
     
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/dashboard/school-performance?${params.toString()}`
+        `https://ribamar-sag-api.gkgtsp.easypanel.host/api/dashboard/school-performance?${params.toString()}`
       );
       const json = await res.json();
 

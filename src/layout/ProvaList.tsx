@@ -34,7 +34,7 @@ export const ProvaList = ({
         queryParams.append("titulo", (searchTitulo ?? "").trim());
 
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/provas?${queryParams.toString()}`
+        `https://ribamar-sag-api.gkgtsp.easypanel.host/api/provas?${queryParams.toString()}`
       );
 
       const data = await res.json();
@@ -64,7 +64,7 @@ export const ProvaList = ({
 
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/provas/${id}`,
+        `https://ribamar-sag-api.gkgtsp.easypanel.host/api/provas/${id}`,
         {
           method: "DELETE",
         }

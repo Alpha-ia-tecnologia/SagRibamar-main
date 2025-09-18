@@ -48,7 +48,7 @@ export const GraficoRankingRegioes = () => {
         if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
         if (filtros.provaId) params.append("prova_id", filtros.provaId); // ✅ corrigido
 
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/dashboard/regional-performance?${params.toString()}`);
+        const res = await fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/dashboard/regional-performance?${params.toString()}`);
         const data = await res.json();
 
         setDadosRegioes(data.dados_grafico || []);

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = 'https://ribamar-sag-api.gkgtsp.easypanel.host';
 
 interface User {
   id: number;

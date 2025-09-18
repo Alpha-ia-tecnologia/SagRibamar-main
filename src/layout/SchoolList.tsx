@@ -53,7 +53,7 @@ export const SchoolList = ({
 if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
 
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/escolas?${queryParams.toString()}`
+        `https://ribamar-sag-api.gkgtsp.easypanel.host/api/escolas?${queryParams.toString()}`
       );
 
       const data = await res.json();
@@ -80,7 +80,7 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/escolas/${id}`, {
+      const res = await fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/escolas/${id}`, {
         method: "DELETE",
       });
 

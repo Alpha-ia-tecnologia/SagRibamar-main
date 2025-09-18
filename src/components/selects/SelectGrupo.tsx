@@ -16,8 +16,8 @@ export const SelectGrupo = ({ regiaoId, value, onChange }: Props) => {
 
   useEffect(() => {
     const endpoint = regiaoId
-      ? `${import.meta.env.VITE_API_URL}/api/grupos?regiao_id=${regiaoId}`
-      : `${import.meta.env.VITE_API_URL}/api/grupos`;
+      ? `https://ribamar-sag-api.gkgtsp.easypanel.host/api/grupos?regiao_id=${regiaoId}`
+      : `https://ribamar-sag-api.gkgtsp.easypanel.host/api/grupos`;
 
     fetch(endpoint)
       .then((res) => res.json())

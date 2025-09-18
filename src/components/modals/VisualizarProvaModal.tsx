@@ -35,7 +35,7 @@ export const VisualizarProvaModal = ({ provaId, onClose }: VisualizarProvaModalP
 
   const carregarQuestoes = () => {
     setLoading(true);
-    fetch(`${import.meta.env.VITE_API_URL}/api/provas/${provaId}/questoes-detalhadas`)
+    fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/provas/${provaId}/questoes-detalhadas`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data?.questoes)) {
@@ -105,7 +105,7 @@ export const VisualizarProvaModal = ({ provaId, onClose }: VisualizarProvaModalP
 
                   {questao.imagem_url && (
                     <img
-                      src={`${import.meta.env.VITE_API_URL}/${questao.imagem_url}`}
+                      src={`https://ribamar-sag-api.gkgtsp.easypanel.host/${questao.imagem_url}`}
                       alt="Imagem da questão"
                       className="mb-4 max-h-48 rounded-lg border"
                     />

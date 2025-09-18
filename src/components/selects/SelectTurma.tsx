@@ -29,9 +29,7 @@ export const SelectTurma = ({ escolaId, serie, value, onChange }: Props) => {
       serie: serie,
     });
 
-    const url = `${
-      import.meta.env.VITE_API_URL
-    }/api/turmas?${params.toString()}`;
+    const url = `https://ribamar-sag-api.gkgtsp.easypanel.host/api/turmas?${params.toString()}`;
 
     fetch(url)
       .then((res) => res.json())

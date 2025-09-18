@@ -61,7 +61,7 @@ export const ModalBNCC = ({
 
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/bncc?${params.toString()}`
+        `https://ribamar-sag-api.gkgtsp.easypanel.host/api/bncc?${params.toString()}`
       );
       if (!res.ok) throw new Error("Erro ao buscar habilidades BNCC");
       const data: unknown = await res.json();
@@ -86,7 +86,7 @@ export const ModalBNCC = ({
       }
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/bncc/${selecionada}/proficiencias`
+          `https://ribamar-sag-api.gkgtsp.easypanel.host/api/bncc/${selecionada}/proficiencias`
         );
         if (!res.ok) {
           setNiveis([]);

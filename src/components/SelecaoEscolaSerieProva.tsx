@@ -35,7 +35,7 @@ export const SelecaoEscolaSerieProva = () => {
   const [provaSelecionada, setProvaSelecionada] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/escolas?page=1&limit=200`)
+    fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/escolas?page=1&limit=200`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data.data)) {
@@ -49,7 +49,7 @@ export const SelecaoEscolaSerieProva = () => {
 
   useEffect(() => {
     if (!escolaSelecionada) return;
-    fetch(`${import.meta.env.VITE_API_URL}/api/obter-series-escola?escola_id=${escolaSelecionada}`)
+    fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/obter-series-escola?escola_id=${escolaSelecionada}`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -63,7 +63,7 @@ export const SelecaoEscolaSerieProva = () => {
 
   useEffect(() => {
     if (!serieSelecionada) return;
-    fetch(`${import.meta.env.VITE_API_URL}/api/provas?serie=${serieSelecionada}`)
+    fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/provas?serie=${serieSelecionada}`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
