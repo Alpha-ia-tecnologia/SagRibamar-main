@@ -52,8 +52,8 @@ export const ModalBNCCEdit = ({
         if (nivelFiltro) allParams.append("nivel_ensino", nivelFiltro);
 
         const [resSelecionadas, resTodas] = await Promise.all([
-          fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/bncc?questao_id=${questaoId}`),
-          fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/bncc?${allParams.toString()}`),
+          fetch(${window.__ENV__?.API_URL}/api/bncc?questao_id=${questaoId}`),
+          fetch(${window.__ENV__?.API_URL}/api/bncc?${allParams.toString()}`),
         ]);
 
         const dataSelecionadas = await resSelecionadas.json();
@@ -85,7 +85,7 @@ export const ModalBNCCEdit = ({
         return;
       }
       try {
-        const res = await fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/bncc/${selecionada}/proficiencias`);
+        const res = await fetch(${window.__ENV__?.API_URL}/api/bncc/${selecionada}/proficiencias`);
         if (!res.ok) return;
         const data = await res.json();
         if (Array.isArray(data)) {
@@ -123,7 +123,7 @@ export const ModalBNCCEdit = ({
 
   const confirmarSelecao = async () => {
     try {
-      const res = await fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/questoes/${questaoId}/vincular-bncc`, {
+      const res = await fetch(${window.__ENV__?.API_URL}/api/questoes/${questaoId}/vincular-bncc`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

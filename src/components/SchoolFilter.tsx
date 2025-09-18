@@ -23,13 +23,13 @@ export const SchoolFilter = ({ onFilter }: SchoolFilterProps) => {
 
   useEffect(() => {
     const fetchRegioes = async () => {
-      const res = await fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/regioes`);
+      const res = await fetch(${window.__ENV__?.API_URL}/api/regioes`);
       const data = await res.json();
       setRegioes(data);
     };
 
     const fetchGrupos = async () => {
-      const res = await fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/grupos`);
+      const res = await fetch(${window.__ENV__?.API_URL}/api/grupos`);
       const data = await res.json();
       setGrupos(data);
     };

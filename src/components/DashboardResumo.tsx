@@ -35,7 +35,7 @@ export const DashboardResumo = () => {
 
     setLoading(true);
 
-    fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/dashboard/statistics?${queryParams.toString()}`)
+    fetch(`${window.__ENV__?.API_URL}/api/dashboard/statistics?${queryParams.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         setStats(data);

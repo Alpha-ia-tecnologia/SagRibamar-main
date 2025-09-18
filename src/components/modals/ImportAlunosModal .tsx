@@ -12,7 +12,7 @@ export const ImportAlunosModal = ({ onClose, onSuccess }: ImportAlunosModalProps
   const [error, setError] = useState<string | null>(null);
 
   const handleDownloadModelo = async () => {
-  const apiUrl = 'https://ribamar-sag-api.gkgtsp.easypanel.host'; // Obtém a URL da API
+  const apiUrl = 'window.__ENV__?.API_URL'; // Obtém a URL da API
   const response = await fetch(`${apiUrl}/api/export/template-importacao`, {
     method: 'GET',
     headers: {
@@ -46,7 +46,7 @@ export const ImportAlunosModal = ({ onClose, onSuccess }: ImportAlunosModalProps
     formData.append("file", file);
 
     try {
-      const res = await fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/import-csv/import`, {
+      const res = await fetch(`${window.__ENV__?.API_URL}/api/import-csv/import`, {
         method: "POST",
         body: formData,
       });
