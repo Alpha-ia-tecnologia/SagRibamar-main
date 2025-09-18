@@ -10,7 +10,7 @@ export const LoginForm = () => {
   const navigate = useNavigate();
   const { login, loading, error } = useAuth(); 
 
-  const appName = import.meta.env.VITE_APP_NAME ?? "SAG";
+  const appName = import.meta.env.VITE_APP_NAME ?? "SAG (Ribamar)";
 
   console.log("🔎 VITE_API_URL:", 'https://ribamar-sag-api.gkgtsp.easypanel.host');
   console.log("🔎 VITE_APP_NAME:", appName);
