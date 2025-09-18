@@ -28,7 +28,7 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
 
     const fetchUser = async () => {
       try {
-        const res = await fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/usuarios/${userId}`);
+        const res = await fetch(`${window.__ENV__?.API_URL}/api/usuarios/${userId}`);
         if (!res.ok) throw new Error("Erro ao buscar usuário");
         const data = await res.json();
         setNome(data.nome || "");
@@ -57,8 +57,8 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
     try {
       const res = await fetch(
         userId
-          ? `https://ribamar-sag-api.gkgtsp.easypanel.host/api/usuarios/${userId}`
-          : `https://ribamar-sag-api.gkgtsp.easypanel.host/api/register`,
+          ? `${window.__ENV__?.API_URL}/api/usuarios/${userId}`
+          : `${window.__ENV__?.API_URL}/api/register`,
         {
           method: userId ? "PUT" : "POST",
           headers: {

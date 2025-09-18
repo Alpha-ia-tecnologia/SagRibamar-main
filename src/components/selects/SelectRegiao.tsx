@@ -14,7 +14,7 @@ export const SelectRegiao = ({ value, onChange }: Props) => {
   const [regioes, setRegioes] = useState<Regiao[]>([]);
 
   useEffect(() => {
-    fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/regioes`)
+    fetch(`${window.__ENV__?.API_URL}/api/regioes`)
       .then((res) => res.json())
       .then((data) => setRegioes(data || []))
       .catch(() => setRegioes([]));

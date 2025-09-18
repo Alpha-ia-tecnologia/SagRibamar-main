@@ -34,7 +34,7 @@ export const SelectSerie = ({ escolaId, value, onChange }: Props) => {
       return;
     }
 
-    const url = `https://ribamar-sag-api.gkgtsp.easypanel.host/api/obter-series-escola?escola_id=${escolaId}`;
+    const url = `${window.__ENV__?.API_URL}/api/obter-series-escola?escola_id=${escolaId}`;
 
     fetch(url)
       .then((res) => res.json())

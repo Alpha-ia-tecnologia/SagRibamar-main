@@ -34,7 +34,7 @@ export const GraficoDesempenhoAvaliacoes = () => {
     if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
      if (filtros.provaId) params.append("prova_id", filtros.provaId); 
 
-    fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/dashboard/provas-desempenho?${params.toString()}`)
+    fetch(`${window.__ENV__?.API_URL}/api/dashboard/provas-desempenho?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {

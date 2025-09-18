@@ -25,7 +25,7 @@ export const DashboardPage = () => {
       if (filtros.filtro) params.append("tipo_filtro", filtros.filtro); 
       if (filtros.provaId) params.append("prova_id", filtros.provaId);   
 
-      const url = `https://ribamar-sag-api.gkgtsp.easypanel.host/api/dashboard/export-xlsx?${params.toString()}`;
+      const url = `${window.__ENV__?.API_URL}/api/dashboard/export-xlsx?${params.toString()}`;
 
       const response = await fetch(url, {
         method: "GET",

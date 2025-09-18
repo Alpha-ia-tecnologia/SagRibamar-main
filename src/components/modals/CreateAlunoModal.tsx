@@ -26,7 +26,7 @@ export const CreateAlunoModal = ({ alunoId, onClose, onSuccess }: CreateAlunoMod
 
   useEffect(() => {
     const fetchEscolas = async () => {
-      const res = await fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/escolas`);
+      const res = await fetch(`${window.__ENV__?.API_URL}/api/escolas`);
       const data = await res.json();
       const lista = Array.isArray(data) ? data : data.data;
       setEscolas(Array.isArray(lista) ? lista : []);
@@ -44,7 +44,7 @@ export const CreateAlunoModal = ({ alunoId, onClose, onSuccess }: CreateAlunoMod
 
     const fetchTurmas = async () => {
       const res = await fetch(
-        `https://ribamar-sag-api.gkgtsp.easypanel.host/api/turmas?escola_id=${escolaId}`
+        `${window.__ENV__?.API_URL}/api/turmas?escola_id=${escolaId}`
       );
       const data = await res.json();
       const lista = Array.isArray(data) ? data : data.data;
@@ -57,7 +57,7 @@ export const CreateAlunoModal = ({ alunoId, onClose, onSuccess }: CreateAlunoMod
   useEffect(() => {
     if (alunoId !== null) {
       const fetchAluno = async () => {
-        const res = await fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/alunos/${alunoId}`);
+        const res = await fetch(`${window.__ENV__?.API_URL}/api/alunos/${alunoId}`);
         const data = await res.json();
         setNome(data.nome || "");
         setEscolaId(data.escola_id || "");
@@ -65,7 +65,7 @@ export const CreateAlunoModal = ({ alunoId, onClose, onSuccess }: CreateAlunoMod
 
         // Força atualização das turmas após obter a escola
         if (data.escola_id) {
-          const turmasRes = await fetch(`https://ribamar-sag-api.gkgtsp.easypanel.host/api/turmas?escola_id=${data.escola_id}`);
+          const turmasRes = await fetch(`${window.__ENV__?.API_URL}/api/turmas?escola_id=${data.escola_id}`);
           const turmasData = await turmasRes.json();
           const lista = Array.isArray(turmasData) ? turmasData : turmasData.data;
           setTurmas(Array.isArray(lista) ? lista : []);
@@ -90,7 +90,7 @@ export const CreateAlunoModal = ({ alunoId, onClose, onSuccess }: CreateAlunoMod
 
     try {
       const res = await fetch(
-        `https://ribamar-sag-api.gkgtsp.easypanel.host/api/alunos${alunoId ? `/${alunoId}` : ""}`,
+        `${window.__ENV__?.API_URL}/api/alunos${alunoId ? `/${alunoId}` : ""}`,
         {
           method: alunoId ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
