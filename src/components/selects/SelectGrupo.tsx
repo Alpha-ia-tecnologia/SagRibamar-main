@@ -16,8 +16,8 @@ export const SelectGrupo = ({ regiaoId, value, onChange }: Props) => {
 
   useEffect(() => {
     const endpoint = regiaoId
-      ? `${window.__ENV__?.API_URL}/api/grupos?regiao_id=${regiaoId}`
-      : `${window.__ENV__?.API_URL}/api/grupos`;
+      ? `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/grupos?regiao_id=${regiaoId}`
+      : `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/grupos`;
 
     fetch(endpoint)
       .then((res) => res.json())

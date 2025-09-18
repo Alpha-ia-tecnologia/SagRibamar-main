@@ -43,7 +43,7 @@ export const TurmaList = ({
       if (escolaId !== null) queryParams.append("escola_id", String(escolaId));
 
       const res = await fetch(
-        `${window.__ENV__?.API_URL}/api/turmas?${queryParams.toString()}`
+        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/turmas?${queryParams.toString()}`
       );
 
       const data = await res.json();
@@ -70,7 +70,7 @@ export const TurmaList = ({
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL}/api/turmas/${id}`, {
+      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/turmas/${id}`, {
         method: "DELETE",
       });
 

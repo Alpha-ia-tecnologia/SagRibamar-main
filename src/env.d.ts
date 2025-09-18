@@ -10,5 +10,5 @@ declare global {
 export {};
 
 // uso
-const api = window.__ENV__?.API_URL ?? "https://fallback";
+const api = window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL ?? "https://fallback";
 const appName = window.__ENV__?.APP_NAME ?? "SAG";

@@ -45,7 +45,7 @@ export const TabelaHabilidadesBNCC = () => {
         if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
         if (filtros.provaId) params.append("prova_id", filtros.provaId); // ✅ corrigido aqui
 
-        const res = await fetch(`${window.__ENV__?.API_URL}/api/dashboard/bncc-skills?${params.toString()}`);
+        const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/dashboard/bncc-skills?${params.toString()}`);
         const json: ApiResponse = await res.json();
 
         setHabilidades(json.data);

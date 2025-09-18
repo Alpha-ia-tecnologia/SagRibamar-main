@@ -35,7 +35,7 @@ export const SelecaoEscolaSerieProva = () => {
   const [provaSelecionada, setProvaSelecionada] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch(`${window.__ENV__?.API_URL}/api/escolas?page=1&limit=200`)
+    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas?page=1&limit=200`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data.data)) {
@@ -49,7 +49,7 @@ export const SelecaoEscolaSerieProva = () => {
 
   useEffect(() => {
     if (!escolaSelecionada) return;
-    fetch(`${window.__ENV__?.API_URL}/api/obter-series-escola?escola_id=${escolaSelecionada}`)
+    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/obter-series-escola?escola_id=${escolaSelecionada}`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -63,7 +63,7 @@ export const SelecaoEscolaSerieProva = () => {
 
   useEffect(() => {
     if (!serieSelecionada) return;
-    fetch(`${window.__ENV__?.API_URL}/api/provas?serie=${serieSelecionada}`)
+    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/provas?serie=${serieSelecionada}`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
