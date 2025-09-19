@@ -10,6 +10,7 @@ interface HabilidadeBNCC {
 
 interface ModalBNCCEditProps {
   questaoId: number;
+  componenteCurricularId: number;
   codigosSelecionados: number[];
   onClose: () => void;
   onSave: (novosCodigos: number[]) => void;
@@ -24,6 +25,7 @@ const series = [
 
 export const ModalBNCCEdit = ({
   questaoId,
+  componenteCurricularId,
   onClose,
   onSave,
 }: ModalBNCCEditProps) => {
@@ -34,50 +36,55 @@ export const ModalBNCCEdit = ({
   const [nivelFiltro, setNivelFiltro] = useState("");
   const [niveis, setNiveis] = useState<{ valor: string; descricao: string }[]>([]);
 
+  const fetchHabilidades = async () => {
+    const params = new URLSearchParams();
+
+    if (componenteCurricularId)
+      params.append("componente_curricular_id", componenteCurricularId.toString());
+    if (serieFiltro) params.append("serie", serieFiltro);
+
+    if (saebFiltro === "true") {
+      params.append("saeb", "true");
+      params.append("bncc", "false");
+    } else if (saebFiltro === "false") {
+      params.append("saeb", "false");
+      params.append("bncc", "true");
+    }
+
+    try {
+      const [resSelecionadas, resTodas] = await Promise.all([
+        fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`),
+        fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?${params.toString()}`),
+      ]);
+
+      if (!resSelecionadas.ok || !resTodas.ok) throw new Error("Erro ao buscar habilidades BNCC");
+
+      const dataSelecionadas: unknown = await resSelecionadas.json();
+      const dataTodas: unknown = await resTodas.json();
+
+      const selecionadasArray = Array.isArray(dataSelecionadas) ? (dataSelecionadas as HabilidadeBNCC[]) : [];
+      const todasArray = Array.isArray(dataTodas) ? (dataTodas as HabilidadeBNCC[]) : [];
+
+      const selecionadasIds = selecionadasArray.map((h) => h.id);
+      const habilidadesUnificadas = [
+        ...selecionadasArray,
+        ...todasArray.filter((h) => !selecionadasIds.includes(h.id)),
+      ];
+
+      setHabilidades(habilidadesUnificadas);
+      setSelecionada(selecionadasIds[0] ?? null);
+    } catch (error) {
+      console.error("Erro ao buscar habilidades BNCC:", error);
+      setHabilidades([]);
+    }
+  };
+
   useEffect(() => {
-    const fetchTodas = async () => {
-      try {
-        const allParams = new URLSearchParams();
-        if (serieFiltro) allParams.append("serie", serieFiltro);
-        
-        // Lógica específica para SAEB e BNCC
-        if (saebFiltro === "true") {
-          allParams.append("saeb", "true");
-          allParams.append("bncc", "false");
-        } else if (saebFiltro === "false") {
-          allParams.append("saeb", "false");
-          allParams.append("bncc", "true");
-        }
-        
-        if (nivelFiltro) allParams.append("nivel_ensino", nivelFiltro);
-
-        const [resSelecionadas, resTodas] = await Promise.all([
-          fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`),
-          fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?${allParams.toString()}`),
-        ]);
-
-        const dataSelecionadas = await resSelecionadas.json();
-        const dataTodas = await resTodas.json();
-
-        const selecionadasIds = dataSelecionadas.map((h: HabilidadeBNCC) => h.id);
-        const habilidadesUnificadas = [
-          ...dataSelecionadas,
-          ...dataTodas.filter((h: HabilidadeBNCC) => !selecionadasIds.includes(h.id)),
-        ];
-
-        setHabilidades(habilidadesUnificadas);
-        setSelecionada(selecionadasIds[0] ?? null);
-      } catch (error) {
-        console.error("Erro ao buscar habilidades BNCC:", error);
-        alert("Erro ao carregar habilidades.");
-      }
-    };
-
-    fetchTodas();
-  }, [questaoId, serieFiltro, saebFiltro, nivelFiltro]);
+    fetchHabilidades();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [questaoId, serieFiltro, saebFiltro, componenteCurricularId]);
 
   useEffect(() => {
-    // Carrega níveis (proficiencias) com base no BNCC selecionado
     const fetchNiveisPorBNCC = async () => {
       if (selecionada == null) {
         setNiveis([]);
@@ -85,65 +92,54 @@ export const ModalBNCCEdit = ({
         return;
       }
       try {
-        const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${selecionada}/proficiencias`);
-        if (!res.ok) return;
-        const data = await res.json();
+        const res = await fetch(
+          `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${selecionada}/proficiencias`
+        );
+        if (!res.ok) {
+          setNiveis([]);
+          return;
+        }
+        const data: unknown = await res.json();
         if (Array.isArray(data)) {
-          const mapaNiveis = new Map<string, string>();
-          for (const item of data) {
-            const nivel = String(item.nivel ?? "");
-            if (!nivel) continue;
-            if (!mapaNiveis.has(nivel)) {
-              mapaNiveis.set(nivel, String(item.descricao ?? nivel));
-            }
-          }
-          const normalizados = Array.from(mapaNiveis.entries()).map(([valor, descricao]) => ({ valor, descricao }));
+          const normalizados: { valor: string; descricao: string }[] = (data as { id: number; nivel?: string | null; descricao?: string | null }[]).map((p) => ({
+            valor: String(p.id),
+            descricao: `${p.nivel ?? ""}${p.nivel ? " - " : ""}${p.descricao ?? ""}`.trim(),
+          }));
           setNiveis(normalizados);
+        } else {
+          setNiveis([]);
         }
       } catch (e) {
-        // silencioso
+        console.error("Erro ao buscar níveis:", e);
+        setNiveis([]);
       }
     };
+
     fetchNiveisPorBNCC();
   }, [selecionada]);
 
   useEffect(() => {
-    // Reseta o filtro se não houver níveis ou se o valor atual não existir mais
     if (niveis.length === 0) {
       if (nivelFiltro !== "") setNivelFiltro("");
       return;
     }
     const exists = niveis.some((n) => n.valor === nivelFiltro);
     if (!exists) setNivelFiltro("");
-  }, [niveis]);
+  }, [niveis, nivelFiltro]);
 
   const toggleSelecionada = (id: number) => {
     setSelecionada((prev) => (prev === id ? null : id));
   };
 
-  const confirmarSelecao = async () => {
-    try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/questoes/${questaoId}/vincular-bncc`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ codigos_bncc: selecionada != null ? [selecionada] : [] }),
-      });
-
-      if (!res.ok) {
-        const errText = await res.text();
-        console.error("Erro ao atualizar habilidades BNCC:", errText);
-        alert("Erro ao salvar seleção de habilidades.");
-        return;
-      }
-
-      onSave(selecionada != null ? [selecionada] : []);
+  const confirmarSelecao = () => {
+    if (selecionada == null) {
+      onSave([]);
       onClose();
-    } catch (error) {
-      console.error("Erro ao enviar dados:", error);
-      alert("Erro inesperado ao salvar seleção.");
+      return;
     }
+
+    onSave([selecionada]);
+    onClose();
   };
 
   return (
@@ -181,7 +177,7 @@ export const ModalBNCCEdit = ({
             className="p-3 border border-gray-300 rounded-xl text-sm"
             disabled={niveis.length === 0}
           >
-            <option value="">Todos os Níveis</option>
+            <option value="">Níveis (opcional)</option>
             {niveis.map((n) => (
               <option key={n.valor} value={n.valor}>{n.descricao}</option>
             ))}
@@ -197,7 +193,7 @@ export const ModalBNCCEdit = ({
             habilidades.map((h) => (
               <div
                 key={h.id}
-                className="p-4 border-b last:border-b-0 flex items-start gap-3 hover:bg-gray-50 transition cursor-pointer"
+                className="p-4 border-b last:border-b-0 flex items-start gap-3 hover:bg-gray-300 transition cursor-pointer"
                 onClick={() => toggleSelecionada(h.id)}
               >
                 <input
@@ -230,7 +226,11 @@ export const ModalBNCCEdit = ({
           <button
             onClick={confirmarSelecao}
             disabled={selecionada == null}
-            className={`px-5 py-2.5 rounded-xl text-sm transition ${selecionada == null ? 'bg-blue-300 text-white cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+            className={`px-5 py-2.5 rounded-xl text-sm transition ${
+              selecionada == null
+                ? "bg-blue-300 text-white cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-700"
+            }`}
           >
             Salvar Seleção
           </button>

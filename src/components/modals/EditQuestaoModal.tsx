@@ -328,20 +328,56 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     {showModalBNCC && (
   <ModalBNCCEdit
     questaoId={questaoId}
+    componenteCurricularId={componenteId}
     codigosSelecionados={codigosBNCC}
     onClose={() => setShowModalBNCC(false)}
-    onSave={(novosCodigos) => {
+    onSave={async (novosCodigos) => {
       setCodigosBNCC(novosCodigos);
       setShowModalBNCC(false);
-      // Recarrega habilidades para refletir chips e botão
-      fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`)
-        .then((res) => res.json())
-        .then((lista) => {
-          if (Array.isArray(lista)) {
-            setHabilidadesSelecionadas(lista.map((h: { id: number; codigo: string }) => ({ id: h.id, codigo: h.codigo })));
+      
+      // Atualiza a questão com os novos códigos BNCC
+      try {
+        const payload = {
+          enunciado,
+          imagem_url: imagemUrl,
+          nivel_ensino: nivelEnsino,
+          dificuldade,
+          serie,
+          pontos,
+          componente_curricular_id: componenteId,
+          codigos_bncc: novosCodigos,
+          alternativas,
+        };
+
+        const res = await fetch(
+          `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/questoes/${questaoId}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
           }
-        })
-        .catch(() => {});
+        );
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error("Erro ao atualizar códigos BNCC:", res.status, errorText);
+          alert("Erro ao atualizar códigos BNCC.");
+          return;
+        }
+
+        // Recarrega habilidades para refletir chips e botão
+        fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`)
+          .then((res) => res.json())
+          .then((lista) => {
+            if (Array.isArray(lista)) {
+              setHabilidadesSelecionadas(lista.map((h: { id: number; codigo: string }) => ({ id: h.id, codigo: h.codigo })));
+            }
+          })
+          .catch(() => {});
+      } catch (err) {
+        console.error("Erro ao salvar códigos BNCC:", err);
+        alert("Erro ao salvar códigos BNCC.");
+      }
     }}
   />
 )}

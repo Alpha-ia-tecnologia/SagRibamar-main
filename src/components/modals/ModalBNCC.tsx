@@ -131,11 +131,6 @@ export const ModalBNCC = ({
       return;
     }
 
-    if (saebFiltro === "true" && !nivelFiltro) {
-      alert("Você deve selecionar um nível para continuar.");
-      return;
-    }
-
     const escolhida = habilidades.find((h) => h.id === selecionada);
     const profId = nivelFiltro ? Number(nivelFiltro) : null;
     onSelect(escolhida ? [escolhida] : [], profId);
@@ -179,11 +174,7 @@ export const ModalBNCC = ({
             className="p-3 border border-gray-300 rounded-xl text-sm"
             disabled={niveis.length === 0}
           >
-            <option value="">
-              {saebFiltro === "true"
-                ? "Selecione um nível obrigatório"
-                : "Níveis (opcional)"}
-            </option>
+            <option value="">Níveis (opcional)</option>
             {niveis.map((n) => (
               <option key={n.valor} value={n.valor}>
                 {n.descricao}
@@ -236,11 +227,9 @@ export const ModalBNCC = ({
           </button>
           <button
             onClick={confirmarSelecao}
-            disabled={
-              selecionada == null || (saebFiltro === "true" && !nivelFiltro)
-            }
+            disabled={selecionada == null}
             className={`px-5 py-2.5 rounded-xl text-sm transition ${
-              selecionada == null || (saebFiltro === "true" && !nivelFiltro)
+              selecionada == null
                 ? "bg-blue-300 text-white cursor-not-allowed"
                 : "bg-blue-600 text-white hover:bg-blue-700"
             }`}
