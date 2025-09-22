@@ -25,3 +25,4 @@ export const useLockBodyScroll = (isLocked: boolean) => {
     }
   }, [isLocked]);
 };
+

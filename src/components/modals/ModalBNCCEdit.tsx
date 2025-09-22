@@ -8,11 +8,22 @@ interface HabilidadeBNCC {
   serie: string;
 }
 
+interface Proficiencia {
+  id: number;
+  nivel?: string | null;
+  descricao?: string | null;
+}
+
+interface NivelNormalizado {
+  valor: string;
+  descricao: string;
+}
+
 interface ModalBNCCEditProps {
   questaoId: number;
   codigosSelecionados: number[];
   onClose: () => void;
-  onSave: (novosCodigos: number[]) => void;
+  onSave: (novosCodigos: number[], proficienciaId?: number | null) => void;
 }
 
 const series = [
@@ -32,7 +43,8 @@ export const ModalBNCCEdit = ({
   const [serieFiltro, setSerieFiltro] = useState("");
   const [saebFiltro, setSaebFiltro] = useState("");
   const [nivelFiltro, setNivelFiltro] = useState("");
-  const [niveis, setNiveis] = useState<{ valor: string; descricao: string }[]>([]);
+  const [niveis, setNiveis] = useState<NivelNormalizado[]>([]);
+  const [nivelProficienciaSelecionado, setNivelProficienciaSelecionado] = useState<string>("");
 
   useEffect(() => {
     const fetchTodas = async () => {
@@ -82,26 +94,28 @@ export const ModalBNCCEdit = ({
       if (selecionada == null) {
         setNiveis([]);
         setNivelFiltro("");
+        setNivelProficienciaSelecionado("");
         return;
       }
       try {
         const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${selecionada}/proficiencias`);
-        if (!res.ok) return;
-        const data = await res.json();
+        if (!res.ok) {
+          setNiveis([]);
+          return;
+        }
+        const data: unknown = await res.json();
         if (Array.isArray(data)) {
-          const mapaNiveis = new Map<string, string>();
-          for (const item of data) {
-            const nivel = String(item.nivel ?? "");
-            if (!nivel) continue;
-            if (!mapaNiveis.has(nivel)) {
-              mapaNiveis.set(nivel, String(item.descricao ?? nivel));
-            }
-          }
-          const normalizados = Array.from(mapaNiveis.entries()).map(([valor, descricao]) => ({ valor, descricao }));
+          const normalizados: NivelNormalizado[] = (data as Proficiencia[]).map((p) => ({
+            valor: String(p.id),
+            descricao: `${p.nivel ?? ""}${p.nivel ? " - " : ""}${p.descricao ?? ""}`.trim(),
+          }));
           setNiveis(normalizados);
+        } else {
+          setNiveis([]);
         }
       } catch (e) {
-        // silencioso
+        console.error("Erro ao buscar níveis:", e);
+        setNiveis([]);
       }
     };
     fetchNiveisPorBNCC();
@@ -111,24 +125,41 @@ export const ModalBNCCEdit = ({
     // Reseta o filtro se não houver níveis ou se o valor atual não existir mais
     if (niveis.length === 0) {
       if (nivelFiltro !== "") setNivelFiltro("");
+      if (nivelProficienciaSelecionado !== "") setNivelProficienciaSelecionado("");
       return;
     }
     const exists = niveis.some((n) => n.valor === nivelFiltro);
     if (!exists) setNivelFiltro("");
-  }, [niveis]);
+  }, [niveis, nivelFiltro]);
 
   const toggleSelecionada = (id: number) => {
     setSelecionada((prev) => (prev === id ? null : id));
   };
 
   const confirmarSelecao = async () => {
+    if (selecionada == null) {
+      onSave([], null);
+      onClose();
+      return;
+    }
+
+    if (saebFiltro === "true" && !nivelProficienciaSelecionado) {
+      alert("Você deve selecionar um nível de proficiência para continuar.");
+      return;
+    }
+
     try {
+      const proficienciaId = nivelProficienciaSelecionado ? Number(nivelProficienciaSelecionado) : null;
+      
       const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/questoes/${questaoId}/vincular-bncc`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ codigos_bncc: selecionada != null ? [selecionada] : [] }),
+        body: JSON.stringify({ 
+          codigos_bncc: [selecionada],
+          proficiencia_saeb_id: proficienciaId
+        }),
       });
 
       if (!res.ok) {
@@ -138,7 +169,7 @@ export const ModalBNCCEdit = ({
         return;
       }
 
-      onSave(selecionada != null ? [selecionada] : []);
+      onSave([selecionada], proficienciaId);
       onClose();
     } catch (error) {
       console.error("Erro ao enviar dados:", error);
@@ -188,6 +219,25 @@ export const ModalBNCCEdit = ({
           </select>
         </div>
 
+        {/* Seleção de Nível de Proficiência SAEB */}
+        {selecionada != null && niveis.length > 0 && saebFiltro === "true" && (
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Selecione o Nível de Proficiência SAEB:
+            </label>
+            <select
+              value={nivelProficienciaSelecionado}
+              onChange={(e) => setNivelProficienciaSelecionado(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-xl text-sm"
+            >
+              <option value="">Selecione um nível</option>
+              {niveis.map((n) => (
+                <option key={n.valor} value={n.valor}>{n.descricao}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <div className="border border-gray-200 rounded-xl overflow-y-auto max-h-[300px] mb-2">
           {habilidades.length === 0 ? (
             <p className="text-gray-500 text-sm text-center py-6">
@@ -220,6 +270,10 @@ export const ModalBNCCEdit = ({
           <p className="text-xs text-red-600 mb-4">Selecione uma habilidade para continuar.</p>
         )}
 
+        {selecionada != null && saebFiltro === "true" && !nivelProficienciaSelecionado && (
+          <p className="text-xs text-red-600 mb-4">Selecione um nível de proficiência SAEB para continuar.</p>
+        )}
+
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
@@ -229,8 +283,12 @@ export const ModalBNCCEdit = ({
           </button>
           <button
             onClick={confirmarSelecao}
-            disabled={selecionada == null}
-            className={`px-5 py-2.5 rounded-xl text-sm transition ${selecionada == null ? 'bg-blue-300 text-white cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+            disabled={selecionada == null || (saebFiltro === "true" && !nivelProficienciaSelecionado)}
+            className={`px-5 py-2.5 rounded-xl text-sm transition ${
+              selecionada == null || (saebFiltro === "true" && !nivelProficienciaSelecionado)
+                ? 'bg-blue-300 text-white cursor-not-allowed' 
+                : 'bg-blue-600 text-white hover:bg-blue-700'
+            }`}
           >
             Salvar Seleção
           </button>
