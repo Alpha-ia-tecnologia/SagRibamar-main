@@ -87,7 +87,9 @@ export const EditarQuestaoModal = ({
                 return codigo;
               }
               return null;
-            }).filter((id): id is number => id !== null)
+            }).filter((id: number | null): id is number => {
+              return id !== null;
+            })
           : [];
         setCodigosBNCC(codigosIds);
         
