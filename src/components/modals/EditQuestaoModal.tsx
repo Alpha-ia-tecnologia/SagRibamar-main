@@ -73,8 +73,24 @@ export const EditarQuestaoModal = ({
         setSerie(data.serie || "PRIMEIRO_ANO");
         setDificuldade(data.dificuldade || "FACIL");
         setPontos(data.pontos || 1);
-        setComponenteId(data.componente_curricular_id || 0);
-        setCodigosBNCC(data.codigos_bncc || []);
+        setComponenteId(data.componente_curricular_id || 4);
+        
+        // Handle codigosBNCC data properly
+        const codigosIds = Array.isArray(data.codigos_bncc) 
+          ? data.codigos_bncc.map((codigo: any): number | null => {
+              // A estrutura real é: { questao_id, bncc_id, bncc: { id, codigo, ... } }
+              if (typeof codigo === 'object' && codigo.bncc_id) {
+                return codigo.bncc_id;
+              } else if (typeof codigo === 'object' && codigo.bncc?.id) {
+                return codigo.bncc.id;
+              } else if (typeof codigo === 'number') {
+                return codigo;
+              }
+              return null;
+            }).filter((id): id is number => id !== null)
+          : [];
+        setCodigosBNCC(codigosIds);
+        
         setProficienciaSaebId(data.proficiencia_saeb_id || null);
       });
 
@@ -181,6 +197,8 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           body: JSON.stringify(payload),
         }
       );
+
+      console.log("Json da apiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", payload);
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -362,7 +380,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     onClose={() => setShowModalBNCC(false)}
     onSave={(novosCodigos, profId) => {
       setCodigosBNCC(novosCodigos);
-      setProficienciaSaebId(profId);
+      setProficienciaSaebId(profId || null);
       setShowModalBNCC(false);
       // Recarrega habilidades para refletir chips e botão
       fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`)
