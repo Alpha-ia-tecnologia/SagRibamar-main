@@ -55,57 +55,56 @@ export const EditarQuestaoModal = ({
   const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
 
   useEffect(() => {
-    const carregarDados = async () => {
-      try {
-        // Carrega dados da questão
-        const questaoRes = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/questoes/${questaoId}`);
-        const questaoData = await questaoRes.json();
-        
-        setEnunciado(questaoData.enunciado || "");
-        setImagemUrl(questaoData.imagem_url || "");
+    let questaoData: any = null;
+    
+    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/questoes/${questaoId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        questaoData = data;
+        setEnunciado(data.enunciado || "");
+        setImagemUrl(data.imagem_url || "");
         setImagemPreview(
-          questaoData.imagem_url
-            ? `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${questaoData.imagem_url}`
+          data.imagem_url
+            ? `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${data.imagem_url}`
             : ""
         );
-        setAlternativas(questaoData.alternativas || []);
-        setNivelEnsino(questaoData.nivel_ensino || "ANOS_INICIAIS");
-        setSerie(questaoData.serie || "PRIMEIRO_ANO");
-        setDificuldade(questaoData.dificuldade || "FACIL");
-        setPontos(questaoData.pontos || 1);
-        setComponenteId(questaoData.componente_curricular_id || 0);
-        setCodigosBNCC(questaoData.codigos_bncc || []);
-        setProficienciaSaebId(questaoData.proficiencia_saeb_id || null);
+        setAlternativas(data.alternativas || []);
+        setNivelEnsino(data.nivel_ensino || "ANOS_INICIAIS");
+        setSerie(data.serie || "PRIMEIRO_ANO");
+        setDificuldade(data.dificuldade || "FACIL");
+        setPontos(data.pontos || 1);
+        setComponenteId(data.componente_curricular_id || 0);
+        setCodigosBNCC(data.codigos_bncc || []);
+        setProficienciaSaebId(data.proficiencia_saeb_id || null);
+      });
 
-        // Carrega componentes curriculares
-        const componentesRes = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/componentes-curriculares`);
-        const componentesData = await componentesRes.json();
-        setComponentes(componentesData || []);
+    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/componentes-curriculares`)
+      .then((res) => res.json())
+      .then((data) => setComponentes(data || []));
 
-        // Carrega habilidades BNCC já vinculadas para exibição/remoção
-        const habilidadesRes = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`);
-        const habilidadesLista = await habilidadesRes.json();
-        
-        if (Array.isArray(habilidadesLista) && habilidadesLista.length > 0) {
+    // Carrega habilidades BNCC já vinculadas para exibição/remoção
+    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`)
+      .then((res) => res.json())
+      .then(async (lista) => {
+        if (Array.isArray(lista)) {
           const habilidadesComNivel = await Promise.all(
-            habilidadesLista.map(async (h: { id: number; codigo: string }) => {
+            lista.map(async (h: { id: number; codigo: string }) => {
               let nivelDescricao = "";
               
-              // Buscar informações de proficiência SAEB se existir
-              try {
-                const profRes = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${h.id}/proficiencias`);
-                if (profRes.ok) {
-                  const profData = await profRes.json();
-                  // Se há proficiência salva na questão, buscar sua descrição
-                  if (questaoData.proficiencia_saeb_id) {
+              // Se há um ID de proficiência, buscar a descrição do nível
+              if (questaoData?.proficiencia_saeb_id) {
+                try {
+                  const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${h.id}/proficiencias`);
+                  if (res.ok) {
+                    const profData = await res.json();
                     const proficiencia = profData.find((p: any) => p.id === questaoData.proficiencia_saeb_id);
                     if (proficiencia) {
                       nivelDescricao = `${proficiencia.nivel ?? ""}${proficiencia.nivel ? " - " : ""}${proficiencia.descricao ?? ""}`.trim();
                     }
                   }
+                } catch (error) {
+                  console.error("Erro ao buscar descrição do nível:", error);
                 }
-              } catch (error) {
-                console.error("Erro ao buscar proficiência:", error);
               }
               
               return { 
@@ -115,15 +114,10 @@ export const EditarQuestaoModal = ({
               };
             })
           );
-          
           setHabilidadesSelecionadas(habilidadesComNivel);
         }
-      } catch (error) {
-        console.error("Erro ao carregar dados da questão:", error);
-      }
-    };
-
-    carregarDados();
+      })
+      .catch(() => {});
   }, [questaoId]);
 
 const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -174,6 +168,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       pontos,
       componente_curricular_id: componenteId,
       codigos_bncc: codigosBNCC,
+      proficiencia_saeb_id: proficienciaSaebId,
       alternativas,
     };
 
@@ -285,9 +280,6 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
             ))}
           </select>
         </div>
-        <p className="text-red-600 text-sm font-medium mb-2">
-          ⚠ É obrigatório selecionar pelo menos uma habilidade BNCC/SAEB.
-        </p>
         <button
           onClick={() => setShowModalBNCC(true)}
           className="w-full mb-6 px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 hover:bg-gray-100 text-sm"
@@ -368,38 +360,33 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     questaoId={questaoId}
     codigosSelecionados={codigosBNCC}
     onClose={() => setShowModalBNCC(false)}
-    onSave={(novosCodigos, proficienciaId) => {
+    onSave={(novosCodigos, profId) => {
       setCodigosBNCC(novosCodigos);
-      setProficienciaSaebId(proficienciaId || null);
+      setProficienciaSaebId(profId);
       setShowModalBNCC(false);
       // Recarrega habilidades para refletir chips e botão
       fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`)
         .then((res) => res.json())
         .then(async (lista) => {
-          if (Array.isArray(lista) && lista.length > 0) {
-            // Buscar dados atualizados da questão para pegar proficiencia_saeb_id
-            const questaoRes = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/questoes/${questaoId}`);
-            const questaoData = await questaoRes.json();
-            
+          if (Array.isArray(lista)) {
             const habilidadesComNivel = await Promise.all(
               lista.map(async (h: { id: number; codigo: string }) => {
                 let nivelDescricao = "";
                 
-                // Buscar informações de proficiência SAEB se existir
-                try {
-                  const profRes = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${h.id}/proficiencias`);
-                  if (profRes.ok) {
-                    const profData = await profRes.json();
-                    // Se há proficiência salva na questão, buscar sua descrição
-                    if (questaoData.proficiencia_saeb_id) {
-                      const proficiencia = profData.find((p: any) => p.id === questaoData.proficiencia_saeb_id);
+                // Se há um ID de proficiência, buscar a descrição do nível
+                if (profId) {
+                  try {
+                    const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${h.id}/proficiencias`);
+                    if (res.ok) {
+                      const profData = await res.json();
+                      const proficiencia = profData.find((p: any) => p.id === profId);
                       if (proficiencia) {
                         nivelDescricao = `${proficiencia.nivel ?? ""}${proficiencia.nivel ? " - " : ""}${proficiencia.descricao ?? ""}`.trim();
                       }
                     }
+                  } catch (error) {
+                    console.error("Erro ao buscar descrição do nível:", error);
                   }
-                } catch (error) {
-                  console.error("Erro ao buscar proficiência:", error);
                 }
                 
                 return { 
@@ -409,9 +396,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
                 };
               })
             );
-            
             setHabilidadesSelecionadas(habilidadesComNivel);
-            setProficienciaSaebId(questaoData.proficiencia_saeb_id || null);
           }
         })
         .catch(() => {});
