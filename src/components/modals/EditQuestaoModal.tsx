@@ -378,46 +378,59 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     questaoId={questaoId}
     codigosSelecionados={codigosBNCC}
     onClose={() => setShowModalBNCC(false)}
-    onSave={(novosCodigos, profId) => {
+    onSave={async (novosCodigos, profId) => {
       setCodigosBNCC(novosCodigos);
       setProficienciaSaebId(profId || null);
       setShowModalBNCC(false);
-      // Recarrega habilidades para refletir chips e botão
-      fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`)
-        .then((res) => res.json())
-        .then(async (lista) => {
-          if (Array.isArray(lista)) {
-            const habilidadesComNivel = await Promise.all(
-              lista.map(async (h: { id: number; codigo: string }) => {
-                let nivelDescricao = "";
-                
-                // Se há um ID de proficiência, buscar a descrição do nível
-                if (profId) {
-                  try {
-                    const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${h.id}/proficiencias`);
-                    if (res.ok) {
-                      const profData = await res.json();
-                      const proficiencia = profData.find((p: any) => p.id === profId);
-                      if (proficiencia) {
-                        nivelDescricao = `${proficiencia.nivel ?? ""}${proficiencia.nivel ? " - " : ""}${proficiencia.descricao ?? ""}`.trim();
-                      }
-                    }
-                  } catch (error) {
-                    console.error("Erro ao buscar descrição do nível:", error);
+      
+      // Se não há códigos selecionados, limpa as habilidades
+      if (novosCodigos.length === 0) {
+        setHabilidadesSelecionadas([]);
+        return;
+      }
+      
+      // Busca as informações das novas habilidades selecionadas
+      try {
+        const habilidadesComNivel = await Promise.all(
+          novosCodigos.map(async (codigoId) => {
+            // Busca informações da habilidade
+            const resHabilidade = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${codigoId}`);
+            if (!resHabilidade.ok) return null;
+            
+            const habilidade = await resHabilidade.json();
+            let nivelDescricao = "";
+            
+            // Se há um ID de proficiência, buscar a descrição do nível
+            if (profId) {
+              try {
+                const resProficiencia = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${codigoId}/proficiencias`);
+                if (resProficiencia.ok) {
+                  const profData = await resProficiencia.json();
+                  const proficiencia = profData.find((p: any) => p.id === profId);
+                  if (proficiencia) {
+                    nivelDescricao = `${proficiencia.nivel ?? ""}${proficiencia.nivel ? " - " : ""}${proficiencia.descricao ?? ""}`.trim();
                   }
                 }
-                
-                return { 
-                  id: h.id, 
-                  codigo: h.codigo, 
-                  nivel: nivelDescricao || undefined 
-                };
-              })
-            );
-            setHabilidadesSelecionadas(habilidadesComNivel);
-          }
-        })
-        .catch(() => {});
+              } catch (error) {
+                console.error("Erro ao buscar descrição do nível:", error);
+              }
+            }
+            
+            return { 
+              id: habilidade.id, 
+              codigo: habilidade.codigo, 
+              nivel: nivelDescricao || undefined 
+            };
+          })
+        );
+        
+        // Filtra valores nulos e atualiza o estado
+        const habilidadesValidas = habilidadesComNivel.filter(h => h !== null);
+        setHabilidadesSelecionadas(habilidadesValidas);
+      } catch (error) {
+        console.error("Erro ao buscar habilidades:", error);
+        setHabilidadesSelecionadas([]);
+      }
     }}
   />
 )}

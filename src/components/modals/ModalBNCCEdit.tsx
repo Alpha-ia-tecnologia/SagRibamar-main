@@ -76,20 +76,20 @@ export const ModalBNCCEdit = ({
   }, [questaoId, serieFiltro, saebFiltro]);
 
   useEffect(() => {
-    // Carrega níveis (proficiencias) com base nas habilidades disponíveis
+    // Carrega níveis (proficiencias) com base na habilidade selecionada
     const fetchNiveisPorBNCC = async () => {
-      if (habilidades.length === 0) {
+      if (!selecionada) {
         setNiveis([]);
+        setProficienciaSelecionada(null);
         return;
       }
       
-      // Busca proficiências da primeira habilidade disponível como exemplo
-      const primeiraHabilidade = habilidades[0];
-      if (!primeiraHabilidade) return;
-      
       try {
-        const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${primeiraHabilidade.id}/proficiencias`);
-        if (!res.ok) return;
+        const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${selecionada}/proficiencias`);
+        if (!res.ok) {
+          setNiveis([]);
+          return;
+        }
         const data = await res.json();
         if (Array.isArray(data)) {
           const normalizados = data.map((item: any) => ({
@@ -100,11 +100,11 @@ export const ModalBNCCEdit = ({
           setNiveis(normalizados);
         }
       } catch (e) {
-        // silencioso
+        setNiveis([]);
       }
     };
     fetchNiveisPorBNCC();
-  }, [habilidades]);
+  }, [selecionada]);
 
 
   const toggleSelecionada = (id: number) => {
