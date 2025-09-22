@@ -12,7 +12,7 @@ interface ModalBNCCEditProps {
   questaoId: number;
   codigosSelecionados: number[];
   onClose: () => void;
-  onSave: (novosCodigos: number[]) => void;
+  onSave: (novosCodigos: number[], profId?: number | null) => void;
 }
 
 const series = [
@@ -31,8 +31,8 @@ export const ModalBNCCEdit = ({
   const [selecionada, setSelecionada] = useState<number | null>(null);
   const [serieFiltro, setSerieFiltro] = useState("");
   const [saebFiltro, setSaebFiltro] = useState("");
-  const [nivelFiltro, setNivelFiltro] = useState("");
-  const [niveis, setNiveis] = useState<{ valor: string; descricao: string }[]>([]);
+  const [niveis, setNiveis] = useState<{ id: number; nivel: string; descricao: string }[]>([]);
+  const [proficienciaSelecionada, setProficienciaSelecionada] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchTodas = async () => {
@@ -49,7 +49,6 @@ export const ModalBNCCEdit = ({
           allParams.append("bncc", "true");
         }
         
-        if (nivelFiltro) allParams.append("nivel_ensino", nivelFiltro);
 
         const [resSelecionadas, resTodas] = await Promise.all([
           fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`),
@@ -74,76 +73,47 @@ export const ModalBNCCEdit = ({
     };
 
     fetchTodas();
-  }, [questaoId, serieFiltro, saebFiltro, nivelFiltro]);
+  }, [questaoId, serieFiltro, saebFiltro]);
 
   useEffect(() => {
-    // Carrega níveis (proficiencias) com base no BNCC selecionado
+    // Carrega níveis (proficiencias) com base na habilidade selecionada
     const fetchNiveisPorBNCC = async () => {
-      if (selecionada == null) {
+      if (!selecionada) {
         setNiveis([]);
-        setNivelFiltro("");
+        setProficienciaSelecionada(null);
         return;
       }
+      
       try {
         const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${selecionada}/proficiencias`);
-        if (!res.ok) return;
+        if (!res.ok) {
+          setNiveis([]);
+          return;
+        }
         const data = await res.json();
         if (Array.isArray(data)) {
-          const mapaNiveis = new Map<string, string>();
-          for (const item of data) {
-            const nivel = String(item.nivel ?? "");
-            if (!nivel) continue;
-            if (!mapaNiveis.has(nivel)) {
-              mapaNiveis.set(nivel, String(item.descricao ?? nivel));
-            }
-          }
-          const normalizados = Array.from(mapaNiveis.entries()).map(([valor, descricao]) => ({ valor, descricao }));
+          const normalizados = data.map((item: any) => ({
+            id: item.id,
+            nivel: item.nivel || "",
+            descricao: item.descricao || item.nivel || ""
+          }));
           setNiveis(normalizados);
         }
       } catch (e) {
-        // silencioso
+        setNiveis([]);
       }
     };
     fetchNiveisPorBNCC();
   }, [selecionada]);
 
-  useEffect(() => {
-    // Reseta o filtro se não houver níveis ou se o valor atual não existir mais
-    if (niveis.length === 0) {
-      if (nivelFiltro !== "") setNivelFiltro("");
-      return;
-    }
-    const exists = niveis.some((n) => n.valor === nivelFiltro);
-    if (!exists) setNivelFiltro("");
-  }, [niveis]);
 
   const toggleSelecionada = (id: number) => {
     setSelecionada((prev) => (prev === id ? null : id));
   };
 
   const confirmarSelecao = async () => {
-    try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/questoes/${questaoId}/vincular-bncc`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ codigos_bncc: selecionada != null ? [selecionada] : [] }),
-      });
-
-      if (!res.ok) {
-        const errText = await res.text();
-        console.error("Erro ao atualizar habilidades BNCC:", errText);
-        alert("Erro ao salvar seleção de habilidades.");
-        return;
-      }
-
-      onSave(selecionada != null ? [selecionada] : []);
-      onClose();
-    } catch (error) {
-      console.error("Erro ao enviar dados:", error);
-      alert("Erro inesperado ao salvar seleção.");
-    }
+    onSave(selecionada != null ? [selecionada] : [], proficienciaSelecionada);
+    onClose();
   };
 
   return (
@@ -176,19 +146,21 @@ export const ModalBNCCEdit = ({
           </select>
 
           <select
-            value={nivelFiltro}
-            onChange={(e) => setNivelFiltro(e.target.value)}
+            value={proficienciaSelecionada || ""}
+            onChange={(e) => setProficienciaSelecionada(e.target.value ? Number(e.target.value) : null)}
             className="p-3 border border-gray-300 rounded-xl text-sm"
             disabled={niveis.length === 0}
           >
-            <option value="">Todos os Níveis</option>
+            <option value="">Nível de Proficiência</option>
             {niveis.map((n) => (
-              <option key={n.valor} value={n.valor}>{n.descricao}</option>
+              <option key={n.id} value={n.id}>
+                {n.nivel ? `${n.nivel} - ${n.descricao}` : n.descricao}
+              </option>
             ))}
           </select>
         </div>
 
-        <div className="border border-gray-200 rounded-xl overflow-y-auto max-h-[300px] mb-2">
+        <div className="border border-gray-200 rounded-xl overflow-y-auto max-h-[300px] mb-4">
           {habilidades.length === 0 ? (
             <p className="text-gray-500 text-sm text-center py-6">
               Nenhuma habilidade encontrada.
@@ -216,6 +188,7 @@ export const ModalBNCCEdit = ({
             ))
           )}
         </div>
+
         {selecionada == null && habilidades.length > 0 && (
           <p className="text-xs text-red-600 mb-4">Selecione uma habilidade para continuar.</p>
         )}

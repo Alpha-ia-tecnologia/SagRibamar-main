@@ -34,7 +34,8 @@ export const EditarQuestaoModal = ({
   const [componentes, setComponentes] = useState<ComponenteCurricular[]>([]);
   const [codigosBNCC, setCodigosBNCC] = useState<number[]>([]);
   const [showModalBNCC, setShowModalBNCC] = useState(false);
-  const [habilidadesSelecionadas, setHabilidadesSelecionadas] = useState<{ id: number; codigo: string }[]>([]);
+  const [habilidadesSelecionadas, setHabilidadesSelecionadas] = useState<{ id: number; codigo: string; nivel?: string }[]>([]);
+  const [proficienciaSaebId, setProficienciaSaebId] = useState<number | null>(null);
 
   const niveis = ["ANOS_INICIAIS", "ANOS_FINAIS", "ENSINO_MEDIO"];
   const series = [
@@ -54,9 +55,12 @@ export const EditarQuestaoModal = ({
   const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
 
   useEffect(() => {
+    let questaoData: any = null;
+    
     fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/questoes/${questaoId}`)
       .then((res) => res.json())
       .then((data) => {
+        questaoData = data;
         setEnunciado(data.enunciado || "");
         setImagemUrl(data.imagem_url || "");
         setImagemPreview(
@@ -69,8 +73,25 @@ export const EditarQuestaoModal = ({
         setSerie(data.serie || "PRIMEIRO_ANO");
         setDificuldade(data.dificuldade || "FACIL");
         setPontos(data.pontos || 1);
-        setComponenteId(data.componente_curricular_id || 0);
-        setCodigosBNCC(data.codigos_bncc || []);
+        setComponenteId(data.componente_curricular_id || 4);
+        
+        // Handle codigosBNCC data properly
+        const codigosIds = Array.isArray(data.codigos_bncc) 
+          ? data.codigos_bncc.map((codigo: any): number | null => {
+              // A estrutura real é: { questao_id, bncc_id, bncc: { id, codigo, ... } }
+              if (typeof codigo === 'object' && codigo.bncc_id) {
+                return codigo.bncc_id;
+              } else if (typeof codigo === 'object' && codigo.bncc?.id) {
+                return codigo.bncc.id;
+              } else if (typeof codigo === 'number') {
+                return codigo;
+              }
+              return null;
+            }).filter((id): id is number => id !== null)
+          : [];
+        setCodigosBNCC(codigosIds);
+        
+        setProficienciaSaebId(data.proficiencia_saeb_id || null);
       });
 
     fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/componentes-curriculares`)
@@ -80,9 +101,36 @@ export const EditarQuestaoModal = ({
     // Carrega habilidades BNCC já vinculadas para exibição/remoção
     fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`)
       .then((res) => res.json())
-      .then((lista) => {
+      .then(async (lista) => {
         if (Array.isArray(lista)) {
-          setHabilidadesSelecionadas(lista.map((h: { id: number; codigo: string }) => ({ id: h.id, codigo: h.codigo })));
+          const habilidadesComNivel = await Promise.all(
+            lista.map(async (h: { id: number; codigo: string }) => {
+              let nivelDescricao = "";
+              
+              // Se há um ID de proficiência, buscar a descrição do nível
+              if (questaoData?.proficiencia_saeb_id) {
+                try {
+                  const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${h.id}/proficiencias`);
+                  if (res.ok) {
+                    const profData = await res.json();
+                    const proficiencia = profData.find((p: any) => p.id === questaoData.proficiencia_saeb_id);
+                    if (proficiencia) {
+                      nivelDescricao = `${proficiencia.nivel ?? ""}${proficiencia.nivel ? " - " : ""}${proficiencia.descricao ?? ""}`.trim();
+                    }
+                  }
+                } catch (error) {
+                  console.error("Erro ao buscar descrição do nível:", error);
+                }
+              }
+              
+              return { 
+                id: h.id, 
+                codigo: h.codigo, 
+                nivel: nivelDescricao || undefined 
+              };
+            })
+          );
+          setHabilidadesSelecionadas(habilidadesComNivel);
         }
       })
       .catch(() => {});
@@ -136,6 +184,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       pontos,
       componente_curricular_id: componenteId,
       codigos_bncc: codigosBNCC,
+      proficiencia_saeb_id: proficienciaSaebId,
       alternativas,
     };
 
@@ -148,6 +197,8 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           body: JSON.stringify(payload),
         }
       );
+
+      console.log("Json da apiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", payload);
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -247,9 +298,6 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
             ))}
           </select>
         </div>
-        <p className="text-red-600 text-sm font-medium mb-2">
-          ⚠ É obrigatório selecionar pelo menos uma habilidade BNCC/SAEB.
-        </p>
         <button
           onClick={() => setShowModalBNCC(true)}
           className="w-full mb-6 px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 hover:bg-gray-100 text-sm"
@@ -268,7 +316,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           <div className="flex flex-wrap gap-2 mb-6">
             {habilidadesSelecionadas.map((h) => (
               <span key={h.id} className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-full text-xs bg-blue-50 text-blue-700 border border-blue-200">
-                {h.codigo}
+                {h.codigo}{h.nivel && ` (${h.nivel})`}
                 <button
                   type="button"
                   onClick={() => {
@@ -330,18 +378,59 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     questaoId={questaoId}
     codigosSelecionados={codigosBNCC}
     onClose={() => setShowModalBNCC(false)}
-    onSave={(novosCodigos) => {
+    onSave={async (novosCodigos, profId) => {
       setCodigosBNCC(novosCodigos);
+      setProficienciaSaebId(profId || null);
       setShowModalBNCC(false);
-      // Recarrega habilidades para refletir chips e botão
-      fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`)
-        .then((res) => res.json())
-        .then((lista) => {
-          if (Array.isArray(lista)) {
-            setHabilidadesSelecionadas(lista.map((h: { id: number; codigo: string }) => ({ id: h.id, codigo: h.codigo })));
-          }
-        })
-        .catch(() => {});
+      
+      // Se não há códigos selecionados, limpa as habilidades
+      if (novosCodigos.length === 0) {
+        setHabilidadesSelecionadas([]);
+        return;
+      }
+      
+      // Busca as informações das novas habilidades selecionadas
+      try {
+        const habilidadesComNivel = await Promise.all(
+          novosCodigos.map(async (codigoId) => {
+            // Busca informações da habilidade
+            const resHabilidade = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${codigoId}`);
+            if (!resHabilidade.ok) return null;
+            
+            const habilidade = await resHabilidade.json();
+            let nivelDescricao = "";
+            
+            // Se há um ID de proficiência, buscar a descrição do nível
+            if (profId) {
+              try {
+                const resProficiencia = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${codigoId}/proficiencias`);
+                if (resProficiencia.ok) {
+                  const profData = await resProficiencia.json();
+                  const proficiencia = profData.find((p: any) => p.id === profId);
+                  if (proficiencia) {
+                    nivelDescricao = `${proficiencia.nivel ?? ""}${proficiencia.nivel ? " - " : ""}${proficiencia.descricao ?? ""}`.trim();
+                  }
+                }
+              } catch (error) {
+                console.error("Erro ao buscar descrição do nível:", error);
+              }
+            }
+            
+            return { 
+              id: habilidade.id, 
+              codigo: habilidade.codigo, 
+              nivel: nivelDescricao || undefined 
+            };
+          })
+        );
+        
+        // Filtra valores nulos e atualiza o estado
+        const habilidadesValidas = habilidadesComNivel.filter(h => h !== null);
+        setHabilidadesSelecionadas(habilidadesValidas);
+      } catch (error) {
+        console.error("Erro ao buscar habilidades:", error);
+        setHabilidadesSelecionadas([]);
+      }
     }}
   />
 )}
