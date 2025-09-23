@@ -102,7 +102,9 @@ export const ProvaList = ({
               📝
             </div>
             <div>
-              <p className="text-blue-700 font-semibold hover:underline cursor-pointer">
+              <p 
+              onClick={() => onVisualizar?.(prova.id)}
+              className="text-blue-700 font-semibold hover:underline cursor-pointer">
                 {prova.nome}
               </p>
               <p className="text-sm text-gray-500">
