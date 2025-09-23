@@ -364,28 +364,28 @@ export const TabelaHabilidadesBNCC = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Componente Curricular</p>
+                      <p className="text-sm font-bold text-gray-800">Componente Curricular</p>
                       <p className="text-sm text-gray-900">{selecionada.componente_curricular_nome}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Série</p>
+                      <p className="text-sm font-bold text-gray-800">Série</p>
                       <p className="text-sm text-gray-900">{selecionada.bncc_serie}</p>
                     </div>
                   </div>
 
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Descrição</p>
+                    <p className="text-sm font-bold text-gray-800">Descrição</p>
                     <p className="text-sm text-gray-900 mt-1">{selecionada.bncc_descricao}</p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Total de Questões</p>
+                      <p className="text-sm font-bold text-gray-800">Total de Questões</p>
                       <p className="text-sm text-gray-900">{selecionada.total_questoes}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Média de Desempenho</p>
-                      <p className="text-sm text-gray-900 font-semibold">
+                      <p className="text-sm font-bold text-gray-800">Média de Desempenho</p>
+                      <p className="text-sm text-gray-900">
                         {parseFloat(selecionada.percentual_acertos as any).toFixed(2)}%
                       </p>
                     </div>
@@ -407,10 +407,10 @@ export const TabelaHabilidadesBNCC = () => {
                     <table className="w-full text-sm text-left text-gray-700">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-4 py-3 font-medium text-gray-900">Avaliação</th>
-                          <th className="px-4 py-3 font-medium text-gray-900">Data</th>
-                          <th className="px-4 py-3 font-medium text-gray-900">Desempenho</th>
-                          <th className="px-4 py-3 font-medium text-gray-900">Evolução</th>
+                          <th className="px-4 py-3 font-bold text-gray-900">Avaliação</th>
+                          <th className="px-4 py-3 font-bold text-gray-900">Data</th>
+                          <th className="px-4 py-3 font-bold text-gray-900">Desempenho</th>
+                          <th className="px-4 py-3 font-bold text-gray-900">Evolução</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
@@ -462,7 +462,17 @@ export const TabelaHabilidadesBNCC = () => {
                       )}
                       
                       <div className="space-y-3">
-                        {questoes.map((questao) => (
+                        {questoes.map((questao) => {
+                          const taxa = questao.desempenho?.taxa_acerto ?? 0;
+
+                          const taxaAcertoClass =
+                            taxa >= 70
+                              ? "bg-green-100 text-green-800"
+                              : taxa >= 50
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-red-100 text-red-800";
+
+                          return (
                           <div key={questao.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                             <div className="flex justify-between items-start mb-3">
                               <div className="flex-1">
@@ -473,22 +483,25 @@ export const TabelaHabilidadesBNCC = () => {
                                   {questao.enunciado}
                                 </p>
                                 <div className="flex flex-wrap gap-2 text-xs">
-                                  <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                                  <span className="bg-gray-200 text-gray-900 px-2 py-1 rounded">
                                     {questao.serie_formatada}
                                   </span>
-                                  <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                                  <span className="bg-gray-200 text-gray-900 px-2 py-1 rounded">
                                     {questao.prova.nome}
                                   </span>
-                                  <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                                  <span className="bg-gray-200 text-gray-900 px-2 py-1 rounded">
                                     {questao.proficiencia_saeb
                                       ? `${questao.proficiencia_saeb.nivel} - ${questao.proficiencia_saeb.descricao}`
-                                      : "sem nivel vinculado"}
+                                      : "Sem nivel vinculado"}
                                   </span>
                                 </div>
                               </div>
                               <div className="text-right ml-4">
-                                <div className="text-sm font-medium text-gray-900">
-                                  Taxa de Acerto: {questao.desempenho.taxa_acerto.toFixed(1)}%
+                                <div className= {`${taxaAcertoClass}`}>
+                                  Taxa de Acerto: <span
+                                  className="font-medium">
+                                    {taxa.toFixed(1)}%
+                                  </span>
                                 </div>
                                 <div className="text-xs text-gray-500">
                                   {questao.desempenho.total_corretas}/{questao.desempenho.total_respostas}
@@ -498,8 +511,8 @@ export const TabelaHabilidadesBNCC = () => {
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                               <div>
-                                <p className="font-medium text-gray-700 mb-1">Alternativas:</p>
-                                <div className="space-y-1">
+                                <p className="font-medium text-gray-700 text-base my-3">Alternativas:</p>
+                                <div className="space-y-6">
                                   {questao.alternativas.map((alt, index) => (
                                     <div key={alt.id} className={`flex items-center gap-2 ${
                                       alt.correta ? 'text-green-700 font-medium' : 'text-gray-600'
@@ -517,8 +530,8 @@ export const TabelaHabilidadesBNCC = () => {
                               </div>
                               
                               <div>
-                                <p className="font-medium text-gray-700 mb-1">Desempenho:</p>
-                                <div className="space-y-1">
+                                <p className="font-medium text-base text-gray-900 my-3">Desempenho:</p>
+                                <div className="space-y-2">
                                   <div className="flex justify-between">
                                     <span>Total de Respostas:</span>
                                     <span className="font-medium">{questao.desempenho.total_respostas.toLocaleString()}</span>
@@ -539,7 +552,8 @@ export const TabelaHabilidadesBNCC = () => {
                               </div>
                             </div>
                           </div>
-                        ))}
+                        );
+                      })}
                       </div>
                     </div>
                   ) : (
@@ -556,7 +570,7 @@ export const TabelaHabilidadesBNCC = () => {
               <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 rounded-b-lg">
                 <div className="flex justify-end">
                   <button
-                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                    className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
                     onClick={fecharModal}
                   >
                     Fechar
