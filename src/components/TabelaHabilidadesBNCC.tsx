@@ -16,6 +16,7 @@ interface Habilidade {
 
 interface Questao {
   id: number;
+  ordem:number;
   enunciado: string;
   imagem_url: string;
   nivel_ensino: string;
@@ -462,7 +463,7 @@ export const TabelaHabilidadesBNCC = () => {
                             <div className="flex justify-between items-start mb-3">
                               <div className="flex-1">
                                 <h5 className="font-medium text-gray-900 mb-1">
-                                  Questão {questao.id}
+                                  Questão {questao.ordem}
                                 </h5>
                                 <p className="text-sm text-gray-600 mb-2">
                                   {questao.enunciado}
