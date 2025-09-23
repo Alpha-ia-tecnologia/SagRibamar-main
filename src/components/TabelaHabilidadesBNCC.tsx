@@ -34,7 +34,11 @@ interface Questao {
     id: number;
     nome: string;
   };
-  proficiencia_saeb: any;
+  proficiencia_saeb: {
+    id: number;
+    nivel: string;
+    descricao: string;
+  };
   codigos_bncc: Array<{
     questao_id: number;
     bncc_id: number;
@@ -473,16 +477,18 @@ export const TabelaHabilidadesBNCC = () => {
                                     {questao.serie_formatada}
                                   </span>
                                   <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded">
-                                    {questao.dificuldade_formatada}
+                                    {questao.prova.nome}
                                   </span>
                                   <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded">
-                                    {questao.prova.nome}
+                                    {questao.proficiencia_saeb
+                                      ? `${questao.proficiencia_saeb.nivel} - ${questao.proficiencia_saeb.descricao}`
+                                      : "sem nivel vinculado"}
                                   </span>
                                 </div>
                               </div>
                               <div className="text-right ml-4">
                                 <div className="text-sm font-medium text-gray-900">
-                                  {questao.desempenho.taxa_acerto.toFixed(1)}%
+                                  Taxa de Acerto: {questao.desempenho.taxa_acerto.toFixed(1)}%
                                 </div>
                                 <div className="text-xs text-gray-500">
                                   {questao.desempenho.total_corretas}/{questao.desempenho.total_respostas}
