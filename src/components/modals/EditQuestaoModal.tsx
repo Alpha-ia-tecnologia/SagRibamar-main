@@ -36,6 +36,7 @@ export const EditarQuestaoModal = ({
   const [showModalBNCC, setShowModalBNCC] = useState(false);
   const [habilidadesSelecionadas, setHabilidadesSelecionadas] = useState<{ id: number; codigo: string; nivel?: string }[]>([]);
   const [proficienciaSaebId, setProficienciaSaebId] = useState<number | null>(null);
+  const [ordem, setOrdem] = useState<number | null>(null);
 
   const niveis = ["ANOS_INICIAIS", "ANOS_FINAIS", "ENSINO_MEDIO"];
   const series = [
@@ -74,6 +75,7 @@ export const EditarQuestaoModal = ({
         setDificuldade(data.dificuldade || "FACIL");
         setPontos(data.pontos || 1);
         setComponenteId(data.componente_curricular_id || 4);
+        setOrdem(data.ordem || null);
         
         // Handle codigosBNCC data properly
         const codigosIds = Array.isArray(data.codigos_bncc) 
@@ -87,7 +89,9 @@ export const EditarQuestaoModal = ({
                 return codigo;
               }
               return null;
-            }).filter((id): id is number => id !== null)
+            }).filter((id: number | null): id is number => {
+              return id !== null;
+            })
           : [];
         setCodigosBNCC(codigosIds);
         
@@ -198,8 +202,6 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         }
       );
 
-      console.log("Json da apiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", payload);
-
       if (!res.ok) {
         const errorText = await res.text();
         console.error("Erro ao atualizar questão:", res.status, errorText);
@@ -218,7 +220,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-50">
       <div className="bg-white w-full max-w-3xl p-6 rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto transition-all">
-        <h2 className="text-xl font-bold mb-6 text-gray-800">Editar Questão</h2>
+        <h2 className="text-xl font-bold mb-6 text-gray-800">Editar Questão - {ordem || questaoId}</h2>
 
         <textarea
           value={enunciado}
