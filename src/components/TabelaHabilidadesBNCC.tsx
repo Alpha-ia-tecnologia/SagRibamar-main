@@ -96,6 +96,7 @@ export const TabelaHabilidadesBNCC = () => {
   const [questoes, setQuestoes] = useState<Questao[]>([]);
   const [carregandoQuestoes, setCarregandoQuestoes] = useState(false);
   const [estatisticasQuestoes, setEstatisticasQuestoes] = useState<QuestoesResponse['estatisticas'] | null>(null);
+  const [loadingSkills,setLoadingSkills] = useState (false)
   const { filtros } = useFiltroDashboard();
   
   // Refs para acessibilidade
@@ -178,6 +179,7 @@ export const TabelaHabilidadesBNCC = () => {
   }, [selecionada]);
 
   useEffect(() => {
+    setLoadingSkills (true);
     const fetchData = async () => {
       try {
         const params = new URLSearchParams();
@@ -200,6 +202,9 @@ export const TabelaHabilidadesBNCC = () => {
         setTotal(json.total);
       } catch (err) {
         console.error("Erro ao buscar habilidades BNCC:", err);
+      }
+      finally {
+        setLoadingSkills(false)
       }
     };
 
@@ -238,6 +243,14 @@ export const TabelaHabilidadesBNCC = () => {
 
   return (
     <div className="p-6 bg-white rounded-xl shadow-md">
+      {loadingSkills && (        
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="flex flex-col items-center bg-white rounded-xl p-6 shadow">
+            <div className="animate-spin rounded-full h-10 w-10 border-4 border-t-transparent border-blue-600"></div>
+            <p className="mt-5 text-md font-medium text-black">Filtrando...</p>
+          </div>
+        </div>
+        )}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Habilidades BNCC / SAEB</h2>
         <div className="flex gap-2">
@@ -246,7 +259,7 @@ export const TabelaHabilidadesBNCC = () => {
               setFiltroOrdem("erros");
               setPage(1);
             }}
-            className={`px-3 py-1 text-sm rounded ${
+            className={`px-3 py-1 text-sm rounded cursor-pointer ${
               filtroOrdem === "erros"
                 ? "bg-red-500 text-white"
                 : "bg-red-100 text-red-600 hover:bg-red-200"
@@ -259,7 +272,7 @@ export const TabelaHabilidadesBNCC = () => {
               setFiltroOrdem("acertos");
               setPage(1);
             }}
-            className={`px-3 py-1 text-sm rounded ${
+            className={`px-3 py-1 text-sm rounded cursor-pointer ${
               filtroOrdem === "acertos"
                 ? "bg-green-500 text-white"
                 : "bg-green-100 text-green-600 hover:bg-green-200"
