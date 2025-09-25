@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { EditarQuestaoModal } from "./EditQuestaoModal"; 
-import { CreateQuestoesModal } from "./CreateQuestoesModal";
+import { EditarQuestaoModal } from "./EditQuestaoModal";
 
 interface VisualizarProvaModalProps {
   provaId: number;
