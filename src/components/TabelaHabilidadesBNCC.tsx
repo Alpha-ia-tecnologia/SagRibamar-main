@@ -136,7 +136,6 @@ export const TabelaHabilidadesBNCC = () => {
       setCarregandoQuestoes(false);
     }
   };
-
   // Função para fechar modal
   const fecharModal = () => {
     setSelecionada(null);
@@ -241,13 +240,24 @@ export const TabelaHabilidadesBNCC = () => {
     return pagesToShow;
   };
 
+  function BlockScroll ({loadingSkills}) {
+    useEffect (() => {
+      if (loadingSkills){
+        document.body.style.overflow = "hidden"
+      }
+      else {
+        document.body.style.overflow = ""
+      }
+  })};
+
   return (
     <div className="p-6 bg-white rounded-xl shadow-md">
+      <BlockScroll loadingSkills={loadingSkills} />
       {loadingSkills && (        
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="flex flex-col items-center bg-white rounded-xl p-6 shadow">
             <div className="animate-spin rounded-full h-10 w-10 border-4 border-t-transparent border-blue-600"></div>
-            <p className="mt-5 text-md font-medium text-black">Filtrando...</p>
+            <p className="mt-5 text-md font-medium text-black">Carregando...</p>
           </div>
         </div>
         )}

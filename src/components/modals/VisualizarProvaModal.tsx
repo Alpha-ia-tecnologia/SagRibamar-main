@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { EditarQuestaoModal } from "./EditQuestaoModal"; 
+import { CreateQuestoesModal } from "./CreateQuestoesModal";
 
 interface VisualizarProvaModalProps {
   provaId: number;
@@ -72,14 +73,18 @@ export const VisualizarProvaModal = ({ provaId, onClose }: VisualizarProvaModalP
           ref={contentRef}
           className="bg-white w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl shadow-lg flex flex-col"
         >
-          <div className="sticky top-0 z-10 bg-white px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+          <div className="sticky top-0 z-10 bg-white px-6 py-4 border-b border-gray-200 grid items-center grid-rows-2 grid-cols-2">
             <h2 className="text-xl font-bold text-blue-700">{prova?.nome}</h2>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-800 text-2xl font-light"
+              className="text-gray-500 hover:text-gray-800 text-2xl font-light grid justify-end"
             >
               &times;
             </button>
+            {/* <button
+            className="rounded-lg py-1.5 px-2.25 bg-blue-600 text-white text-sm mt-2 w-max">
+              + Adicionar nova questão
+            </button> */}
           </div>
 
           <div className="overflow-y-auto p-6 space-y-6">
