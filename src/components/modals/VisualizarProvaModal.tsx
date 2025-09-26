@@ -5,6 +5,7 @@ import { CreateQuestoesModal } from "./CreateQuestoesModal";
 interface VisualizarProvaModalProps {
   provaId: number;
   onClose: () => void;
+  modoVisualizacao?: boolean; // true quando aberto via botão "eye", false quando via "squarepen"
 }
 
 interface Alternativa {
@@ -30,6 +31,7 @@ interface Prova {
 export const VisualizarProvaModal = ({
   provaId,
   onClose,
+  modoVisualizacao = false,
 }: VisualizarProvaModalProps) => {
   const [prova, setProva] = useState<Prova | null>(null);
   const [questoes, setQuestoes] = useState<Questao[]>([]);
@@ -91,12 +93,14 @@ export const VisualizarProvaModal = ({
             >
               &times;
             </button>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="rounded-lg py-1.5 px-2.25 bg-blue-600 text-white text-sm mt-2 w-max"
-            >
-              + Adicionar nova questão
-            </button>
+            {!modoVisualizacao && (
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="rounded-lg py-1.5 px-2.25 bg-blue-600 text-white text-sm mt-2 w-max col-start-2 justify-self-end"              
+              >
+                + Adicionar nova questão
+              </button>
+            )}
           </div>
 
           <div className="overflow-y-auto p-6 space-y-6">
@@ -114,13 +118,16 @@ export const VisualizarProvaModal = ({
                     <p className="font-semibold text-gray-800">
                       {index + 1}. {questao.enunciado}
                     </p>
-                    <button
-                      onClick={() => setQuestaoIdEmEdicao(questao.id)}
-                      className="text-blue-600 hover:text-blue-800 transition text-sm"
-                      title="Editar questão"
-                    >
-                      Editar
-                    </button>
+                    {!modoVisualizacao && (
+                      <button
+                        onClick={() => setQuestaoIdEmEdicao(questao.id)
+                        }
+                        className="text-blue-600 hover:text-blue-800 transition text-sm"
+                        title="Editar questão"
+                      >
+                        Editar
+                      </button>
+                    )}
                   </div>
 
                   {questao.imagem_url && (

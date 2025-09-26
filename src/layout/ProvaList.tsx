@@ -15,7 +15,7 @@ interface ProvaListProps {
   reload?: boolean;
   onReloadDone?: () => void;
   onEdit?: (id: number) => void;
-  onVisualizar?: (id: number) => void; 
+  onVisualizar?: (id: number, modoVisualizacao?: boolean) => void; 
   searchTitulo?: string;
 }
 
@@ -103,7 +103,7 @@ export const ProvaList = ({
             </div>
             <div>
               <p 
-              onClick={() => onVisualizar?.(prova.id)}
+              onClick={() => onVisualizar?.(prova.id, true)}
               className="text-blue-700 font-semibold hover:underline cursor-pointer">
                 {prova.nome}
               </p>
@@ -117,14 +117,14 @@ export const ProvaList = ({
 
           <div className="flex gap-5">
             <button
-              onClick={() => onVisualizar?.(prova.id)}
+              onClick={() => onVisualizar?.(prova.id, true)}
               className=" rounded-full hover:bg-blue-100 transition cursor-pointer"
               title="Visualizar prova"
             >
             <Eye className="w-5 h-5 text-gray-600" />
             </button>
             <button
-            onClick={() => onVisualizar?.(prova.id)}
+            onClick={() => onVisualizar?.(prova.id, false)}
             className=" rounded-full hover:bg-blue-100 transition cursor-pointer"
             title="Editar"
             >
