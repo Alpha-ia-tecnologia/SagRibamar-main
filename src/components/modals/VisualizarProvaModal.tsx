@@ -181,10 +181,9 @@ export const VisualizarProvaModal = ({
         <CreateQuestoesModal
           provaId={provaId}
           onClose={() => setShowCreateModal(false)}
-          onSave={() => {
-            // ou onCreated / onSuccess, conforme sua API
+          onSuccess={() => {
             setShowCreateModal(false);
-            carregarQuestoes(); // recarrega a lista após criar
+            carregarQuestoes();
           }}
         />
       )}

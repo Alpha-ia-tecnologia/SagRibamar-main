@@ -209,8 +209,6 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      console.log("estou aqui")
-      console.log(payload)
 
       if (!res.ok) {
         const errorText = await res.text();
