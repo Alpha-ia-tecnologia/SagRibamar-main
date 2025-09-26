@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { IconButton } from "../components/IconButton";
-import { Eye } from "lucide-react";
+import { Eye, SquarePen } from "lucide-react";
 
 interface Prova {
   id: number;
@@ -115,16 +115,22 @@ export const ProvaList = ({
             </div>
           </div>
 
-          <div className="flex gap-3">
-            {/* <IconButton type="edit" onClick={() => onEdit?.(prova.id)} /> */}
-            <IconButton type="delete" onClick={() => handleDelete(prova.id)} />
+          <div className="flex gap-5">
             <button
               onClick={() => onVisualizar?.(prova.id)}
-              className="p-2 rounded-full hover:bg-blue-100 transition"
+              className=" rounded-full hover:bg-blue-100 transition cursor-pointer"
               title="Visualizar prova"
             >
-              <Eye className="w-5 h-5 text-blue-600" />
+            <Eye className="w-5 h-5 text-gray-600" />
             </button>
+            <button
+            onClick={() => onVisualizar?.(prova.id)}
+            className=" rounded-full hover:bg-blue-100 transition cursor-pointer"
+            title="Editar"
+            >
+            <SquarePen className="w-5 h-4.5 text-blue-600"/>
+            </button>
+            <IconButton type="delete" onClick={() => handleDelete(prova.id)} />
           </div>
         </div>
       ))}

@@ -257,7 +257,7 @@ export const TabelaHabilidadesBNCC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="flex flex-col items-center bg-white rounded-xl p-6 shadow">
             <div className="animate-spin rounded-full h-10 w-10 border-4 border-t-transparent border-blue-600"></div>
-            <p className="mt-5 text-md font-medium text-black">Carregando...</p>
+            <p className="mt-5 text-md font-medium text-black">Carregando Dashboard...</p>
           </div>
         </div>
         )}
@@ -504,6 +504,17 @@ export const TabelaHabilidadesBNCC = () => {
                                 </h5>
                                 <p className="text-sm text-gray-600 mb-2">
                                   {questao.enunciado}
+                                </p>
+                                <p>
+                                  {questao.imagem_url && (
+                                    <img
+                                      src={`${
+                                        window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL
+                                      }/${questao.imagem_url}`}
+                                      alt="Imagem da questão"
+                                      className="mb-4 max-h-48 rounded-lg border"
+                                    />
+                                  )}
                                 </p>
                                 <div className="flex flex-wrap gap-2 text-xs">
                                   <span className="bg-gray-200 text-gray-900 px-2 py-1 rounded">
