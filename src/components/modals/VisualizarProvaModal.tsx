@@ -92,7 +92,7 @@ export const VisualizarProvaModal = ({
               &times;
             </button>
             <button
-              onClick= {() => setShowCreateModal (true)}
+              onClick={() => setShowCreateModal(true)}
               className="rounded-lg py-1.5 px-2.25 bg-blue-600 text-white text-sm mt-2 w-max"
             >
               + Adicionar nova questão
@@ -179,11 +179,12 @@ export const VisualizarProvaModal = ({
 
       {showCreateModal && (
         <CreateQuestoesModal
-          provaId={provaId}     
+          provaId={provaId}
           onClose={() => setShowCreateModal(false)}
-          onSave={() => {                   // ou onCreated / onSuccess, conforme sua API
+          onSave={() => {
+            // ou onCreated / onSuccess, conforme sua API
             setShowCreateModal(false);
-            carregarQuestoes();             // recarrega a lista após criar
+            carregarQuestoes(); // recarrega a lista após criar
           }}
         />
       )}

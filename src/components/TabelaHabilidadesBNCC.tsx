@@ -240,15 +240,22 @@ export const TabelaHabilidadesBNCC = () => {
     return pagesToShow;
   };
 
-  function BlockScroll ({loadingSkills}) {
-    useEffect (() => {
-      if (loadingSkills){
-        document.body.style.overflow = "hidden"
+  function BlockScroll({ loadingSkills }: { loadingSkills: boolean }) {
+    useEffect(() => {
+      if (loadingSkills) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "";
       }
-      else {
-        document.body.style.overflow = ""
-      }
-  })};
+      
+      // Cleanup function to restore scroll when component unmounts
+      return () => {
+        document.body.style.overflow = "";
+      };
+    }, [loadingSkills]);
+    
+    return null; // Component doesn't render anything visible
+  }
 
   return (
     <div className="p-6 bg-white rounded-xl shadow-md">

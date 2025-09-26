@@ -71,7 +71,7 @@ export const SelecaoEscolaSerieProva = () => {
     setIsLoading(true);
     try {
       const res = await fetch(
-        "https://gerador-gabarito-gerador-gabarito.lh6c5d.easypanel.host/api/gerar-gabarito/",
+        `${window.__ENV__?.CORRETOR_URL ?? import.meta.env.VITE_URL_GABARITOS}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
