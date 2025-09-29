@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { IconButton } from "../components/IconButton";
-import { Eye, SquarePen } from "lucide-react";
+import { FileDown, SquarePen } from "lucide-react";
 
 interface Prova {
   id: number;
@@ -86,6 +86,48 @@ export const ProvaList = ({
     }
   };
 
+const handleDownloadTest = async (id: number) => {
+  try {
+    const apiUrl = (window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL) ?? "";
+    const base = apiUrl.endsWith("/") ? apiUrl.slice(0, -1) : apiUrl;
+
+    // endpoint aqui!!!!
+    const url = `${base}/api/provas/${id}/pdf`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "accept": "application/pdf",
+      },
+    });
+
+    if (!response.ok) {
+      console.error("Erro ao baixar a prova:", response.status, await response.text());
+      alert("Não foi possível baixar a prova.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const cd = response.headers.get("Content-Disposition") ?? "";
+    const match = cd.match(/filename\*?=(?:UTF-8''|")?([^;"']+)/i);
+    const serverFileName = match ? decodeURIComponent(match[1]) : null;
+
+    const fileName = serverFileName ?? `prova-${id}.pdf`;
+
+    const urlObj = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = urlObj;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(urlObj);
+  } catch (e) {
+    console.error("Erro inesperado no download:", e);
+    alert("Erro inesperado ao baixar a prova.");
+  }
+};
+
   return (
     <div className="bg-white rounded-xl shadow overflow-hidden">
       <div className="px-5 py-3 bg-blue-50 border-b border-gray-200 font-semibold text-sm text-gray-800">
@@ -117,20 +159,18 @@ export const ProvaList = ({
 
           <div className="flex gap-5">
             <button
-              onClick={() => onVisualizar?.(prova.id, true)}
-              className=" rounded-full hover:bg-blue-100 transition cursor-pointer"
-              title="Visualizar prova"
-            >
-            <Eye className="w-5 h-5 text-gray-600" />
+              onClick={() => handleDownloadTest(prova.id)}
+              title = "Baixar Prova PDF">
+              <FileDown className="w-5 h-5 text-blue-500 cursor-pointer" />
             </button>
             <button
             onClick={() => onVisualizar?.(prova.id, false)}
             className=" rounded-full hover:bg-blue-100 transition cursor-pointer"
             title="Editar"
             >
-            <SquarePen className="w-5 h-4.5 text-blue-600"/>
+            <SquarePen className="w-5 h-4.5 text-orange-500"/>
             </button>
-            <IconButton type="delete" onClick={() => handleDelete(prova.id)} />
+            <IconButton type="delete"  onClick={() => handleDelete(prova.id)} />
           </div>
         </div>
       ))}
