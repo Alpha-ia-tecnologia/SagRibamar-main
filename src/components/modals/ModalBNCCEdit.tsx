@@ -7,6 +7,10 @@ interface HabilidadeBNCC {
   componente_curricular: string;
   serie: string;
 }
+interface Serie {
+  value: string;
+  label: string;
+}
 
 interface ModalBNCCEditProps {
   questaoId: number;
@@ -14,13 +18,6 @@ interface ModalBNCCEditProps {
   onClose: () => void;
   onSave: (novosCodigos: number[], profId?: number | null) => void;
 }
-
-const series = [
-  "PRIMEIRO_ANO", "SEGUNDO_ANO", "TERCEIRO_ANO", "QUARTO_ANO", "QUINTO_ANO",
-  "SEXTO_ANO", "SETIMO_ANO", "OITAVO_ANO", "NONO_ANO", "PRIMEIRA_SERIE",
-  "SEGUNDA_SERIE", "TERCEIRA_SERIE", "PRIMEIRO_E_SEGUNDO_ANOS",
-  "TERCEIRO_AO_QUINTO_ANO", "PRIMEIRO_AO_QUINTO_ANO", "EJA"
-];
 
 export const ModalBNCCEdit = ({
   questaoId,
@@ -33,6 +30,23 @@ export const ModalBNCCEdit = ({
   const [saebFiltro, setSaebFiltro] = useState("");
   const [niveis, setNiveis] = useState<{ id: number; nivel: string; descricao: string }[]>([]);
   const [proficienciaSelecionada, setProficienciaSelecionada] = useState<number | null>(null);
+  const [series, setSeries] = useState<Serie[]>([]);
+
+  const fetchSeries = async () => {
+    try {
+      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/enums/series`);
+      if (!res.ok) throw new Error("Erro ao buscar séries");
+      const data: Serie[] = await res.json();
+      setSeries(data);
+    } catch (error) {
+      console.error("Erro ao buscar séries:", error);
+      setSeries([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchSeries();
+  }, []);
 
   useEffect(() => {
     const fetchTodas = async () => {
@@ -131,7 +145,7 @@ export const ModalBNCCEdit = ({
           >
             <option value="">Todas as Séries</option>
             {series.map((s) => (
-              <option key={s} value={s}>{s}</option>
+              <option key={s.value} value={s.value}>{s.label}</option>
             ))}
           </select>
 
