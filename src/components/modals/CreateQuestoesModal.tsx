@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ModalBNCC } from "./ModalBNCC";
+import { Trash2 } from "lucide-react";
 
 interface CreateQuestoesModalProps {
   provaId?: number;
@@ -254,10 +255,21 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
             className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
           />
         </label>
-
+        
         {imagemPreview && (
           <div className="mb-4">
-            <img src={imagemPreview} alt="Preview" className="max-h-48 rounded-lg border" />
+            <div className="relative inline-block w-fit rounded-lg overflow-hidden border">
+            <img src={imagemPreview} alt="Preview" className="block h-48 w-auto" />
+              <button 
+              onClick={() => {
+                setImagemUrl("");
+                setImagemPreview("");
+              }}
+                className="absolute top-2 right-2 bg-white text-red-700 rounded-full px-2 py-1 shadow-md cursor-pointer border-black border-1"
+                title="Apagar imagem">
+                <Trash2 className="h-5 w-4" />
+              </button>
+            </div>
           </div>
         )}
 

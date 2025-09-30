@@ -26,6 +26,7 @@ export const ProvaList = ({
   searchTitulo = "",
 }: ProvaListProps) => {
   const [provas, setProvas] = useState<Prova[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchProvas = async () => {
     try {
@@ -87,18 +88,16 @@ export const ProvaList = ({
   };
 
 const handleDownloadTest = async (id: number) => {
+  setIsLoading(true);
   try {
-    const apiUrl = (window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL) ?? "";
-    const base = apiUrl.endsWith("/") ? apiUrl.slice(0, -1) : apiUrl;
+  const apiUrl = window.__ENV__?.URL_PROVAS ?? import.meta.env.VITE_URL_PROVAS;
 
-    // endpoint aqui!!!!
-    const url = `${base}/api/provas/${id}/pdf`;
-
-    const response = await fetch(url, {
-      method: "GET",
+    const response = await fetch(apiUrl, {
+      method: "POST",
       headers: {
         "accept": "application/pdf",
       },
+      body: JSON.stringify({ exam_id: id }),
     });
 
     if (!response.ok) {
@@ -126,9 +125,21 @@ const handleDownloadTest = async (id: number) => {
     console.error("Erro inesperado no download:", e);
     alert("Erro inesperado ao baixar a prova.");
   }
+  finally {
+    setIsLoading(false);
+  }
 };
 
   return (
+    <div className="p-4 bg-white rounded-xl shadow-sm mb-6 relative">
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="flex flex-col items-center bg-white rounded-xl p-6 shadow">
+            <div className="animate-spin rounded-full h-10 w-10 border-4 border-t-transparent border-blue-600"></div>
+            <p className="mt-5 text-md font-medium text-black">Gerando prova...</p>
+          </div>
+        </div>
+      )}
     <div className="bg-white rounded-xl shadow overflow-hidden">
       <div className="px-5 py-3 bg-blue-50 border-b border-gray-200 font-semibold text-sm text-gray-800">
         Total: {provas.length} provas
@@ -181,5 +192,6 @@ const handleDownloadTest = async (id: number) => {
         </div>
       )}
     </div>
+  </div>
   );
 };
