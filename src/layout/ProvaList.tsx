@@ -103,7 +103,7 @@ const handleDownloadTest = async (id: number) => {
 
     if (!response.ok) {
       console.error("Erro ao baixar a prova:", response.status, await response.text());
-      alert("Não foi possível baixar a prova.");
+      alert("Essa funcionalidade estará disponível em breve!");
       return;
     }
 
