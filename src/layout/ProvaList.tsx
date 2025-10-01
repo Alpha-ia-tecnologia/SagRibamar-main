@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { IconButton } from "../components/IconButton";
-import { FileDown, SquarePen } from "lucide-react";
+import { DeleteIcon, FileDown, SquarePen, TriangleAlert } from "lucide-react";
 
 interface Prova {
   id: number;
@@ -27,6 +27,8 @@ export const ProvaList = ({
 }: ProvaListProps) => {
   const [provas, setProvas] = useState<Prova[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [confirmationDelete, setConfirmationDelete] = useState(false);
+  const [provaIdSelecionada, setProvaIdSelecionada] = useState<number | null>(null);
 
   const fetchProvas = async () => {
     try {
@@ -61,8 +63,6 @@ export const ProvaList = ({
   }, [reload]);
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Deseja realmente excluir esta prova?")) return;
-
     try {
       const res = await fetch(
         `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/provas/${id}`,
@@ -181,11 +181,53 @@ const handleDownloadTest = async (id: number) => {
             >
             <SquarePen className="w-5 h-4.5 text-orange-500"/>
             </button>
-            <IconButton type="delete"  onClick={() => handleDelete(prova.id)} />
+           <IconButton
+              type="delete"
+              onClick={() => {
+                setProvaIdSelecionada(prova.id); // <- salva o id
+                setConfirmationDelete(true);     // abre modal
+              }}
+            />
           </div>
         </div>
       ))}
-
+        
+        {confirmationDelete && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+            <div className="bg-white rounded-xl p-10 flex flex-col items-center">
+              <div className="text-red-600"> <TriangleAlert className="h-30 w-30" /></div>
+                  <p className="mt-5 text-xl font-medium text-black">
+                    Tem certeza que deseja excluir a prova?
+                  </p>
+                  <p className="mt-1 align-text-center">
+                      Esta ação não poderá ser desfeita.
+                  </p>
+                  <p className="mt-3 border-l-6 border-red-500 bg-red-100 text-red-900 font-medium px-4 py-2 rounded-lg">
+                    Todas as notas dos alunos associadas a esta prova também serão excluídas.
+                  </p>
+                      <div className="flex gap-5 mt-6">
+                  <button
+                    className="bg-red-600 text-white font-medium px-10 py-2 rounded-lg hover:bg-red-700 transition"
+                    onClick={() => {
+                      if (provaIdSelecionada != null) handleDelete(provaIdSelecionada);
+                      setConfirmationDelete(false);
+                      setProvaIdSelecionada(null);
+                    }}
+                  >
+                    Excluir
+                  </button>
+                  <button className="bg-gray-300 text-gray-800 font-medium px-9 py-2 rounded-lg hover:text-amber-50   hover:bg-gray-500 transition"
+                   onClick={() => {
+                    setConfirmationDelete(false);
+                    setProvaIdSelecionada(null);
+                   }}>
+                    Cancelar
+                  </button>
+                </div>
+            </div>
+          </div>
+        )}
+      
       {provas.length === 0 && (
         <div className="px-5 py-4 text-sm text-gray-500 text-center">
           Nenhuma prova encontrada.
