@@ -15,3 +15,4 @@ export {};
 const api = window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL ?? "https://fallback";
 const appName = window.__ENV__?.APP_NAME ?? "SAG";
 const corretorUrl = window.__ENV__?.CORRETOR_URL ?? import.meta.env.VITE_URL_GABARITOS ?? "https://fallback-gabarito";
+const urlProvas = window.__ENV__?.URL_PROVAS ?? import.meta.env.VITE_URL_PROVAS ?? "https://fallback-provas";
