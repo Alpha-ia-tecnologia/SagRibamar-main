@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ModalBNCCEdit } from "./ModalBNCCEdit";
+import { Trash2 } from "lucide-react";
 
 interface EditarQuestaoModalProps {
   questaoId: number;
@@ -242,11 +243,18 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
         {imagemPreview && (
           <div className="mb-4">
-            <img
-              src={imagemPreview}
-              alt="Preview"
-              className="max-h-48 rounded-lg border"
-            />
+            <div className="relative inline-block w-fit rounded-lg overflow-hidden border">
+            <img src={imagemPreview} alt="Preview" className="block h-48 w-auto" />
+              <button 
+              onClick={() => {
+                setImagemUrl("");
+                setImagemPreview("");
+              }}
+                className="absolute top-2 right-2 bg-white text-red-700 rounded-full px-2 py-1 shadow-md cursor-pointer border-black border-1"
+                title="Apagar imagem">
+                <Trash2 className="h-5 w-4" />
+              </button>
+            </div>
           </div>
         )}
 

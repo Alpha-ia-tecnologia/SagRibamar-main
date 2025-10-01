@@ -19,18 +19,16 @@ interface NivelNormalizado {
   descricao: string;
 }
 
+interface Serie {
+  value: string;
+  label: string;
+}
+
 interface ModalBNCCProps {
   componenteCurricularId: number;
   onClose: () => void;
   onSelect: (habilidades: HabilidadeBNCC[], proficienciaId: number | null) => void;
 }
-
-const series = [
-  "PRIMEIRO_ANO", "SEGUNDO_ANO", "TERCEIRO_ANO", "QUARTO_ANO", "QUINTO_ANO",
-  "SEXTO_ANO", "SETIMO_ANO", "OITAVO_ANO", "NONO_ANO", "PRIMEIRA_SERIE",
-  "SEGUNDA_SERIE", "TERCEIRA_SERIE", "PRIMEIRO_E_SEGUNDO_ANOS",
-  "TERCEIRO_AO_QUINTO_ANO", "PRIMEIRO_AO_QUINTO_ANO", "EJA"
-];
 
 export const ModalBNCC = ({
   componenteCurricularId,
@@ -43,6 +41,19 @@ export const ModalBNCC = ({
   const [saebFiltro, setSaebFiltro] = useState("");
   const [nivelFiltro, setNivelFiltro] = useState("");
   const [niveis, setNiveis] = useState<NivelNormalizado[]>([]);
+  const [series, setSeries] = useState<Serie[]>([]);
+
+  const fetchSeries = async () => {
+    try {
+      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/enums/series`);
+      if (!res.ok) throw new Error("Erro ao buscar séries");
+      const data: Serie[] = await res.json();
+      setSeries(data);
+    } catch (error) {
+      console.error("Erro ao buscar séries:", error);
+      setSeries([]);
+    }
+  };
 
   const fetchHabilidades = async () => {
     const params = new URLSearchParams();
@@ -71,6 +82,10 @@ export const ModalBNCC = ({
       setHabilidades([]);
     }
   };
+
+  useEffect(() => {
+    fetchSeries();
+  }, []);
 
   useEffect(() => {
     fetchHabilidades();
@@ -157,8 +172,8 @@ export const ModalBNCC = ({
           >
             <option value="">Todas as Séries</option>
             {series.map((s) => (
-              <option key={s} value={s}>
-                {s}
+              <option key={s.value} value={s.value}>
+                {s.label}
               </option>
             ))}
           </select>

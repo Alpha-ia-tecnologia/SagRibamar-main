@@ -5,6 +5,7 @@ declare global {
       API_URL?: string;
       APP_NAME?: string;
       CORRETOR_URL?: string;
+      URL_PROVAS?: string;
     };
   }
 }
