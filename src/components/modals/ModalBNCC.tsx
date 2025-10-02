@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CreateHabilidadeModal } from "./CreateHabilidadeModal";
 
 interface HabilidadeBNCC {
   id: number;
@@ -42,6 +43,7 @@ export const ModalBNCC = ({
   const [nivelFiltro, setNivelFiltro] = useState("");
   const [niveis, setNiveis] = useState<NivelNormalizado[]>([]);
   const [series, setSeries] = useState<Serie[]>([]);
+  const [showCreateHabilidadeModal,setShowCreateHabilidadeModal] = useState(false);
 
   const fetchSeries = async () => {
     try {
@@ -160,11 +162,16 @@ export const ModalBNCC = ({
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
       <div className="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl p-8">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+        <div className="flex justify-between">
+        <h2 className="text-2xl font-semibold text-gray-800 inline">
           Selecionar Habilidades da BNCC
-        </h2>
-
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        </h2>        
+        <button
+        className="rounded-lg text-black cursor-pointer py-1.5 px-2 text-sm underline"
+        onClick={() => setShowCreateHabilidadeModal(true)}>
+          Não achou a Habilidade? Cadastre clicando aqui!</button>
+        </div>
+        <div className="grid grid-cols-3 gap-4 my-6">
           <select
             value={serieFiltro}
             onChange={(e) => setSerieFiltro(e.target.value)}
@@ -263,6 +270,8 @@ export const ModalBNCC = ({
             Confirmar Seleção
           </button>
         </div>
+        {showCreateHabilidadeModal && (
+          <CreateHabilidadeModal onClose = {() => setShowCreateHabilidadeModal(false)} />)}
       </div>
     </div>
   );

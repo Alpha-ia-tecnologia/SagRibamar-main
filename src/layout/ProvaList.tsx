@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { IconButton } from "../components/IconButton";
-import { DeleteIcon, FileDown, SquarePen, TriangleAlert } from "lucide-react";
+import { FileDown, SquarePen, TriangleAlert } from "lucide-react";
 
 interface Prova {
   id: number;
@@ -207,7 +207,7 @@ const handleDownloadTest = async (id: number) => {
                   </p>
                       <div className="flex gap-5 mt-6">
                   <button
-                    className="bg-red-600 text-white font-medium px-10 py-2 rounded-lg hover:bg-red-700 transition"
+                    className="bg-red-600 text-white font-medium px-10 py-2 rounded-lg hover:bg-red-700 transition cursor-pointer"
                     onClick={() => {
                       if (provaIdSelecionada != null) handleDelete(provaIdSelecionada);
                       setConfirmationDelete(false);
@@ -216,7 +216,7 @@ const handleDownloadTest = async (id: number) => {
                   >
                     Excluir
                   </button>
-                  <button className="bg-gray-300 text-gray-800 font-medium px-9 py-2 rounded-lg hover:text-amber-50   hover:bg-gray-500 transition"
+                  <button className="bg-gray-300 text-gray-800 font-medium px-9 py-2 rounded-lg hover:text-amber-50 hover:bg-gray-500 transition cursor-pointer"
                    onClick={() => {
                     setConfirmationDelete(false);
                     setProvaIdSelecionada(null);
