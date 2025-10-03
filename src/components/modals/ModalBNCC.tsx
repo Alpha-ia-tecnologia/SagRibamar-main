@@ -148,11 +148,6 @@ export const ModalBNCC = ({
       return;
     }
 
-    if (saebFiltro === "true" && !nivelFiltro) {
-      alert("Você deve selecionar um nível para continuar.");
-      return;
-    }
-
     const escolhida = habilidades.find((h) => h.id === selecionada);
     const profId = nivelFiltro ? Number(nivelFiltro) : null;
     onSelect(escolhida ? [escolhida] : [], profId);
@@ -252,17 +247,17 @@ export const ModalBNCC = ({
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm transition"
+            className="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm transition cursor-pointer"
           >
             Cancelar
           </button>
           <button
             onClick={confirmarSelecao}
             disabled={
-              selecionada == null || (saebFiltro === "true" && !nivelFiltro)
+              selecionada == null
             }
-            className={`px-5 py-2.5 rounded-xl text-sm transition ${
-              selecionada == null || (saebFiltro === "true" && !nivelFiltro)
+            className={`px-5 py-2.5 rounded-xl text-sm transition cursor-pointer ${
+              selecionada == null
                 ? "bg-blue-300 text-white cursor-not-allowed"
                 : "bg-blue-600 text-white hover:bg-blue-700"
             }`}

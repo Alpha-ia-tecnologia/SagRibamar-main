@@ -2,17 +2,21 @@ import { useEffect, useState } from "react";
 
 interface CreateHabilidadeModalProps {
   onClose: () => void;
-}
-
+};
 interface Serie {
   value: string;
   label: string;
-}
+};
 
 interface ComponenteCurricular {
   id: number;
   nome: string;
-}
+};
+
+interface NivelSaeb {
+  nivel: string;
+  descricao: string;
+};
 
 export const CreateHabilidadeModal = ({onClose}: CreateHabilidadeModalProps) => {
   const [series, setSeries] = useState<Serie[]>([]);
@@ -22,6 +26,9 @@ export const CreateHabilidadeModal = ({onClose}: CreateHabilidadeModalProps) => 
   const [codigo, setCodigo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [saeb, setSaeb] = useState<boolean>(false);
+  const [niveisSaeb, setNiveisSaeb] = useState<NivelSaeb[]>([]);
+  const [novoNivel, setNovoNivel] = useState("");
+  const [novaDescricaoNivel, setNovaDescricaoNivel] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -54,9 +61,33 @@ export const CreateHabilidadeModal = ({onClose}: CreateHabilidadeModalProps) => 
     setSerie("");
     setComponenteId(0);
     setSaeb(false);
+    setNiveisSaeb([]);
+    setNovoNivel("");
+    setNovaDescricaoNivel("");
     setError("");
     setSuccess(false);
     setFoiSalva(false);
+  };
+
+  const adicionarNivel = () => {
+    if (!novoNivel.trim() || !novaDescricaoNivel.trim()) {
+      setError("Nível e descrição são obrigatórios");
+      return;
+    }
+    
+    const novoNivelSaeb: NivelSaeb = {
+      nivel: novoNivel.trim(),
+      descricao: novaDescricaoNivel.trim()
+    };
+    
+    setNiveisSaeb([...niveisSaeb, novoNivelSaeb]);
+    setNovoNivel("");
+    setNovaDescricaoNivel("");
+    setError("");
+  };
+
+  const removerNivel = (index: number) => {
+    setNiveisSaeb(niveisSaeb.filter((_, i) => i !== index));
   };
 
   const handleCreateHabilidade = async () => {
@@ -77,6 +108,7 @@ export const CreateHabilidadeModal = ({onClose}: CreateHabilidadeModalProps) => 
       setError("Componente curricular é obrigatório");
       return;
     }
+    // Níveis SAEB são opcionais, não há validação obrigatória
 
     setLoading(true);
     setError("");
@@ -103,6 +135,34 @@ export const CreateHabilidadeModal = ({onClose}: CreateHabilidadeModalProps) => 
         throw new Error(errorData.message || 'Erro ao criar habilidade');
       }
 
+      const habilidadeCriada = await response.json();
+      
+      // Se for SAEB e houver níveis adicionados, criar os níveis de proficiência
+      if (saeb && niveisSaeb.length > 0) {
+        const niveisPromises = niveisSaeb.map(nivel => 
+          fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/proficiencias-saeb`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              nivel: nivel.nivel,
+              descricao: nivel.descricao,
+              bncc_id: habilidadeCriada.id
+            })
+          })
+        );
+
+        const niveisResponses = await Promise.all(niveisPromises);
+        
+        for (const nivelResponse of niveisResponses) {
+          if (!nivelResponse.ok) {
+            const errorData = await nivelResponse.json();
+            throw new Error(errorData.message || 'Erro ao criar nível de proficiência');
+          }
+        }
+      }
+
       setSuccess(true);
       setFoiSalva(true);
 
@@ -116,7 +176,7 @@ export const CreateHabilidadeModal = ({onClose}: CreateHabilidadeModalProps) => 
   
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div className="bg-white h-80 w-[40vw] rounded-lg overflow-auto shadow-lg">
+      <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-lg overflow-auto shadow-lg">
         <div className="flex h-full flex-col p-4">
           <h2 className="font-medium">Digite abaixo o código que deseja criar:</h2>
           <input 
@@ -127,9 +187,8 @@ export const CreateHabilidadeModal = ({onClose}: CreateHabilidadeModalProps) => 
             onChange={(e) => setCodigo(e.target.value)}
           />
           <h2 className="font-medium">Descrição:</h2>
-          <input 
-            type="text" 
-            className="w-full h-8 border-1 rounded-lg mt-1 mb-6 border-gray-400 px-1 py-5" 
+          <textarea
+            className="w-full text-sm border-1 rounded-lg mt-1 mb-6 border-gray-400 p-1 h-15" 
             placeholder="Exemplo: Distinguir as letras do alfabeto de outros sinais gráficos."
             value={descricao}
             onChange={(e) => setDescricao(e.target.value)}
@@ -141,7 +200,6 @@ export const CreateHabilidadeModal = ({onClose}: CreateHabilidadeModalProps) => 
               value={saeb.toString()} 
               className="border-1 border-gray-400 py-1 rounded-lg"
             >
-              <option value="" disabled hidden>Tipo de Habilidade</option>
               <option value="false">BNCC</option>
               <option value="true">SAEB</option>
             </select>
@@ -168,6 +226,59 @@ export const CreateHabilidadeModal = ({onClose}: CreateHabilidadeModalProps) => 
               ))}
             </select>
           </div>
+          {saeb && (
+          <div className="bg-blue-100 p-3 rounded-lg mb-4 border-l-4 border-blue-500 h-50 overflow-auto">             
+            {/* Formulário para adicionar novo nível */}
+            <div className="mb-4 mt-2 p-3 bg-white rounded-lg border">
+              <h3 className="font-medium text-sm mb-2">Adicionar Novo Nível (Opcional):</h3>
+              <div className="grid grid-cols-2 gap-2 mb-2">
+                <input 
+                  type="text" 
+                  className="h-8 border-1 rounded-lg text-sm border-gray-400 px-2 py-1" 
+                  placeholder="Exemplo: N4"
+                  value={novoNivel}
+                  onChange={(e) => setNovoNivel(e.target.value)}
+                />
+                <input 
+                  type="text" 
+                  className="h-8 border-1 rounded-lg text-sm border-gray-400 px-2 py-1" 
+                  placeholder="Descrição do nível"
+                  value={novaDescricaoNivel}
+                  onChange={(e) => setNovaDescricaoNivel(e.target.value)}
+                />
+              </div>
+              <button
+                onClick={adicionarNivel}
+                className="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+              >
+                Adicionar Nível
+              </button>
+            </div>
+
+            {/* Lista de níveis adicionados */}
+            {niveisSaeb.length > 0 && (
+              <div className="mb-3">
+                <h3 className="font-medium text-sm mb-2">Níveis Adicionados:</h3>
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {niveisSaeb.map((nivel, index) => (
+                    <div key={index} className="flex items-center justify-between bg-white p-2 rounded border">
+                      <div className="flex-1">
+                        <span className="font-medium text-sm">{nivel.nivel}</span>
+                        <span className="text-xs text-gray-600 ml-2">{nivel.descricao}</span>
+                      </div>
+                      <button
+                        onClick={() => removerNivel(index)}
+                        className="ml-2 px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600"
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          )}
 
           {/* Mensagens de feedback */}
           {error && (
