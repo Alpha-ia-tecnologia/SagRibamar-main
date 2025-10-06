@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAuthContext } from "../../context/AuthContext";
 
 interface CreateUserModalProps {
   onClose: () => void;
@@ -15,6 +16,7 @@ const userTypes = [
 ];
 
 export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalProps) => {
+  const { token } = useAuthContext();
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -28,7 +30,12 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
 
     const fetchUser = async () => {
       try {
-        const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/usuarios/${userId}`);
+        const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/usuarios/${userId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+        });
         if (!res.ok) throw new Error("Erro ao buscar usuário");
         const data = await res.json();
         setNome(data.nome || "");
@@ -40,7 +47,7 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
     };
 
     fetchUser();
-  }, [userId]);
+  }, [userId, token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +70,7 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
           method: userId ? "PUT" : "POST",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
           },
           body: JSON.stringify(payload),
         }

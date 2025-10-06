@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { IconButton } from "../components/IconButton";
-import { Eye } from "lucide-react";
+import { FileDown, SquarePen, TriangleAlert } from "lucide-react";
 
 interface Prova {
   id: number;
@@ -15,7 +15,7 @@ interface ProvaListProps {
   reload?: boolean;
   onReloadDone?: () => void;
   onEdit?: (id: number) => void;
-  onVisualizar?: (id: number) => void; 
+  onVisualizar?: (id: number, modoVisualizacao?: boolean) => void; 
   searchTitulo?: string;
 }
 
@@ -26,6 +26,9 @@ export const ProvaList = ({
   searchTitulo = "",
 }: ProvaListProps) => {
   const [provas, setProvas] = useState<Prova[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [confirmationDelete, setConfirmationDelete] = useState(false);
+  const [provaIdSelecionada, setProvaIdSelecionada] = useState<number | null>(null);
 
   const fetchProvas = async () => {
     try {
@@ -60,8 +63,6 @@ export const ProvaList = ({
   }, [reload]);
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Deseja realmente excluir esta prova?")) return;
-
     try {
       const res = await fetch(
         `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/provas/${id}`,
@@ -86,7 +87,59 @@ export const ProvaList = ({
     }
   };
 
+const handleDownloadTest = async (id: number) => {
+  setIsLoading(true);
+  try {
+  const apiUrl = window.__ENV__?.URL_PROVAS ?? import.meta.env.VITE_URL_PROVAS;
+
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "accept": "application/pdf",
+      },
+      body: JSON.stringify({ exam_id: id }),
+    });
+
+    if (!response.ok) {
+      console.error("Erro ao baixar a prova:", response.status, await response.text());
+      alert("Essa funcionalidade estará disponível em breve!");
+      return;
+    }
+
+    const blob = await response.blob();
+    const cd = response.headers.get("Content-Disposition") ?? "";
+    const match = cd.match(/filename\*?=(?:UTF-8''|")?([^;"']+)/i);
+    const serverFileName = match ? decodeURIComponent(match[1]) : null;
+
+    const fileName = serverFileName ?? `prova-${id}.pdf`;
+
+    const urlObj = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = urlObj;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(urlObj);
+  } catch (e) {
+    console.error("Erro inesperado no download:", e);
+    alert("Erro inesperado ao baixar a prova.");
+  }
+  finally {
+    setIsLoading(false);
+  }
+};
+
   return (
+    <div className="p-4 bg-white rounded-xl shadow-sm mb-6 relative">
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="flex flex-col items-center bg-white rounded-xl p-6 shadow">
+            <div className="animate-spin rounded-full h-10 w-10 border-4 border-t-transparent border-blue-600"></div>
+            <p className="mt-5 text-md font-medium text-black">Gerando prova...</p>
+          </div>
+        </div>
+      )}
     <div className="bg-white rounded-xl shadow overflow-hidden">
       <div className="px-5 py-3 bg-blue-50 border-b border-gray-200 font-semibold text-sm text-gray-800">
         Total: {provas.length} provas
@@ -102,7 +155,9 @@ export const ProvaList = ({
               📝
             </div>
             <div>
-              <p className="text-blue-700 font-semibold hover:underline cursor-pointer">
+              <p 
+              onClick={() => onVisualizar?.(prova.id, true)}
+              className="text-blue-700 font-semibold hover:underline cursor-pointer">
                 {prova.nome}
               </p>
               <p className="text-sm text-gray-500">
@@ -113,25 +168,72 @@ export const ProvaList = ({
             </div>
           </div>
 
-          <div className="flex gap-3">
-            {/* <IconButton type="edit" onClick={() => onEdit?.(prova.id)} /> */}
-            <IconButton type="delete" onClick={() => handleDelete(prova.id)} />
+          <div className="flex gap-5">
             <button
-              onClick={() => onVisualizar?.(prova.id)}
-              className="p-2 rounded-full hover:bg-blue-100 transition"
-              title="Visualizar prova"
-            >
-              <Eye className="w-5 h-5 text-blue-600" />
+              onClick={() => handleDownloadTest(prova.id)}
+              title = "Baixar Prova PDF">
+              <FileDown className="w-5 h-5 text-blue-500 cursor-pointer" />
             </button>
+            <button
+            onClick={() => onVisualizar?.(prova.id, false)}
+            className=" rounded-full hover:bg-blue-100 transition cursor-pointer"
+            title="Editar"
+            >
+            <SquarePen className="w-5 h-4.5 text-orange-500"/>
+            </button>
+           <IconButton
+              type="delete"
+              onClick={() => {
+                setProvaIdSelecionada(prova.id); // <- salva o id
+                setConfirmationDelete(true);     // abre modal
+              }}
+            />
           </div>
         </div>
       ))}
-
+        
+        {confirmationDelete && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+            <div className="bg-white rounded-xl p-10 flex flex-col items-center">
+              <div className="text-red-600"> <TriangleAlert className="h-30 w-30" /></div>
+                  <p className="mt-5 text-xl font-medium text-black">
+                    Tem certeza que deseja excluir a prova?
+                  </p>
+                  <p className="mt-1 align-text-center">
+                      Esta ação não poderá ser desfeita.
+                  </p>
+                  <p className="mt-3 border-l-6 border-red-500 bg-red-100 text-red-900 font-medium px-4 py-2 rounded-lg">
+                    Todas as notas dos alunos associadas a esta prova também serão excluídas.
+                  </p>
+                      <div className="flex gap-5 mt-6">
+                  <button
+                    className="bg-red-600 text-white font-medium px-10 py-2 rounded-lg hover:bg-red-700 transition cursor-pointer"
+                    onClick={() => {
+                      if (provaIdSelecionada != null) handleDelete(provaIdSelecionada);
+                      setConfirmationDelete(false);
+                      setProvaIdSelecionada(null);
+                    }}
+                  >
+                    Excluir
+                  </button>
+                  <button className="bg-gray-300 text-gray-800 font-medium px-9 py-2 rounded-lg hover:text-amber-50 hover:bg-gray-500 transition cursor-pointer"
+                   onClick={() => {
+                    setConfirmationDelete(false);
+                    setProvaIdSelecionada(null);
+                   }}>
+                    Cancelar
+                  </button>
+                </div>
+            </div>
+          </div>
+        )}
+      
       {provas.length === 0 && (
         <div className="px-5 py-4 text-sm text-gray-500 text-center">
           Nenhuma prova encontrada.
         </div>
       )}
     </div>
+  </div>
   );
 };

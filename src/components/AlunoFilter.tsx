@@ -39,7 +39,7 @@ export const AlunoFilter = ({ onFilter }: AlunoFilterProps) => {
     }
 
     const fetchTurmas = async () => {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/turmas?escola_id=${escolaId}`);
+      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/turmas?escola_id=${escolaId}&limit=2000`);
       const data = await res.json();
       setTurmas(Array.isArray(data.data) ? data.data : data);
     };

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CreateHabilidadeModal } from "./CreateHabilidadeModal";
 
 interface HabilidadeBNCC {
   id: number;
@@ -19,18 +20,16 @@ interface NivelNormalizado {
   descricao: string;
 }
 
+interface Serie {
+  value: string;
+  label: string;
+}
+
 interface ModalBNCCProps {
   componenteCurricularId: number;
   onClose: () => void;
   onSelect: (habilidades: HabilidadeBNCC[], proficienciaId: number | null) => void;
 }
-
-const series = [
-  "PRIMEIRO_ANO", "SEGUNDO_ANO", "TERCEIRO_ANO", "QUARTO_ANO", "QUINTO_ANO",
-  "SEXTO_ANO", "SETIMO_ANO", "OITAVO_ANO", "NONO_ANO", "PRIMEIRA_SERIE",
-  "SEGUNDA_SERIE", "TERCEIRA_SERIE", "PRIMEIRO_E_SEGUNDO_ANOS",
-  "TERCEIRO_AO_QUINTO_ANO", "PRIMEIRO_AO_QUINTO_ANO", "EJA"
-];
 
 export const ModalBNCC = ({
   componenteCurricularId,
@@ -43,6 +42,20 @@ export const ModalBNCC = ({
   const [saebFiltro, setSaebFiltro] = useState("");
   const [nivelFiltro, setNivelFiltro] = useState("");
   const [niveis, setNiveis] = useState<NivelNormalizado[]>([]);
+  const [series, setSeries] = useState<Serie[]>([]);
+  const [showCreateHabilidadeModal,setShowCreateHabilidadeModal] = useState(false);
+
+  const fetchSeries = async () => {
+    try {
+      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/enums/series`);
+      if (!res.ok) throw new Error("Erro ao buscar séries");
+      const data: Serie[] = await res.json();
+      setSeries(data);
+    } catch (error) {
+      console.error("Erro ao buscar séries:", error);
+      setSeries([]);
+    }
+  };
 
   const fetchHabilidades = async () => {
     const params = new URLSearchParams();
@@ -71,6 +84,10 @@ export const ModalBNCC = ({
       setHabilidades([]);
     }
   };
+
+  useEffect(() => {
+    fetchSeries();
+  }, []);
 
   useEffect(() => {
     fetchHabilidades();
@@ -131,11 +148,6 @@ export const ModalBNCC = ({
       return;
     }
 
-    if (saebFiltro === "true" && !nivelFiltro) {
-      alert("Você deve selecionar um nível para continuar.");
-      return;
-    }
-
     const escolhida = habilidades.find((h) => h.id === selecionada);
     const profId = nivelFiltro ? Number(nivelFiltro) : null;
     onSelect(escolhida ? [escolhida] : [], profId);
@@ -145,11 +157,16 @@ export const ModalBNCC = ({
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
       <div className="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl p-8">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+        <div className="flex justify-between">
+        <h2 className="text-2xl font-semibold text-gray-800 inline">
           Selecionar Habilidades da BNCC
-        </h2>
-
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        </h2>        
+        <button
+        className="rounded-lg text-black cursor-pointer py-1.5 px-2 text-sm underline"
+        onClick={() => setShowCreateHabilidadeModal(true)}>
+          Não achou a Habilidade? Cadastre clicando aqui!</button>
+        </div>
+        <div className="grid grid-cols-3 gap-4 my-6">
           <select
             value={serieFiltro}
             onChange={(e) => setSerieFiltro(e.target.value)}
@@ -157,8 +174,8 @@ export const ModalBNCC = ({
           >
             <option value="">Todas as Séries</option>
             {series.map((s) => (
-              <option key={s} value={s}>
-                {s}
+              <option key={s.value} value={s.value}>
+                {s.label}
               </option>
             ))}
           </select>
@@ -230,17 +247,17 @@ export const ModalBNCC = ({
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm transition"
+            className="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm transition cursor-pointer"
           >
             Cancelar
           </button>
           <button
             onClick={confirmarSelecao}
             disabled={
-              selecionada == null || (saebFiltro === "true" && !nivelFiltro)
+              selecionada == null
             }
-            className={`px-5 py-2.5 rounded-xl text-sm transition ${
-              selecionada == null || (saebFiltro === "true" && !nivelFiltro)
+            className={`px-5 py-2.5 rounded-xl text-sm transition cursor-pointer ${
+              selecionada == null
                 ? "bg-blue-300 text-white cursor-not-allowed"
                 : "bg-blue-600 text-white hover:bg-blue-700"
             }`}
@@ -248,6 +265,8 @@ export const ModalBNCC = ({
             Confirmar Seleção
           </button>
         </div>
+        {showCreateHabilidadeModal && (
+          <CreateHabilidadeModal onClose = {() => setShowCreateHabilidadeModal(false)} />)}
       </div>
     </div>
   );

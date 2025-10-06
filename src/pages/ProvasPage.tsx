@@ -9,7 +9,8 @@ export default function ProvasPage() {
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [reload, setReload] = useState(false);
-  const [visualizarId, setVisualizarId] = useState<number | null>(null); 
+  const [visualizarId, setVisualizarId] = useState<number | null>(null);
+  const [modoVisualizacao, setModoVisualizacao] = useState<boolean>(false); 
 
   const handleSuccess = () => {
     setShowModal(false);
@@ -41,7 +42,10 @@ export default function ProvasPage() {
           reload={reload}
           onReloadDone={() => setReload(false)}
           onEdit={handleEdit}
-          onVisualizar={(id) => setVisualizarId(id)}
+          onVisualizar={(id, modoVisualizacao) => {
+            setVisualizarId(id);
+            setModoVisualizacao(modoVisualizacao ?? false);
+          }}
         />
       </div>
 
@@ -57,6 +61,7 @@ export default function ProvasPage() {
         <VisualizarProvaModal
           provaId={visualizarId}
           onClose={() => setVisualizarId(null)}
+          modoVisualizacao={modoVisualizacao}
         />
       )}
     </>

@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { EditarQuestaoModal } from "./EditQuestaoModal"; 
+import { EditarQuestaoModal } from "./EditQuestaoModal";
+import { CreateQuestoesModal } from "./CreateQuestoesModal";
 
 interface VisualizarProvaModalProps {
   provaId: number;
   onClose: () => void;
+  modoVisualizacao?: boolean; // true quando aberto via botão "eye", false quando via "squarepen"
 }
 
 interface Alternativa {
@@ -26,18 +28,29 @@ interface Prova {
   arquivo_url?: string;
 }
 
-export const VisualizarProvaModal = ({ provaId, onClose }: VisualizarProvaModalProps) => {
+export const VisualizarProvaModal = ({
+  provaId,
+  onClose,
+  modoVisualizacao = false,
+}: VisualizarProvaModalProps) => {
   const [prova, setProva] = useState<Prova | null>(null);
   const [questoes, setQuestoes] = useState<Questao[]>([]);
   const [loading, setLoading] = useState(true);
-  const [questaoIdEmEdicao, setQuestaoIdEmEdicao] = useState<number | null>(null);
+  const [questaoIdEmEdicao, setQuestaoIdEmEdicao] = useState<number | null>(
+    null
+  );
   const contentRef = useRef<HTMLDivElement>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const carregarQuestoes = () => {
     setLoading(true);
-    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/provas/${provaId}/questoes-detalhadas`)
-      .then(res => res.json())
-      .then(data => {
+    fetch(
+      `${
+        window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL
+      }/api/provas/${provaId}/questoes-detalhadas`
+    )
+      .then((res) => res.json())
+      .then((data) => {
         if (Array.isArray(data?.questoes)) {
           setProva(data.prova);
           setQuestoes(data.questoes);
@@ -46,7 +59,7 @@ export const VisualizarProvaModal = ({ provaId, onClose }: VisualizarProvaModalP
         }
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Erro ao carregar questões:", err);
         setLoading(false);
       });
@@ -72,14 +85,22 @@ export const VisualizarProvaModal = ({ provaId, onClose }: VisualizarProvaModalP
           ref={contentRef}
           className="bg-white w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl shadow-lg flex flex-col"
         >
-          <div className="sticky top-0 z-10 bg-white px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+          <div className="sticky top-0 z-10 bg-white px-6 py-4 border-b border-gray-200 grid items-center grid-rows-2 grid-cols-2">
             <h2 className="text-xl font-bold text-blue-700">{prova?.nome}</h2>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-800 text-2xl font-light"
+              className="text-gray-500 hover:text-gray-800 text-2xl font-light grid justify-end"
             >
               &times;
             </button>
+            {!modoVisualizacao && (
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="rounded-lg py-1.5 px-2.25 bg-blue-600 text-white text-sm mt-2 w-max col-start-2 justify-self-end"              
+              >
+                + Adicionar nova questão
+              </button>
+            )}
           </div>
 
           <div className="overflow-y-auto p-6 space-y-6">
@@ -89,23 +110,31 @@ export const VisualizarProvaModal = ({ provaId, onClose }: VisualizarProvaModalP
               <p className="text-gray-500">Nenhuma questão encontrada.</p>
             ) : (
               questoes.map((questao, index) => (
-                <div key={questao.id} className="p-4 border border-gray-200 rounded-xl shadow-sm bg-gray-50">
+                <div
+                  key={questao.id}
+                  className="p-4 border border-gray-200 rounded-xl shadow-sm bg-gray-50"
+                >
                   <div className="flex justify-between items-start mb-2">
                     <p className="font-semibold text-gray-800">
                       {index + 1}. {questao.enunciado}
                     </p>
-                    <button
-                      onClick={() => setQuestaoIdEmEdicao(questao.id)} 
-                      className="text-blue-600 hover:text-blue-800 transition text-sm"
-                      title="Editar questão"
-                    >
-                      Editar
-                    </button>
+                    {!modoVisualizacao && (
+                      <button
+                        onClick={() => setQuestaoIdEmEdicao(questao.id)
+                        }
+                        className="text-blue-600 hover:text-blue-800 transition text-sm"
+                        title="Editar questão"
+                      >
+                        Editar
+                      </button>
+                    )}
                   </div>
 
                   {questao.imagem_url && (
                     <img
-                      src={`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${questao.imagem_url}`}
+                      src={`${
+                        window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL
+                      }/${questao.imagem_url}`}
                       alt="Imagem da questão"
                       className="mb-4 max-h-48 rounded-lg border"
                     />
@@ -116,7 +145,9 @@ export const VisualizarProvaModal = ({ provaId, onClose }: VisualizarProvaModalP
                       <li
                         key={alt.id}
                         className={`p-2 rounded ${
-                          alt.correta ? "bg-green-50 border-l-4 border-green-400" : ""
+                          alt.correta
+                            ? "bg-green-50 border-l-4 border-green-400"
+                            : ""
                         }`}
                       >
                         <span className="font-medium mr-2">
@@ -132,20 +163,34 @@ export const VisualizarProvaModal = ({ provaId, onClose }: VisualizarProvaModalP
                     ))}
                   </ul>
 
-                  <p className="text-xs text-gray-400 mt-2">Pontos: {questao.pontos}</p>
+                  <p className="text-xs text-gray-400 mt-2">
+                    Pontos: {questao.pontos}
+                  </p>
                 </div>
               ))
             )}
           </div>
         </div>
       </div>
+
       {questaoIdEmEdicao !== null && (
         <EditarQuestaoModal
           questaoId={questaoIdEmEdicao}
           onClose={() => setQuestaoIdEmEdicao(null)}
           onSave={() => {
             setQuestaoIdEmEdicao(null);
-            carregarQuestoes(); 
+            carregarQuestoes();
+          }}
+        />
+      )}
+
+      {showCreateModal && (
+        <CreateQuestoesModal
+          provaId={provaId}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => {
+            setShowCreateModal(false);
+            carregarQuestoes();
           }}
         />
       )}

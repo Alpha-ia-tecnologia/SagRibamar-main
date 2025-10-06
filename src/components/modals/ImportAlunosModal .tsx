@@ -12,7 +12,7 @@ export const ImportAlunosModal = ({ onClose, onSuccess }: ImportAlunosModalProps
   const [error, setError] = useState<string | null>(null);
 
   const handleDownloadModelo = async () => {
-  const apiUrl = 'window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL'; // Obtém a URL da API
+  const apiUrl = window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL; // Obtém a URL da API
   const response = await fetch(`${apiUrl}/api/export/template-importacao`, {
     method: 'GET',
     headers: {
@@ -24,7 +24,7 @@ export const ImportAlunosModal = ({ onClose, onSuccess }: ImportAlunosModalProps
     const blob = await response.blob();
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'modelo-importacao.xlsx';
+    link.download = 'template-importacao-alunos.xlsx';
     link.click();
   } else {
     console.error('Erro ao baixar o modelo:', response.statusText);

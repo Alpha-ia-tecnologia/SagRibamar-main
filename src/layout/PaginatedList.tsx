@@ -61,6 +61,35 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
     fetchUsuarios(); 
   };
 
+  const gerarBotoesPaginacao = (): (number | string)[] => {
+    const botoes: (number | string)[] = [];
+    const maxVisiveis = 3;
+
+    if (totalPages <= maxVisiveis + 2) {
+      for (let i = 1; i <= totalPages; i++) botoes.push(i);
+    } else {
+      if (currentPage <= maxVisiveis) {
+        for (let i = 1; i <= maxVisiveis + 1; i++) botoes.push(i);
+        botoes.push("...");
+        botoes.push(totalPages);
+      } else if (currentPage >= totalPages - maxVisiveis + 1) {
+        botoes.push(1);
+        botoes.push("...");
+        for (let i = totalPages - maxVisiveis; i <= totalPages; i++) botoes.push(i);
+      } else {
+        botoes.push(1);
+        botoes.push("...");
+        botoes.push(currentPage - 1);
+        botoes.push(currentPage);
+        botoes.push(currentPage + 1);
+        botoes.push("...");
+        botoes.push(totalPages);
+      }
+    }
+
+    return botoes;
+  };
+
   const paginated = usuarios.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -84,26 +113,48 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
           />
         ))}
 
-        <div className="flex justify-between items-center px-5 py-3 bg-gray-50 border-t text-sm text-gray-600">
-          <span>
-            Mostrando {start} a {end} de {usuarios.length} usuários
-          </span>
+        {/* Paginação */}
+        <div className="flex items-center justify-between px-5 py-3 bg-gray-50 text-sm text-gray-700 border-t border-gray-200">
+          <p>
+            Mostrando {start} a {end} de {usuarios.length} resultados
+          </p>
 
-          <div className="flex items-center gap-2">
+          <div className="flex gap-2 items-center flex-wrap">
             <button
-              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              onClick={() => setCurrentPage(1)}
               disabled={currentPage === 1}
-              className="px-3 py-1 rounded border text-gray-600 hover:bg-gray-100 disabled:opacity-40"
+              className="px-3 py-1.5 rounded-lg border text-sm hover:bg-gray-100 disabled:opacity-40 transition"
             >
               &lt;
             </button>
-            <span className="px-3 py-1 rounded bg-blue-600 text-white">
-              {currentPage}
-            </span>
+
+            {gerarBotoesPaginacao().map((num, i) =>
+              num === "..." ? (
+                <span
+                  key={`dots-${i}`}
+                  className="px-3 py-1.5 text-gray-400 text-sm"
+                >
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={num}
+                  onClick={() => setCurrentPage(num as number)}
+                  className={`px-3 py-1.5 rounded-lg border text-sm transition ${
+                    currentPage === num
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "hover:bg-gray-100"
+                  }`}
+                >
+                  {num}
+                </button>
+              )
+            )}
+
             <button
-              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+              onClick={() => setCurrentPage(totalPages)}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 rounded border text-gray-600 hover:bg-gray-100 disabled:opacity-40"
+              className="px-3 py-1.5 rounded-lg border text-sm hover:bg-gray-100 disabled:opacity-40 transition"
             >
               &gt;
             </button>
