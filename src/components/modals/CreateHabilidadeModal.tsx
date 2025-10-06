@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 interface CreateHabilidadeModalProps {
   onClose: () => void;
+  onHabilidadeCreated?: () => void;
 };
 interface Serie {
   value: string;
@@ -18,7 +19,7 @@ interface NivelSaeb {
   descricao: string;
 };
 
-export const CreateHabilidadeModal = ({onClose}: CreateHabilidadeModalProps) => {
+export const CreateHabilidadeModal = ({onClose, onHabilidadeCreated}: CreateHabilidadeModalProps) => {
   const [series, setSeries] = useState<Serie[]>([]);
   const [componenteId, setComponenteId] = useState<number>(0);
   const [componentes, setComponentes] = useState<ComponenteCurricular[]>([]);
@@ -165,6 +166,11 @@ export const CreateHabilidadeModal = ({onClose}: CreateHabilidadeModalProps) => 
 
       setSuccess(true);
       setFoiSalva(true);
+      
+      // Chama o callback para atualizar as listas de habilidades
+      if (onHabilidadeCreated) {
+        onHabilidadeCreated();
+      }
 
     } catch (error) {
       console.error("Erro ao criar habilidade:", error);

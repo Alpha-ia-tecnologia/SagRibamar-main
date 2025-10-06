@@ -44,6 +44,7 @@ export const ModalBNCC = ({
   const [niveis, setNiveis] = useState<NivelNormalizado[]>([]);
   const [series, setSeries] = useState<Serie[]>([]);
   const [showCreateHabilidadeModal,setShowCreateHabilidadeModal] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const fetchSeries = async () => {
     try {
@@ -92,7 +93,7 @@ export const ModalBNCC = ({
   useEffect(() => {
     fetchHabilidades();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serieFiltro, saebFiltro, componenteCurricularId]);
+  }, [serieFiltro, saebFiltro, componenteCurricularId, refreshKey]);
 
   useEffect(() => {
     const fetchNiveisPorBNCC = async () => {
@@ -266,7 +267,13 @@ export const ModalBNCC = ({
           </button>
         </div>
         {showCreateHabilidadeModal && (
-          <CreateHabilidadeModal onClose = {() => setShowCreateHabilidadeModal(false)} />)}
+          <CreateHabilidadeModal 
+            onClose={() => setShowCreateHabilidadeModal(false)} 
+            onHabilidadeCreated={() => {
+              setRefreshKey(prev => prev + 1);
+            }}
+          />
+        )}
       </div>
     </div>
   );
