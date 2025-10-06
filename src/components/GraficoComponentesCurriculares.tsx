@@ -10,6 +10,7 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
+import { useApi } from "../utils/api";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -25,6 +26,7 @@ interface DesempenhoComponente {
 export const GraficoComponentesCurriculares = () => {
   const [dados, setDados] = useState<DesempenhoComponente[]>([]);
   const { filtros } = useFiltroDashboard();
+  const api = useApi();
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -36,7 +38,7 @@ export const GraficoComponentesCurriculares = () => {
     if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
     if (filtros.provaId) params.append("prova_id", filtros.provaId); 
 
-    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/dashboard/componentes-curriculares-desempenho?${params.toString()}`)
+    api.get(`/api/dashboard/componentes-curriculares-desempenho?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {

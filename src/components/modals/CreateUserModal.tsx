@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
+import { useApi } from "../../utils/api";
 
 interface CreateUserModalProps {
   onClose: () => void;
@@ -23,6 +24,7 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
   const [tipoUsuario, setTipoUsuario] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const api = useApi();
 
   // Buscar dados do usuário se for edição
   useEffect(() => {
@@ -30,12 +32,7 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
 
     const fetchUser = async () => {
       try {
-        const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/usuarios/${userId}`, {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-        });
+        const res = await api.get(`/api/usuarios/${userId}`);
         if (!res.ok) throw new Error("Erro ao buscar usuário");
         const data = await res.json();
         setNome(data.nome || "");
@@ -62,19 +59,9 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
     };
 
     try {
-      const res = await fetch(
-        userId
-          ? `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/usuarios/${userId}`
-          : `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/register`,
-        {
-          method: userId ? "PUT" : "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const res = userId 
+        ? await api.put(`/api/usuarios/${userId}`, payload)
+        : await api.post(`/api/register`, payload);
 
       if (!res.ok) {
         const data = await res.json();

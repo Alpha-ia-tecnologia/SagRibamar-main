@@ -3,6 +3,7 @@ import { Header } from "../components/Header";
 import { PageHeader } from "../ui/PageHeader";
 import { TurmaList } from "../layout/TurmaList";
 import { CreateTurmaModal } from "../components/modals/CreateTurmaModal";
+import { useApi } from "../utils/api";
 
 interface Escola {
   id: number;
@@ -17,11 +18,12 @@ export default function TurmasPage() {
   const [searchNome, setSearchNome] = useState("");
   const [escolaId, setEscolaId] = useState<number | null>(null);
   const [escolas, setEscolas] = useState<Escola[]>([]);
+  const api = useApi();
 
   useEffect(() => {
     const fetchEscolas = async () => {
       try {
-        const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas?page=1&limit=200`);
+        const res = await api.get(`/api/escolas?page=1&limit=200`);
         const data = await res.json();
         const lista = Array.isArray(data) ? data : data.data;
         setEscolas(Array.isArray(lista) ? lista : []);

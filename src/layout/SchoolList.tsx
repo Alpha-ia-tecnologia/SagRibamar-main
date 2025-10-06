@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { IconButton } from "../components/IconButton";
+import { useApi } from "../utils/api";
 
 interface Regiao {
   id: number;
@@ -41,6 +42,7 @@ export const SchoolList = ({
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const api = useApi();
 
   const fetchEscolas = async () => {
     try {
@@ -52,9 +54,7 @@ export const SchoolList = ({
       if (regiaoId !== null) queryParams.append("regiao_id", String(regiaoId));
 if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
 
-      const res = await fetch(
-        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas?${queryParams.toString()}`
-      );
+      const res = await api.get(`/api/escolas?${queryParams.toString()}`);
 
       const data = await res.json();
       setEscolas(data.data || []);
@@ -80,9 +80,7 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas/${id}`, {
-        method: "DELETE",
-      });
+      const res = await api.delete(`/api/escolas/${id}`);
 
       if (!res.ok) throw new Error("Erro ao excluir");
 

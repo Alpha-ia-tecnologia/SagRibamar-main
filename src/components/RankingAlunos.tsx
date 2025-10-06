@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
+import { useApi } from "../utils/api";
 
 interface Aluno {
   aluno_id: number;
@@ -32,6 +33,7 @@ export const RankingAlunos = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const { filtros } = useFiltroDashboard();
+  const api = useApi();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,7 +49,7 @@ export const RankingAlunos = () => {
         if (filtros.turmaId) params.append("turma_id", filtros.turmaId); 
         if (filtros.provaId) params.append("prova_id", filtros.provaId); 
 
-        const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/dashboard/student-ranking?${params.toString()}`);
+        const res = await api.get(`/api/dashboard/student-ranking?${params.toString()}`);
         const json: ApiResponse = await res.json();
 
         setAlunos(json.data);

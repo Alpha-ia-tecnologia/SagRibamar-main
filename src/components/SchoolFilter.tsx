@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useApi } from "../utils/api";
 
 interface Regiao {
   id: number;
@@ -20,23 +21,24 @@ export const SchoolFilter = ({ onFilter }: SchoolFilterProps) => {
   const [grupos, setGrupos] = useState<Grupo[]>([]);
   const [regiaoId, setRegiaoId] = useState<number | "">("");
   const [grupoId, setGrupoId] = useState<number | "">("");
+  const api = useApi();
 
   useEffect(() => {
     const fetchRegioes = async () => {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/regioes`);
+      const res = await api.get(`/api/regioes`);
       const data = await res.json();
       setRegioes(data);
     };
 
     const fetchGrupos = async () => {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/grupos`);
+      const res = await api.get(`/api/grupos`);
       const data = await res.json();
       setGrupos(data);
     };
 
     fetchRegioes();
     fetchGrupos();
-  }, []);
+  }, [api]);
 
   const handleFilter = () => {
     onFilter(

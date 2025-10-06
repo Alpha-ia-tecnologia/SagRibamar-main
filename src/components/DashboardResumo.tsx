@@ -8,6 +8,7 @@ import {
   CalculatorIcon
 } from "@heroicons/react/24/solid";
 import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
+import { useApi } from "../utils/api";
 
 interface Statistics {
   total_escolas: number;
@@ -22,6 +23,7 @@ export const DashboardResumo = () => {
   const { filtros } = useFiltroDashboard(); 
   const [stats, setStats] = useState<Statistics | null>(null);
   const [loading, setLoading] = useState(true);
+  const api = useApi();
 
   useEffect(() => {
     const queryParams = new URLSearchParams();
@@ -35,7 +37,7 @@ export const DashboardResumo = () => {
 
     setLoading(true);
 
-    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/dashboard/statistics?${queryParams.toString()}`)
+    api.get(`/api/dashboard/statistics?${queryParams.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         setStats(data);

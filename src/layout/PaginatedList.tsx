@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { UserRow } from "../ui/UserRow";
 import { CreateUserModal } from "../components/modals/CreateUserModal";
+import { useApi } from "../utils/api";
 
 interface Usuario {
   id: number;
@@ -19,9 +20,10 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [editingUserId, setEditingUserId] = useState<number | null>(null); 
   const itemsPerPage = 5;
+  const api = useApi();
 
   const fetchUsuarios = async () => {
-    const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/usuarios`);
+    const res = await api.get(`/api/usuarios`);
     const data = await res.json();
     setUsuarios(data);
   };
@@ -41,9 +43,7 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
     if (!confirm) return;
 
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/usuarios/${id}`, {
-        method: "DELETE",
-      });
+      const res = await api.delete(`/api/usuarios/${id}`);
 
       if (!res.ok) {
         const data = await res.json();

@@ -10,6 +10,7 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
+import { useApi } from "../utils/api";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -35,6 +36,7 @@ export const GraficoRankingRegioes = () => {
   });
 
   const { filtros } = useFiltroDashboard();
+  const api = useApi();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,7 +50,7 @@ export const GraficoRankingRegioes = () => {
         if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
         if (filtros.provaId) params.append("prova_id", filtros.provaId); // ✅ corrigido
 
-        const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/dashboard/regional-performance?${params.toString()}`);
+        const res = await api.get(`/api/dashboard/regional-performance?${params.toString()}`);
         const data = await res.json();
 
         setDadosRegioes(data.dados_grafico || []);

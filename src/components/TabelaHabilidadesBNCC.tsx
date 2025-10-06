@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
 import { useLockBodyScroll } from "../hooks/useLockBodyScroll";
+import { useApi } from "../utils/api";
 
 interface Habilidade {
   bncc_id: number;
@@ -96,7 +97,8 @@ export const TabelaHabilidadesBNCC = () => {
   const [questoes, setQuestoes] = useState<Questao[]>([]);
   const [carregandoQuestoes, setCarregandoQuestoes] = useState(false);
   const [estatisticasQuestoes, setEstatisticasQuestoes] = useState<QuestoesResponse['estatisticas'] | null>(null);
-  const [loadingSkills,setLoadingSkills] = useState (false)
+  const [loadingSkills,setLoadingSkills] = useState (false);
+  const api = useApi();
   const { filtros } = useFiltroDashboard();
   
   // Refs para acessibilidade
@@ -117,9 +119,7 @@ export const TabelaHabilidadesBNCC = () => {
         params.append("proficiencia_saeb_id", proficienciaSaebId.toString());
       }
 
-      const res = await fetch(
-        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/dashboard/bncc-questoes?${params.toString()}`
-      );
+      const res = await api.get(`/api/dashboard/bncc-questoes?${params.toString()}`);
       
       if (!res.ok) {
         throw new Error("Erro ao buscar questões");
@@ -193,7 +193,7 @@ export const TabelaHabilidadesBNCC = () => {
         if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
         if (filtros.provaId) params.append("prova_id", filtros.provaId); // ✅ corrigido aqui
 
-        const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/dashboard/bncc-skills?${params.toString()}`);
+        const res = await api.get(`/api/dashboard/bncc-skills?${params.toString()}`);
         const json: ApiResponse = await res.json();
 
         setHabilidades(json.data);

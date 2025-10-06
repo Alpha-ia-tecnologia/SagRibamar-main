@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { CreateHabilidadeModal } from "./CreateHabilidadeModal";
+import { useApi } from "../../utils/api";
 
 interface HabilidadeBNCC {
   id: number;
@@ -45,10 +46,11 @@ export const ModalBNCC = ({
   const [series, setSeries] = useState<Serie[]>([]);
   const [showCreateHabilidadeModal,setShowCreateHabilidadeModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const api = useApi();
 
   const fetchSeries = async () => {
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/enums/series`);
+      const res = await api.get(`/api/enums/series`);
       if (!res.ok) throw new Error("Erro ao buscar séries");
       const data: Serie[] = await res.json();
       setSeries(data);
@@ -74,9 +76,7 @@ export const ModalBNCC = ({
     }
 
     try {
-      const res = await fetch(
-        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?${params.toString()}`
-      );
+      const res = await api.get(`/api/bncc?${params.toString()}`);
       if (!res.ok) throw new Error("Erro ao buscar habilidades BNCC");
       const data: unknown = await res.json();
       setHabilidades(Array.isArray(data) ? (data as HabilidadeBNCC[]) : []);
@@ -103,9 +103,7 @@ export const ModalBNCC = ({
         return;
       }
       try {
-        const res = await fetch(
-          `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${selecionada}/proficiencias`
-        );
+        const res = await api.get(`/api/bncc/${selecionada}/proficiencias`);
         if (!res.ok) {
           setNiveis([]);
           return;

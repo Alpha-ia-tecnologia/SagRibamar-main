@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useApi } from "../../utils/api";
 
 interface Prova {
   id: number;
@@ -12,9 +13,10 @@ interface Props {
 
 export const SelectProvas = ({ value, onChange }: Props) => {
   const [provas, setProvas] = useState<Prova[]>([]);
+  const api = useApi();
 
   useEffect(() => {
-    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/provas`)
+    api.get(`/api/provas`)
       .then((res) => res.json())
       .then((data) => setProvas(data || []))
       .catch(() => setProvas([]));

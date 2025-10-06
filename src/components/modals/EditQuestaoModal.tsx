@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ModalBNCCEdit } from "./ModalBNCCEdit";
 import { Trash2 } from "lucide-react";
+import { useApi } from "../../utils/api";
 
 interface EditarQuestaoModalProps {
   questaoId: number;
@@ -38,6 +39,7 @@ export const EditarQuestaoModal = ({
   const [habilidadesSelecionadas, setHabilidadesSelecionadas] = useState<{ id: number; codigo: string; nivel?: string }[]>([]);
   const [proficienciaSaebId, setProficienciaSaebId] = useState<number | null>(null);
   const [ordem, setOrdem] = useState<number | null>(null);
+  const api = useApi();
 
   const niveis = ["ANOS_INICIAIS", "ANOS_FINAIS", "ENSINO_MEDIO"];
   const series = [
@@ -59,7 +61,7 @@ export const EditarQuestaoModal = ({
   useEffect(() => {
     let questaoData: any = null;
     
-    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/questoes/${questaoId}`)
+    api.get(`/api/questoes/${questaoId}`)
       .then((res) => res.json())
       .then((data) => {
         questaoData = data;
@@ -99,12 +101,12 @@ export const EditarQuestaoModal = ({
         setProficienciaSaebId(data.proficiencia_saeb_id || null);
       });
 
-    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/componentes-curriculares`)
+    api.get(`/api/componentes-curriculares`)
       .then((res) => res.json())
       .then((data) => setComponentes(data || []));
 
     // Carrega habilidades BNCC já vinculadas para exibição/remoção
-    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`)
+    api.get(`/api/bncc?questao_id=${questaoId}`)
       .then((res) => res.json())
       .then(async (lista) => {
         if (Array.isArray(lista)) {
@@ -115,7 +117,7 @@ export const EditarQuestaoModal = ({
               // Se há um ID de proficiência, buscar a descrição do nível
               if (questaoData?.proficiencia_saeb_id) {
                 try {
-                  const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${h.id}/proficiencias`);
+                  const res = await api.get(`/api/bncc/${h.id}/proficiencias`);
                   if (res.ok) {
                     const profData = await res.json();
                     const proficiencia = profData.find((p: any) => p.id === questaoData.proficiencia_saeb_id);
@@ -149,9 +151,8 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
   formData.append("imagem", file); 
 
   try {
-    const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/upload/questao-imagem`, {
-      method: "POST",
-      body: formData,
+    const res = await api.post(`/api/upload/questao-imagem`, formData, {
+      headers: {}, // Remove Content-Type para permitir que o browser defina o boundary
     });
 
     const data = await res.json(); 
@@ -194,14 +195,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     };
 
     try {
-      const res = await fetch(
-        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/questoes/${questaoId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const res = await api.put(`/api/questoes/${questaoId}`, payload);
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -404,7 +398,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const habilidadesComNivel = await Promise.all(
           novosCodigos.map(async (codigoId) => {
             // Busca informações da habilidade
-            const resHabilidade = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${codigoId}`);
+            const resHabilidade = await api.get(`/api/bncc/${codigoId}`);
             if (!resHabilidade.ok) return null;
             
             const habilidade = await resHabilidade.json();
@@ -413,7 +407,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
             // Se há um ID de proficiência, buscar a descrição do nível
             if (profId) {
               try {
-                const resProficiencia = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${codigoId}/proficiencias`);
+                const resProficiencia = await api.get(`/api/bncc/${codigoId}/proficiencias`);
                 if (resProficiencia.ok) {
                   const profData = await resProficiencia.json();
                   const proficiencia = profData.find((p: any) => p.id === profId);

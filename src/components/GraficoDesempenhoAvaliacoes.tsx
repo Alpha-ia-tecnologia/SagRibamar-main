@@ -11,6 +11,7 @@ import {
 
 import { Bar } from "react-chartjs-2";
 import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
+import { useApi } from "../utils/api";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -23,6 +24,7 @@ interface DesempenhoProva {
 export const GraficoDesempenhoAvaliacoes = () => {
   const { filtros } = useFiltroDashboard();
   const [dados, setDados] = useState<DesempenhoProva[]>([]);
+  const api = useApi();
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -34,7 +36,7 @@ export const GraficoDesempenhoAvaliacoes = () => {
     if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
      if (filtros.provaId) params.append("prova_id", filtros.provaId); 
 
-    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/dashboard/provas-desempenho?${params.toString()}`)
+    api.get(`/api/dashboard/provas-desempenho?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {

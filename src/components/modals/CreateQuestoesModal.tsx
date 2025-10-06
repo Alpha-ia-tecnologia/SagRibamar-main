@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ModalBNCC } from "./ModalBNCC";
 import { Trash2 } from "lucide-react";
+import { useApi } from "../../utils/api";
 
 interface CreateQuestoesModalProps {
   provaId?: number;
@@ -82,6 +83,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
   const [foiSalva, setFoiSalva] = useState(false);
   const [proficienciaSaebId, setProficienciaSaebId] = useState<number | null>(null);
   const [provaCriada, setProvaCriada] = useState<number | null>(provaId || null);
+  const api = useApi();
 
   const niveis = ["ANOS_INICIAIS", "ANOS_FINAIS", "ENSINO_MEDIO"];
   const series = [
@@ -93,10 +95,10 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
   const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
 
   useEffect(() => {
-    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/componentes-curriculares`)
+    api.get(`/api/componentes-curriculares`)
       .then(res => res.json())
       .then(data => setComponentes(data || []));
-  }, []);
+  }, [api]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -106,9 +108,8 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     formData.append("imagem", file);
 
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/upload/questao-imagem`, {
-        method: "POST",
-        body: formData,
+      const res = await api.post(`/api/upload/questao-imagem`, formData, {
+        headers: {}, // Remove Content-Type para permitir que o browser defina o boundary
       });
 
       const contentType = res.headers.get("content-type");
@@ -167,11 +168,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     // Se não há prova criada ainda, criar uma nova
     if (!provaIdAtual && tituloProva) {
       try {
-        const provaRes = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/provas`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nome: tituloProva }),
-        });
+        const provaRes = await api.post(`/api/provas`, { nome: tituloProva });
 
         if (!provaRes.ok) {
           const errorText = await provaRes.text();
@@ -205,11 +202,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     };
 
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/questoes`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+      const res = await api.post(`/api/questoes`, payload);
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -392,7 +385,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
             // Se há um ID de proficiência, buscar a descrição do nível
             if (profId) {
               try {
-                const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${habilidades[0]?.id}/proficiencias`);
+                const res = await api.get(`/api/bncc/${habilidades[0]?.id}/proficiencias`);
                 if (res.ok) {
                   const data = await res.json();
                   const proficiencia = data.find((p: any) => p.id === profId);

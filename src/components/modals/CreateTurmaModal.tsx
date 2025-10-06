@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useApi } from "../../utils/api";
 
 interface CreateTurmaModalProps {
   turmaId: number | null;
@@ -39,17 +40,18 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
   const [turno, setTurno] = useState<string>("");
   const [escolas, setEscolas] = useState<Escola[]>([]);
   const [loading, setLoading] = useState(false);
+  const api = useApi();
 
   useEffect(() => {
     const fetchEscolas = async () => {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas?limit=200`);
+      const res = await api.get(`/api/escolas?limit=200`);
       const data = await res.json();
       const lista = Array.isArray(data) ? data : data.data;
       setEscolas(Array.isArray(lista) ? lista : []);
     };
 
     fetchEscolas();
-  }, []);
+  }, [api]);
 
   const handleSubmit = async () => {
     if (!nome.trim() || escolaId === "" || serie === "" || turno === "") {
@@ -66,11 +68,9 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
     };
 
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/turmas${turmaId ? `/${turmaId}` : ""}`, {
-        method: turmaId ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = turmaId 
+        ? await api.put(`/api/turmas/${turmaId}`, payload)
+        : await api.post(`/api/turmas`, payload);
 
       if (!res.ok) throw new Error("Erro ao salvar turma");
 

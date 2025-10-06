@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useApi } from "../../utils/api";
 
 interface Grupo {
   id: number;
@@ -13,13 +14,14 @@ interface Props {
 
 export const SelectGrupo = ({ regiaoId, value, onChange }: Props) => {
   const [grupos, setGrupos] = useState<Grupo[]>([]);
+  const api = useApi();
 
   useEffect(() => {
     const endpoint = regiaoId
-      ? `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/grupos?regiao_id=${regiaoId}`
-      : `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/grupos`;
+      ? `/api/grupos?regiao_id=${regiaoId}`
+      : `/api/grupos`;
 
-    fetch(endpoint)
+    api.get(endpoint)
       .then((res) => res.json())
       .then((data) => {
         console.log("Grupos carregados:", data);

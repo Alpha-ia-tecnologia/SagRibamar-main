@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useApi } from "../../utils/api";
 
 interface ImportAlunosModalProps {
   onClose: () => void;
@@ -10,11 +11,10 @@ export const ImportAlunosModal = ({ onClose, onSuccess }: ImportAlunosModalProps
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const api = useApi();
 
   const handleDownloadModelo = async () => {
-  const apiUrl = window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL; // Obtém a URL da API
-  const response = await fetch(`${apiUrl}/api/export/template-importacao`, {
-    method: 'GET',
+  const response = await api.get(`/api/export/template-importacao`, {
     headers: {
       'accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     }
@@ -46,9 +46,8 @@ export const ImportAlunosModal = ({ onClose, onSuccess }: ImportAlunosModalProps
     formData.append("file", file);
 
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/import-csv/import`, {
-        method: "POST",
-        body: formData,
+      const res = await api.post(`/api/import-csv/import`, formData, {
+        headers: {}, // Remove Content-Type para permitir que o browser defina o boundary
       });
 
       if (!res.ok) throw new Error("Erro ao importar alunos");

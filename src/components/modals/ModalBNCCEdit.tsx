@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { CreateHabilidadeModal } from "./CreateHabilidadeModal";
+import { useApi } from "../../utils/api";
 
 interface HabilidadeBNCC {
   id: number;
@@ -34,10 +35,11 @@ export const ModalBNCCEdit = ({
   const [series, setSeries] = useState<Serie[]>([]);
   const [showCreateHabilidadeModal,setShowCreateHabilidadeModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const api = useApi();
 
   const fetchSeries = async () => {
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/enums/series`);
+      const res = await api.get(`/api/enums/series`);
       if (!res.ok) throw new Error("Erro ao buscar séries");
       const data: Serie[] = await res.json();
       setSeries(data);
@@ -68,8 +70,8 @@ export const ModalBNCCEdit = ({
         
 
         const [resSelecionadas, resTodas] = await Promise.all([
-          fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`),
-          fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?${allParams.toString()}`),
+          api.get(`/api/bncc?questao_id=${questaoId}`),
+          api.get(`/api/bncc?${allParams.toString()}`),
         ]);
 
         const dataSelecionadas = await resSelecionadas.json();
@@ -102,7 +104,7 @@ export const ModalBNCCEdit = ({
       }
       
       try {
-        const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${selecionada}/proficiencias`);
+        const res = await api.get(`/api/bncc/${selecionada}/proficiencias`);
         if (!res.ok) {
           setNiveis([]);
           return;

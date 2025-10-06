@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { IconButton } from "../components/IconButton";
+import { useApi } from "../utils/api";
 
 interface Escola {
   id: number;
@@ -32,6 +33,7 @@ export const TurmaList = ({
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const api = useApi();
 
   const fetchTurmas = async () => {
     try {
@@ -42,9 +44,7 @@ export const TurmaList = ({
       if (searchNome.trim() !== "") queryParams.append("nome", searchNome);
       if (escolaId !== null) queryParams.append("escola_id", String(escolaId));
 
-      const res = await fetch(
-        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/turmas?${queryParams.toString()}`
-      );
+      const res = await api.get(`/api/turmas?${queryParams.toString()}`);
 
       const data = await res.json();
       setTurmas(data.data || []);
@@ -70,9 +70,7 @@ export const TurmaList = ({
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/turmas/${id}`, {
-        method: "DELETE",
-      });
+      const res = await api.delete(`/api/turmas/${id}`);
 
       if (!res.ok) throw new Error("Erro ao excluir");
 

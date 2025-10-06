@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useApi } from "../../utils/api";
 
 interface Regiao {
   id: number;
@@ -12,9 +13,10 @@ interface Props {
 
 export const SelectRegiao = ({ value, onChange }: Props) => {
   const [regioes, setRegioes] = useState<Regiao[]>([]);
+  const api = useApi();
 
   useEffect(() => {
-    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/regioes`)
+    api.get(`/api/regioes`)
       .then((res) => res.json())
       .then((data) => setRegioes(data || []))
       .catch(() => setRegioes([]));

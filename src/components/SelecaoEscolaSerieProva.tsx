@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { SuccessCheck } from "./Checked";
+import { useApi } from "../utils/api";
 
 interface Escola { id: number; nome: string; }
 interface Prova {
@@ -30,9 +31,10 @@ export const SelecaoEscolaSerieProva = () => {
   const [provaSelecionada, setProvaSelecionada] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const api = useApi();
 
   useEffect(() => {
-    fetch(`${(window as any).__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas?page=1&limit=200`)
+    api.get(`/api/escolas?page=1&limit=200`)
       .then(res => res.json())
       .then(data => Array.isArray(data.data) ? setEscolas(data.data) : setEscolas([]))
       .catch(console.error);
@@ -40,7 +42,7 @@ export const SelecaoEscolaSerieProva = () => {
 
   useEffect(() => {
     if (!escolaSelecionada) return;
-    fetch(`${(window as any).__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/obter-series-escola?escola_id=${escolaSelecionada}`)
+    api.get(`/api/obter-series-escola?escola_id=${escolaSelecionada}`)
       .then(res => res.json())
       .then(data => Array.isArray(data) ? setSeries(data) : setSeries([]))
       .catch(console.error);
@@ -48,7 +50,7 @@ export const SelecaoEscolaSerieProva = () => {
 
   useEffect(() => {
     if (!serieSelecionada) return;
-    fetch(`${(window as any).__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/provas?serie=${serieSelecionada}`)
+    api.get(`/api/provas?serie=${serieSelecionada}`)
       .then(res => res.json())
       .then(data => Array.isArray(data) ? setProvas(data) : setProvas([]))
       .catch(console.error);

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { IconButton } from "../components/IconButton";
+import { useApi } from "../utils/api";
 
 interface Turma {
   id: number;
@@ -40,6 +41,7 @@ export const AlunoList = ({
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const api = useApi();
 
   const fetchAlunos = async () => {
     try {
@@ -51,9 +53,7 @@ export const AlunoList = ({
       if (escolaId !== null) queryParams.append("escola_id", String(escolaId));
       if (turmaId !== null) queryParams.append("turma_id", String(turmaId));
 
-      const res = await fetch(
-        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/alunos?${queryParams.toString()}`
-      );
+      const res = await api.get(`/api/alunos?${queryParams.toString()}`);
 
       const data = await res.json();
       setAlunos(data.data || []);
@@ -79,9 +79,7 @@ export const AlunoList = ({
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/alunos/${id}`, {
-        method: "DELETE",
-      });
+      const res = await api.delete(`/api/alunos/${id}`);
 
       if (!res.ok) throw new Error("Erro ao excluir");
 

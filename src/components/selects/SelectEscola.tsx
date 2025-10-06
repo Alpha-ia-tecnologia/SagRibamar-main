@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useApi } from "../../utils/api";
 
 interface Escola {
   id: number;
@@ -14,6 +15,7 @@ interface Props {
 
 export const SelectEscola = ({ regiaoId, grupoId, value, onChange }: Props) => {
   const [escolas, setEscolas] = useState<Escola[]>([]);
+  const api = useApi();
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -23,9 +25,9 @@ export const SelectEscola = ({ regiaoId, grupoId, value, onChange }: Props) => {
     if (regiaoId) params.append("regiao_id", regiaoId);
     if (grupoId) params.append("grupo_id", grupoId);
 
-    const url = `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas?${params.toString()}`;
+    const url = `/api/escolas?${params.toString()}`;
 
-    fetch(url)
+    api.get(url)
       .then(res => res.json())
       .then(data => {
         const lista = Array.isArray(data?.data) ? data.data : [];

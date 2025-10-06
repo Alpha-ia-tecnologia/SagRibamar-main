@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { IconButton } from "../components/IconButton";
 import { FileDown, SquarePen, TriangleAlert } from "lucide-react";
+import { useApi } from "../utils/api";
 
 interface Prova {
   id: number;
@@ -29,6 +30,7 @@ export const ProvaList = ({
   const [isLoading, setIsLoading] = useState(false);
   const [confirmationDelete, setConfirmationDelete] = useState(false);
   const [provaIdSelecionada, setProvaIdSelecionada] = useState<number | null>(null);
+  const api = useApi();
 
   const fetchProvas = async () => {
     try {
@@ -36,9 +38,7 @@ export const ProvaList = ({
       if ((searchTitulo ?? "").trim())
         queryParams.append("titulo", (searchTitulo ?? "").trim());
 
-      const res = await fetch(
-        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/provas?${queryParams.toString()}`
-      );
+      const res = await api.get(`/api/provas?${queryParams.toString()}`);
 
       const data = await res.json();
 
@@ -64,12 +64,7 @@ export const ProvaList = ({
 
   const handleDelete = async (id: number) => {
     try {
-      const res = await fetch(
-        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/provas/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const res = await api.delete(`/api/provas/${id}`);
 
       if (!res.ok) {
         const erro = await res.text();

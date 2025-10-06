@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useApi } from "../utils/api";
 
 interface Escola {
   id: number;
@@ -20,16 +21,17 @@ export const AlunoFilter = ({ onFilter }: AlunoFilterProps) => {
   const [turmas, setTurmas] = useState<Turma[]>([]);
   const [escolaId, setEscolaId] = useState<number | "">("");
   const [turmaId, setTurmaId] = useState<number | "">("");
+  const api = useApi();
 
   useEffect(() => {
     const fetchEscolas = async () => {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas?page=1&limit=200`);
+      const res = await api.get(`/api/escolas?page=1&limit=200`);
       const data = await res.json();
       setEscolas(Array.isArray(data.data) ? data.data : data);
     };
 
     fetchEscolas();
-  }, []);
+  }, [api]);
 
   useEffect(() => {
     if (escolaId === "") {
@@ -39,7 +41,7 @@ export const AlunoFilter = ({ onFilter }: AlunoFilterProps) => {
     }
 
     const fetchTurmas = async () => {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/turmas?escola_id=${escolaId}&limit=2000`);
+      const res = await api.get(`/api/turmas?escola_id=${escolaId}&limit=2000`);
       const data = await res.json();
       setTurmas(Array.isArray(data.data) ? data.data : data);
     };

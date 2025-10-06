@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useApi } from "../../utils/api";
 
 interface Turma {
   id: number;
@@ -17,6 +18,7 @@ interface Props {
 
 export const SelectTurma = ({ escolaId, serie, value, onChange }: Props) => {
   const [turmas, setTurmas] = useState<Turma[]>([]);
+  const api = useApi();
 
   useEffect(() => {
     if (!escolaId || !serie) {
@@ -29,9 +31,7 @@ export const SelectTurma = ({ escolaId, serie, value, onChange }: Props) => {
       serie: serie,
     });
 
-    const url = `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/turmas?${params.toString()}`;
-
-    fetch(url)
+    api.get(`/api/turmas?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         console.log("Turmas carregadas:", data);

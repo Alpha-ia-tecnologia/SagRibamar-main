@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { EditarQuestaoModal } from "./EditQuestaoModal";
 import { CreateQuestoesModal } from "./CreateQuestoesModal";
+import { useApi } from "../../utils/api";
 
 interface VisualizarProvaModalProps {
   provaId: number;
@@ -41,14 +42,11 @@ export const VisualizarProvaModal = ({
   );
   const contentRef = useRef<HTMLDivElement>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const api = useApi();
 
   const carregarQuestoes = () => {
     setLoading(true);
-    fetch(
-      `${
-        window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL
-      }/api/provas/${provaId}/questoes-detalhadas`
-    )
+    api.get(`/api/provas/${provaId}/questoes-detalhadas`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data?.questoes)) {

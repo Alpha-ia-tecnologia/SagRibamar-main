@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useApi } from "../../utils/api";
 
 interface Props {
   escolaId?: string;
@@ -27,6 +28,7 @@ const TODAS_AS_SERIES = Object.keys(nomeSerieLegivel);
 
 export const SelectSerie = ({ escolaId, value, onChange }: Props) => {
   const [series, setSeries] = useState<string[]>(TODAS_AS_SERIES);
+  const api = useApi();
 
   useEffect(() => {
     if (!escolaId) {
@@ -34,9 +36,7 @@ export const SelectSerie = ({ escolaId, value, onChange }: Props) => {
       return;
     }
 
-    const url = `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/obter-series-escola?escola_id=${escolaId}`;
-
-    fetch(url)
+    api.get(`/api/obter-series-escola?escola_id=${escolaId}`)
       .then((res) => res.json())
       .then((data) => {
         console.log("Séries da escola carregadas:", data);

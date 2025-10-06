@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useApi } from "../../utils/api";
 
 interface CreateHabilidadeModalProps {
   onClose: () => void;
@@ -34,10 +35,11 @@ export const CreateHabilidadeModal = ({onClose, onHabilidadeCreated}: CreateHabi
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [foiSalva, setFoiSalva] = useState(false);
+  const api = useApi();
 
   const fetchSeries = async () => {
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/enums/series`);
+      const res = await api.get(`/api/enums/series`);
       if (!res.ok) throw new Error("Erro ao buscar séries");
       const data: Serie[] = await res.json();
       setSeries(data);
@@ -51,7 +53,7 @@ export const CreateHabilidadeModal = ({onClose, onHabilidadeCreated}: CreateHabi
   }, []);
 
   useEffect(() => {
-    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/componentes-curriculares`)
+    api.get(`/api/componentes-curriculares`)
       .then(res => res.json())
       .then(data => setComponentes(data || []));
   }, []);
@@ -123,13 +125,7 @@ export const CreateHabilidadeModal = ({onClose, onHabilidadeCreated}: CreateHabi
         componente_curricular_id: componenteId
       };
 
-      const response = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(habilidadeData)
-      });
+      const response = await api.post(`/api/bncc`, habilidadeData);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -141,16 +137,10 @@ export const CreateHabilidadeModal = ({onClose, onHabilidadeCreated}: CreateHabi
       // Se for SAEB e houver níveis adicionados, criar os níveis de proficiência
       if (saeb && niveisSaeb.length > 0) {
         const niveisPromises = niveisSaeb.map(nivel => 
-          fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/proficiencias-saeb`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              nivel: nivel.nivel,
-              descricao: nivel.descricao,
-              bncc_id: habilidadeCriada.id
-            })
+          api.post(`/api/proficiencias-saeb`, {
+            nivel: nivel.nivel,
+            descricao: nivel.descricao,
+            bncc_id: habilidadeCriada.id
           })
         );
 
