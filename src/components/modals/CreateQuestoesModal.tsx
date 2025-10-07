@@ -83,6 +83,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
   const [foiSalva, setFoiSalva] = useState(false);
   const [proficienciaSaebId, setProficienciaSaebId] = useState<number | null>(null);
   const [provaCriada, setProvaCriada] = useState<number | null>(provaId || null);
+  const [proximoNumero, setProximoNumero] = useState<number>(1);
   const api = useApi();
 
   const niveis = ["ANOS_INICIAIS", "ANOS_FINAIS", "ENSINO_MEDIO"];
@@ -99,6 +100,29 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
       .then(res => res.json())
       .then(data => setComponentes(data || []));
   }, [api]);
+
+  // Função para buscar o próximo número da questão
+  const buscarProximoNumero = async (provaIdAtual: number) => {
+    try {
+      const res = await api.get(`/api/provas/${provaIdAtual}/questoes-detalhadas`);
+      if (res.ok) {
+        const data = await res.json();
+        const questoes = data.questoes || [];
+        const proximoNum = questoes.length + 1;
+        setProximoNumero(proximoNum);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar próximo número:", error);
+      setProximoNumero(1);
+    }
+  };
+
+  // Buscar próximo número quando provaId for definido
+  useEffect(() => {
+    if (provaId) {
+      buscarProximoNumero(provaId);
+    }
+  }, [provaId]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -159,7 +183,11 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     setHabilidadesSelecionadas([]);
     setProficienciaSaebId(null);
     setFoiSalva(false);
-    // Não resetar provaCriada para manter a prova já criada
+    
+    // Atualizar próximo número quando adicionar nova questão
+    if (provaCriada) {
+      buscarProximoNumero(provaCriada);
+    }
   };
 
   const handleSubmit = async () => {
@@ -180,6 +208,8 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
         const provaSalva = await provaRes.json();
         provaIdAtual = provaSalva.id;
         setProvaCriada(provaIdAtual);
+        // Buscar próximo número para a nova prova criada
+        buscarProximoNumero(provaIdAtual);
       } catch (err) {
         alert("Erro ao criar prova. Veja o console para mais informações.");
         console.error(err);
@@ -230,7 +260,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-50">
       <div className="bg-white w-full max-w-3xl p-6 rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto transition-all">
-        <h2 className="text-xl font-bold mb-6 text-gray-800">Adicionar Questão</h2>
+        <h2 className="text-xl font-bold mb-6 text-gray-800">Adicionar Questão - {proximoNumero}</h2>
 
         <textarea
           value={enunciado}
