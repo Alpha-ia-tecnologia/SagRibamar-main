@@ -87,14 +87,14 @@ export const SelecaoEscolaSerieProva = () => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", "gabarito.pdf");
+      const nomeArquivo = `${escolas.find(escola => escola.id === escolaSelecionada)?.nome || "Escola"}-${serieNomes[serieSelecionada] || serieSelecionada}-${prova?.nome || "Prova"}.pdf`;
+      link.setAttribute("download", nomeArquivo);
       document.body.appendChild(link);
       link.click();
       link.remove();
       URL.revokeObjectURL(url);
       setSuccess (true);
       setTimeout(() => setSuccess(false), 4000);
-
     } catch (err) {
       console.error(err);
       alert("Falha ao gerar o gabarito.");
