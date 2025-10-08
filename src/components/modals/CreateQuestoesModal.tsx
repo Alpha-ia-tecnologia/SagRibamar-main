@@ -75,7 +75,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
   const [serie, setSerie] = useState("PRIMEIRO_ANO");
   const [dificuldade, setDificuldade] = useState("FACIL");
   const [pontos, setPontos] = useState(1);
-  const [componenteId, setComponenteId] = useState(0);
+  const [componenteId, setComponenteId] = useState(1);
   const [componentes, setComponentes] = useState<ComponenteCurricular[]>([]);
   const [codigosBNCC, setCodigosBNCC] = useState<number[]>([]);
   const [habilidadesSelecionadas, setHabilidadesSelecionadas] = useState<{ id: number; codigo: string; nivel?: string }[]>([]);
@@ -191,7 +191,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
   };
 
   const handleSubmit = async () => {
-    let provaIdAtual = provaCriada;
+    let provaIdAtual: number | null = provaCriada;
 
     // Se não há prova criada ainda, criar uma nova
     if (!provaIdAtual && tituloProva) {
@@ -209,7 +209,9 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
         provaIdAtual = provaSalva.id;
         setProvaCriada(provaIdAtual);
         // Buscar próximo número para a nova prova criada
-        buscarProximoNumero(provaIdAtual);
+        if (provaIdAtual) {
+          buscarProximoNumero(provaIdAtual);
+        }
       } catch (err) {
         alert("Erro ao criar prova. Veja o console para mais informações.");
         console.error(err);
