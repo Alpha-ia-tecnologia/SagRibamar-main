@@ -12,6 +12,39 @@ interface Escola {
   nome: string;
 }
 
+const formatarTextoSelect = (texto: string) => {
+  const mapaSeries: Record<string, string> = {
+    PRIMEIRO_ANO: "1° ano",
+    SEGUNDO_ANO: "2° ano",
+    TERCEIRO_ANO: "3° ano",
+    QUARTO_ANO: "4° ano",
+    QUINTO_ANO: "5° ano",
+    SEXTO_ANO: "6° ano",
+    SETIMO_ANO: "7° ano",
+    OITAVO_ANO: "8° ano",
+    NONO_ANO: "9° ano",
+    PRIMEIRA_SERIE: "1ª série",
+    SEGUNDA_SERIE: "2ª série",
+    TERCEIRA_SERIE: "3ª série",
+    PRIMEIRO_E_SEGUNDO_ANOS: "1° e 2° anos",
+    TERCEIRO_AO_QUINTO_ANO: "3° ao 5° ano",
+    PRIMEIRO_AO_QUINTO_ANO: "1° ao 5° ano",
+    EJA: "EJA"
+  };
+
+  const mapaTurnos: Record<string, string> = {
+    MANHA: "Matutino",
+    TARDE: "Vespertino",
+    NOITE: "Noturno"
+  };
+
+  return (
+    mapaSeries[texto] ||
+    mapaTurnos[texto] ||
+    texto.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+  );
+};
+
 const turnos = ["MANHA", "TARDE", "NOITE"] as const;
 
 const series = [
@@ -124,14 +157,9 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
               value={serie}
               onChange={(e) => setSerie(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-            >
-              <option value="">Selecione a série</option>
-              {series.map((s) => (
-                <option key={s} value={s}>
-                  {s.replace(/_/g, " ").toLowerCase().replace(/^\w/, c => c.toUpperCase())}
-                </option>
-              ))}
-            </select>
+              >
+              {series.map(s => <option key={s} value={s}>{formatarTextoSelect(s)}</option>)}
+             </select>
           </div>
 
           <div>
@@ -141,12 +169,7 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
               onChange={(e) => setTurno(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
             >
-              <option value="">Selecione o turno</option>
-              {turnos.map((t) => (
-                <option key={t} value={t}>
-                  {t.charAt(0) + t.slice(1).toLowerCase()}
-                </option>
-              ))}
+              {turnos.map(t => <option key={t} value={t}>{formatarTextoSelect(t)}</option>)}
             </select>
           </div>
         </div>
