@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { IconButton } from "../components/IconButton";
 import { useApi } from "../utils/api";
+import { ConfirmDialog } from "../components/modals/ConfirmDialog";
 
 interface Turma {
   id: number;
@@ -41,6 +42,8 @@ export const AlunoList = ({
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [confirmationDelete, setConfirmationDelete] = useState(false);
+  const [alunoIdSelecionado, setAlunoIdSelecionado] = useState<number | null>(null);
   const api = useApi();
 
   const fetchAlunos = async () => {
@@ -75,9 +78,6 @@ export const AlunoList = ({
   }, [reload, onReloadDone]);
 
   const handleDelete = async (id: number) => {
-    const confirmDelete = window.confirm("Deseja excluir este aluno?");
-    if (!confirmDelete) return;
-
     try {
       const res = await api.delete(`/api/alunos/${id}`);
 
@@ -144,7 +144,12 @@ export const AlunoList = ({
           </div>
           <div className="flex gap-3">
             <IconButton type="edit" onClick={() => onEdit?.(aluno.id)} />
-            <IconButton type="delete" onClick={() => handleDelete(aluno.id)} />
+            <IconButton 
+            type="delete" 
+            onClick={() => {
+              setAlunoIdSelecionado(aluno.id);
+              setConfirmationDelete(true);
+            }} />
           </div>
         </div>
       ))}
@@ -194,6 +199,29 @@ export const AlunoList = ({
           >
             &gt;
           </button>
+
+          {confirmationDelete && (
+            <ConfirmDialog
+              isOpen={confirmationDelete}
+              title="Tem certeza que deseja excluir esse aluno?"
+              description="Ao excluir o aluno, todas as informações relacionadas a ele serão perdidas."
+              warning="Essa ação não poderá ser desfeita."
+              confirmText="Excluir"
+              cancelText="Cancelar"
+              onConfirm= {() => {
+                if (alunoIdSelecionado !== null) {
+                  handleDelete(alunoIdSelecionado);
+                  setAlunoIdSelecionado(null);
+                  setConfirmationDelete(false);
+                }
+              }}
+              onCancel={() => {
+                setConfirmationDelete(false);
+                setAlunoIdSelecionado(null);
+              }}
+              />
+          )}
+
         </div>
       </div>
     </div>

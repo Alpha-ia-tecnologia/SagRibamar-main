@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { IconButton } from "../components/IconButton";
 import { useApi } from "../utils/api";
+import { ConfirmDialog } from "../components/modals/ConfirmDialog";
 
 interface Escola {
   id: number;
@@ -33,6 +34,8 @@ export const TurmaList = ({
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [turmaIdSelecionada, setTurmaIdSelecionada] = useState<number | null>(null);
+  const [confirmationDelete, setConfirmationDelete] = useState(false);
   const api = useApi();
 
   const fetchTurmas = async () => {
@@ -66,9 +69,6 @@ export const TurmaList = ({
   }, [reload, onReloadDone]);
 
   const handleDelete = async (id: number) => {
-    const confirmDelete = window.confirm("Deseja excluir esta turma?");
-    if (!confirmDelete) return;
-
     try {
       const res = await api.delete(`/api/turmas/${id}`);
 
@@ -135,7 +135,12 @@ export const TurmaList = ({
           </div>
           <div className="flex gap-3">
             <IconButton type="edit" onClick={() => onEdit?.(turma.id)} />
-            <IconButton type="delete" onClick={() => handleDelete(turma.id)} />
+            <IconButton 
+            type="delete" 
+            onClick={() => {
+              setTurmaIdSelecionada(turma.id)
+              setConfirmationDelete(true)
+            }} />
           </div>
         </div>
       ))}
@@ -185,6 +190,24 @@ export const TurmaList = ({
           >
             &gt;
           </button>
+          {confirmationDelete && (
+            <ConfirmDialog
+            isOpen={confirmationDelete}
+            title="Tem certeza que deseja excluir essa turma?"
+            description="Ao excluir uma turma, todos os alunos vinculados a ela também serão excluídos."
+            warning="Esta ação é irreversível e resultará na perda de todos os dados associados à turma."
+            confirmText="Excluir"
+            cancelText="Cancelar"
+            onConfirm={() => {
+              if (turmaIdSelecionada != null) handleDelete(turmaIdSelecionada);
+              setConfirmationDelete(false);
+              setTurmaIdSelecionada(null);
+            }}
+            onCancel={()=> {
+              setConfirmationDelete(false)
+              setTurmaIdSelecionada(null);
+            }}
+          />)}
         </div>
       </div>
     </div>

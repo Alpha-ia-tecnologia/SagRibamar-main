@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { IconButton } from "../components/IconButton";
 import { useApi } from "../utils/api";
+import { ConfirmDialog } from "../components/modals/ConfirmDialog";
 
 interface Regiao {
   id: number;
@@ -42,6 +43,8 @@ export const SchoolList = ({
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [confirmationDelete, setConfirmationDelete] = useState(false);
+  const [escolaIdSelecionada, setEscoldaIdSelecionada] = useState<number | null>(null);
   const api = useApi();
 
   const fetchEscolas = async () => {
@@ -76,9 +79,6 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
   }, [reload, onReloadDone]);
 
   const handleDelete = async (id: number) => {
-    const confirmDelete = window.confirm("Deseja excluir esta escola?");
-    if (!confirmDelete) return;
-
     try {
       const res = await api.delete(`/api/escolas/${id}`);
 
@@ -145,7 +145,12 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
           </div>
           <div className="flex gap-3">
             <IconButton type="edit" onClick={() => onEdit?.(escola.id)} />
-            <IconButton type="delete" onClick={() => handleDelete(escola.id)} />
+            <IconButton 
+            type="delete" 
+            onClick={() => {
+              setEscoldaIdSelecionada(escola.id); // <- salva o id);
+              setConfirmationDelete(true)
+            }} />
           </div>
         </div>
       ))}
@@ -195,6 +200,26 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
           >
             &gt;
           </button>
+
+          {confirmationDelete && (
+            <ConfirmDialog
+            isOpen={confirmationDelete}
+            title="Tem certeza que deseja excluir essa escola?"
+            description="Ao excluir uma escola, todas as provas, turmas e alunos vinculados a ela também serão excluídos."
+            warning="Esta ação é irreversível e resultará na perda de todos os dados associados à escola."
+            confirmText="Excluir"
+            cancelText="Cancelar"
+            onConfirm={() => {
+              if ( escolaIdSelecionada != null) handleDelete(escolaIdSelecionada);
+              setConfirmationDelete(false);
+              setEscoldaIdSelecionada(null);
+            }}
+            onCancel={() => {
+              setConfirmationDelete(false)
+              setEscoldaIdSelecionada(null);
+            }}
+            
+            />)}
         </div>
       </div>
     </div>

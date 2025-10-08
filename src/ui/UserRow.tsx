@@ -26,7 +26,9 @@ export const UserRow = ({ nome, email, tipo_usuario, onEdit, onDelete }: UserRow
         <Badge text={tipo_usuario} />
         <div className="flex gap-3">
           <IconButton type="edit" onClick={onEdit} />
-          <IconButton type="delete" onClick={onDelete} />
+          <IconButton 
+          type="delete" 
+          onClick={onDelete} />
         </div>
       </div>
     </div>

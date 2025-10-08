@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { UserRow } from "../ui/UserRow";
 import { CreateUserModal } from "../components/modals/CreateUserModal";
 import { useApi } from "../utils/api";
+import { ConfirmDialog } from "../components/modals/ConfirmDialog";
 
 interface Usuario {
   id: number;
@@ -20,6 +21,8 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [editingUserId, setEditingUserId] = useState<number | null>(null); 
   const itemsPerPage = 5;
+  const [confirmationDelete, setConfirmationDelete] = useState(false);
+  const [idUser, setIdUser] = useState<number | null>(null);
   const api = useApi();
 
   const fetchUsuarios = async () => {
@@ -39,9 +42,6 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
   }, [reload, onReloadDone]);
 
   const deleteUsuario = async (id: number) => {
-    const confirm = window.confirm("Tem certeza que deseja excluir este usuário?");
-    if (!confirm) return;
-
     try {
       const res = await api.delete(`/api/usuarios/${id}`);
 
@@ -109,7 +109,10 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
             email={usuario.email}
             tipo_usuario={usuario.tipo_usuario}
             onEdit={() => setEditingUserId(usuario.id)} 
-            onDelete={() => deleteUsuario(usuario.id)}
+            onDelete={() => {
+              setIdUser(usuario.id);
+              setConfirmationDelete(true);
+            }}
           />
         ))}
 
@@ -167,6 +170,25 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
           userId={editingUserId}
           onClose={() => setEditingUserId(null)}
           onSuccess={handleEditSuccess}
+        />
+      )}
+      {confirmationDelete && (
+        <ConfirmDialog
+          isOpen={confirmationDelete}
+          title="Tem certeza que deseja excluir esse usuário?"
+          description="Ao excluir um usuário, o mesmo não poderá mais acessar a plataforma com as mesmas informações de login."
+          warning="Esta ação é irreversível."
+          onConfirm={() => {
+            if (idUser !== null) {
+              deleteUsuario(idUser);
+              setIdUser(null);
+              setConfirmationDelete(false);
+            }
+          }}
+          onCancel={() => {
+            setIdUser(null);
+            setConfirmationDelete(false);
+          }}
         />
       )}
     </>

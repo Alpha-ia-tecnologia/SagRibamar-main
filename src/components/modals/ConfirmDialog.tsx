@@ -82,7 +82,7 @@ export function ConfirmDialog({
         <div className="flex items-center justify-center gap-3 mt-6">
           <button
             ref={firstFocusRef}
-            className={"px-6 py-2 rounded-lg font-medium text-white transition bg-red-600 hover:bg-red-700"
+            className={"px-6 py-2 rounded-lg font-medium text-white transition bg-red-600 hover:bg-red-700 cursor-pointer"
              }
             onClick={onConfirm}
           >
@@ -90,7 +90,7 @@ export function ConfirmDialog({
           </button>
 
           <button
-            className="px-6 py-2 rounded-lg font-medium bg-gray-200 text-gray-800 hover:bg-gray-300 transition"
+            className="px-6 py-2 rounded-lg font-medium bg-gray-200 text-gray-800 hover:bg-gray-300 transition cursor-pointer"
             onClick={onCancel}
           >
             {cancelText}
