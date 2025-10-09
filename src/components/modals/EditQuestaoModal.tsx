@@ -19,6 +19,46 @@ interface ComponenteCurricular {
   nome: string;
 }
 
+const formatarTextoSelect = (texto: string) => {
+  const mapaSeries: Record<string, string> = {
+    PRIMEIRO_ANO: "1° ano",
+    SEGUNDO_ANO: "2° ano",
+    TERCEIRO_ANO: "3° ano",
+    QUARTO_ANO: "4° ano",
+    QUINTO_ANO: "5° ano",
+    SEXTO_ANO: "6° ano",
+    SETIMO_ANO: "7° ano",
+    OITAVO_ANO: "8° ano",
+    NONO_ANO: "9° ano",
+    PRIMEIRA_SERIE: "1ª série",
+    SEGUNDA_SERIE: "2ª série",
+    TERCEIRA_SERIE: "3ª série",
+    PRIMEIRO_E_SEGUNDO_ANOS: "1° e 2° anos",
+    TERCEIRO_AO_QUINTO_ANO: "3° ao 5° ano",
+    PRIMEIRO_AO_QUINTO_ANO: "1° ao 5° ano",
+    EJA: "EJA"
+  };
+
+  const mapaNiveis: Record<string, string> = {
+    ANOS_INICIAIS: "Anos iniciais",
+    ANOS_FINAIS: "Anos finais",
+    ENSINO_MEDIO: "Ensino médio"
+  };
+
+  const mapaDificuldades: Record<string, string> = {
+    FACIL: "Fácil",
+    MEDIO: "Média",
+    DIFICIL: "Difícil"
+  };
+
+  return (
+    mapaSeries[texto] ||
+    mapaNiveis[texto] ||
+    mapaDificuldades[texto] ||
+    texto.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+  );
+};
+
 export const EditarQuestaoModal = ({
   questaoId,
   onClose,
@@ -260,7 +300,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           >
             {niveis.map((n) => (
               <option key={n} value={n}>
-                {n}
+                {formatarTextoSelect(n)}
               </option>
             ))}
           </select>
@@ -270,11 +310,13 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
             onChange={(e) => setSerie(e.target.value)}
             className="p-3 border rounded-xl"
           >
-            {series.map((s) => (
-              <option key={s} value={s}>
-                {s}
+            {series.map((s) => 
+              <option 
+              key={s} 
+              value={s}>
+                {formatarTextoSelect(s)}
               </option>
-            ))}
+            )}
           </select>
 
           <select
@@ -284,7 +326,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           >
             {dificuldades.map((d) => (
               <option key={d} value={d}>
-                {d}
+                {formatarTextoSelect(d)}
               </option>
             ))}
           </select>
