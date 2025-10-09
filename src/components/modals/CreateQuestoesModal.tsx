@@ -301,11 +301,22 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
             {niveis.map(n => <option key={n} value={n}>{formatarTextoSelect(n)}</option>)}
           </select>
 
-          <select value={serie} onChange={(e) => setSerie(e.target.value)} className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
-            {series.map(s => <option key={s} value={s}>{formatarTextoSelect(s)}</option>)}
+          <select 
+          value={serie} 
+          onChange={(e) => setSerie(e.target.value)} 
+          className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+          >
+            {series.map(s => 
+            <option 
+            key={s} 
+            value={s}>
+              {formatarTextoSelect(s)}
+            </option>)}
           </select>
 
-          <select value={dificuldade} onChange={(e) => setDificuldade(e.target.value)} className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
+          <select 
+          value={dificuldade} 
+          onChange={(e) => setDificuldade(e.target.value)} className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
             {dificuldades.map(d => <option key={d} value={d}>{formatarTextoSelect(d)}</option>)}
           </select>
 
