@@ -4,8 +4,21 @@ import { useState } from "react";
 
 export const Header = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(sessionStorage.getItem("currentUser") || "{}");
   const [isOpen, setIsOpen] = useState(false);
+  
+  // Função segura para obter usuário do sessionStorage
+  const getUser = () => {
+    try {
+      const storedUser = sessionStorage.getItem("currentUser");
+      return storedUser ? JSON.parse(storedUser) : {};
+    } catch (error) {
+      console.error("Erro ao fazer parse do usuário:", error);
+      sessionStorage.removeItem("currentUser");
+      return {};
+    }
+  };
+  
+  const user = getUser();
 
   const tipo = user?.tipo_usuario;
 
