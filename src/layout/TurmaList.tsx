@@ -13,6 +13,9 @@ interface Turma {
   nome: string;
   escola_id: number;
   escola: Escola;
+  turno: string;
+  serie: string;
+  _count: { alunos: number }
 }
 
 interface TurmaListProps {
@@ -22,6 +25,60 @@ interface TurmaListProps {
   searchNome: string;
   escolaId: number | null;
 }
+
+const formatarTextoSelect = (texto: string) => {
+  const mapaSeries: Record<string, string> = {
+    PRIMEIRO_ANO: "1° ano",
+    SEGUNDO_ANO: "2° ano",
+    TERCEIRO_ANO: "3° ano",
+    QUARTO_ANO: "4° ano",
+    QUINTO_ANO: "5° ano",
+    SEXTO_ANO: "6° ano",
+    SETIMO_ANO: "7° ano",
+    OITAVO_ANO: "8° ano",
+    NONO_ANO: "9° ano",
+    PRIMEIRA_SERIE: "1ª série",
+    SEGUNDA_SERIE: "2ª série",
+    TERCEIRA_SERIE: "3ª série",
+    PRIMEIRO_E_SEGUNDO_ANOS: "1° e 2° anos",
+    TERCEIRO_AO_QUINTO_ANO: "3° ao 5° ano",
+    PRIMEIRO_AO_QUINTO_ANO: "1° ao 5° ano",
+    EJA: "EJA"
+  };
+
+  const mapaTurnos: Record<string, string> = {
+    MANHA: "Matutino",
+    TARDE: "Vespertino",
+    NOITE: "Noturno"
+  };
+
+  return (
+    mapaSeries[texto] ||
+    mapaTurnos[texto] ||
+    texto.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+  );
+};
+
+const turnos = ["MANHA", "TARDE", "NOITE"] as const;
+
+const series = [
+  "PRIMEIRO_ANO",
+  "SEGUNDO_ANO",
+  "TERCEIRO_ANO",
+  "QUARTO_ANO",
+  "QUINTO_ANO",
+  "SEXTO_ANO",
+  "SETIMO_ANO",
+  "OITAVO_ANO",
+  "NONO_ANO",
+  "PRIMEIRA_SERIE",
+  "SEGUNDA_SERIE",
+  "TERCEIRA_SERIE",
+  "PRIMEIRO_E_SEGUNDO_ANOS",
+  "TERCEIRO_AO_QUINTO_ANO",
+  "PRIMEIRO_AO_QUINTO_ANO",
+  "EJA",
+] as const;
 
 export const TurmaList = ({
   reload,
@@ -129,7 +186,11 @@ export const TurmaList = ({
                 {turma.nome}
               </p>
               <p className="text-sm text-gray-500">
-                ID: {turma.id} | Escola: {turma.escola?.nome || "N/A"}
+                ID: {turma.id} | 
+                Escola: {turma.escola?.nome || "N/A"} | 
+                Série: {series.filter(s => s === turma.serie).map(s => formatarTextoSelect(s))} | 
+                Turno: {turnos.filter(t => t === turma.turno).map(t => formatarTextoSelect(t))} | 
+                Alunos: {turma._count.alunos} 
               </p>
             </div>
           </div>
