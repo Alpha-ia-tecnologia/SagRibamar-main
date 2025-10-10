@@ -119,6 +119,11 @@ export const TabelaHabilidadesBNCC = () => {
         params.append("proficiencia_saeb_id", proficienciaSaebId.toString());
       }
 
+      // Adiciona o prova_id se estiver selecionado no dashboard
+      if (filtros.provaId) {
+        params.append("prova_id", filtros.provaId);
+      }
+
       const res = await api.get(`/api/dashboard/bncc-questoes?${params.toString()}`);
       
       if (!res.ok) {
