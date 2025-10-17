@@ -108,7 +108,7 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
       if (!res.ok) throw new Error("Erro ao salvar turma");
 
       onSuccess();
-    } catch (err) {
+    } catch {
       alert("Erro ao salvar turma");
     } finally {
       setLoading(false);
@@ -132,9 +132,15 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
               }
               className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
             >
-              <option value="">Selecione uma escola</option>
+              <option 
+              value=""
+              disabled>
+                Selecione uma escola
+              </option>
               {escolas.map((escola) => (
-                <option key={escola.id} value={escola.id}>
+                <option 
+                key={escola.id} 
+                value={escola.id}>
                   {escola.nome}
                 </option>
               ))}
@@ -158,7 +164,17 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
               onChange={(e) => setSerie(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
               >
-              {series.map(s => <option key={s} value={s}>{formatarTextoSelect(s)}</option>)}
+                <option 
+                value=""
+                disabled>
+                  Selecione uma Série
+                </option>
+                {series.map(s => (
+                  <option 
+                  key={s}
+                  value={s}>
+                    {formatarTextoSelect(s)}
+                  </option>))}
              </select>
           </div>
 
@@ -169,7 +185,18 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
               onChange={(e) => setTurno(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
             >
-              {turnos.map(t => <option key={t} value={t}>{formatarTextoSelect(t)}</option>)}
+              <option 
+              value=""
+              disabled>
+                Selecione um Turno
+              </option>
+
+              {turnos.map(t => 
+              <option
+              key={t}
+              value={t}>
+                {formatarTextoSelect(t)}
+              </option>)}
             </select>
           </div>
         </div>
