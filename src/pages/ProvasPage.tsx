@@ -4,6 +4,7 @@ import { PageHeader } from "../ui/PageHeader";
 import { ProvaList } from "../layout/ProvaList";
 import { CreateProvaModal } from "../components/modals/CreateProvaModal";
 import { VisualizarProvaModal } from "../components/modals/VisualizarProvaModal";
+import Footer from "../components/Footer";
 
 export default function ProvasPage() {
   const [showModal, setShowModal] = useState(false);
@@ -27,7 +28,7 @@ export default function ProvasPage() {
     <>
       <Header />
 
-      <div className="pt-20 p-8 bg-gray-100 min-h-screen">
+      <div className="p-8 bg-gray-100 min-h-screen">
         <PageHeader
           title="Avaliações"
           description="Gerenciamento de avaliações"
@@ -64,6 +65,9 @@ export default function ProvasPage() {
           modoVisualizacao={modoVisualizacao}
         />
       )}
+      <div>
+        <Footer />
+      </div>
     </>
   );
 }

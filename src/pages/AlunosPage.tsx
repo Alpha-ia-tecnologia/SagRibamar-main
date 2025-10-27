@@ -7,6 +7,7 @@ import { AlunoFilter } from "../components/AlunoFilter";
 import { ImportAlunosModal } from "../components/modals/ImportAlunosModal ";
 import { Loading } from "../components/Loading";
 import { useApi } from "../utils/api";
+import Footer from "../components/Footer";
 
 export default function AlunosPage() {
   const [showModal, setShowModal] = useState(false);
@@ -116,7 +117,7 @@ const handleDownloadStudent = async () => {
   return (
     <>
       <Header />
-        <div className="pt-20 p-12 bg-gray-100 min-h-screen">
+        <div className="p-12 bg-gray-100 min-h-screen">
         <div className="flex items-center justify-between mb-6">
        <PageHeader
           title="Alunos"
@@ -177,6 +178,9 @@ const handleDownloadStudent = async () => {
       )}
 
       {isLoading && <Loading />}
+      <div>
+        <Footer />
+      </div>
     </>
   );
 }
