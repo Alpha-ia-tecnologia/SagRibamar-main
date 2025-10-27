@@ -6,6 +6,7 @@ import { CreateAlunoModal } from "../components/modals/CreateAlunoModal";
 import { AlunoFilter } from "../components/AlunoFilter";
 import { ImportAlunosModal } from "../components/modals/ImportAlunosModal ";
 import { Loading } from "../components/Loading";
+import { useApi } from "../utils/api";
 
 export default function AlunosPage() {
   const [showModal, setShowModal] = useState(false);
@@ -18,6 +19,8 @@ export default function AlunosPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [showImportModal, setShowImportModal] = useState(false);
+  
+  const api = useApi();
 
   const handleSuccess = () => {
     setShowModal(false);
@@ -40,21 +43,49 @@ export default function AlunosPage() {
     setTurmaId(turmaId);
   };
 
-const handleDownloadStudent = async (id: number) => {
+const handleDownloadStudent = async () => {
+  setIsLoading(true);
   try {
-  const apiUrl = window.__ENV__?.URL_PROVAS ?? import.meta.env.VITE_URL_PROVAS;
+    // Obter município baseado no nome da aplicação
+    const appName = window.__ENV__?.APP_NAME ?? import.meta.env.VITE_APP_NAME;
+    console.log("APP_NAME:", appName);
+    
+    // Extrair município do nome da aplicação (ex: "SAG (Ribamar)" -> "Ribamar")
+    const municipio = appName && appName.includes("(") && appName.includes(")") 
+      ? appName.match(/\(([^)]+)\)/)?.[1] || "Ribamar"
+      : "Ribamar";
+    
+    console.log("Município detectado:", municipio);
+    
+    // Tentar primeiro com a API interna usando GET
+    let response;
+    try {
+      response = await api.get(`/api/alunos-pdf?municipio=${encodeURIComponent(municipio)}`, {
+        headers: {
+          "accept": "application/pdf",
+        }
+      });
+    } catch (apiError) {
+      console.log("Erro na API interna, tentando URL externa:", apiError);
+      // Se falhar, tentar com URL externa usando GET
+      const apiUrl = (window.__ENV__ as any)?.URL_ALUNOS ?? import.meta.env.VITE_URL_ALUNOS ?? `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/alunos-pdf`;
+      
+      response = await fetch(`${apiUrl}?municipio=${encodeURIComponent(municipio)}`, {
+        method: "GET",
+        headers: {
+          "accept": "application/pdf",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+      });
+    }
 
-    const response = await fetch(apiUrl, {
-      method: "POST",
-      headers: {
-        "accept": "application/pdf",
-      },
-      body: JSON.stringify({  }),
-    });
+    console.log("Response status:", response.status);
+    console.log("Response ok:", response.ok);
 
     if (!response.ok) {
-      console.error("Erro ao baixar a prova:", response.status, await response.text());
-      alert("Essa funcionalidade estará disponível em breve!");
+      const errorText = await response.text();
+      console.error("Erro ao baixar alunos:", response.status, errorText);
+      alert(`Erro ao baixar alunos! Status: ${response.status}`);
       return;
     }
 
@@ -63,7 +94,7 @@ const handleDownloadStudent = async (id: number) => {
     const match = cd.match(/filename\*?=(?:UTF-8''|")?([^;"']+)/i);
     const serverFileName = match ? decodeURIComponent(match[1]) : null;
 
-    const fileName = serverFileName ?? `prova-${id}.pdf`;
+    const fileName = serverFileName ?? `alunos-${municipio}.pdf`;
 
     const urlObj = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -75,13 +106,12 @@ const handleDownloadStudent = async (id: number) => {
     URL.revokeObjectURL(urlObj);
   } catch (e) {
     console.error("Erro inesperado no download:", e);
-    alert("Erro inesperado ao baixar a prova.");
+    alert("Erro inesperado ao baixar alunos.");
   }
   finally {
     setIsLoading(false);
   }
 };
-
 
   return (
     <>
@@ -105,7 +135,7 @@ const handleDownloadStudent = async (id: number) => {
             Importar via CSV
           </button>
           <button
-          onClick={() => setIsLoading (true)}
+          onClick={handleDownloadStudent}
           className="flex items-center gap-2 bg-green-500 text-white hover:bg-green-600 px-4 py-2 rounded-md text-sm transition"
           >
             Exportar Alunos

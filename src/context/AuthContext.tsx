@@ -7,6 +7,7 @@ interface User {
   nome: string;
   email: string;
   tipo_usuario: string;
+  municipio?: string;
 }
 
 interface AuthContextProps {
