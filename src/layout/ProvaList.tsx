@@ -3,6 +3,8 @@ import { IconButton } from "../components/IconButton";
 import { FileDown, SquarePen } from "lucide-react";
 import { useApi } from "../utils/api";
 import { ConfirmDialog } from "../components/modals/ConfirmDialog";
+import { Loading } from "../components/Loading";
+
 
 interface Prova {
   id: number;
@@ -129,13 +131,8 @@ const handleDownloadTest = async (id: number) => {
   return (
     <div className="p-4 bg-white rounded-xl shadow-sm mb-6 relative">
       {isLoading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="flex flex-col items-center bg-white rounded-xl p-6 shadow">
-            <div className="animate-spin rounded-full h-10 w-10 border-4 border-t-transparent border-blue-600"></div>
-            <p className="mt-5 text-md font-medium text-black">Gerando prova...</p>
-          </div>
-        </div>
-      )}
+        <Loading />
+        )}
     <div className="bg-white rounded-xl shadow overflow-hidden">
       <div className="px-5 py-3 bg-blue-50 border-b border-gray-200 font-semibold text-sm text-gray-800">
         Total: {provas.length} provas
