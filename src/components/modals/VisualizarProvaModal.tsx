@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { EditarQuestaoModal } from "./EditQuestaoModal";
 import { CreateQuestoesModal } from "./CreateQuestoesModal";
 import { useApi } from "../../utils/api";
+import { SquarePen } from "lucide-react";
 
 interface VisualizarProvaModalProps {
   provaId: number;
@@ -42,6 +43,8 @@ export const VisualizarProvaModal = ({
   );
   const contentRef = useRef<HTMLDivElement>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editandoNome, setEditandoNome] = useState(false);
+  const [novoNome, setNovoNome] = useState("");
   const api = useApi();
 
   const carregarQuestoes = () => {
@@ -73,6 +76,43 @@ export const VisualizarProvaModal = ({
     }
   };
 
+  const handleEditarNome = () => {
+    if (prova) {
+      setNovoNome(prova.nome);
+      setEditandoNome(true);
+    }
+  };
+
+  const handleSalvarNome = async () => {
+    if (!novoNome.trim()) {
+      alert("Por favor, digite um nome para a prova.");
+      return;
+    }
+
+    try {
+      const res = await api.put(`/api/provas/${provaId}`, { nome: novoNome.trim() });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Erro ao atualizar prova:", res.status, errorText);
+        alert("Erro ao atualizar nome da prova.");
+        return;
+      }
+
+      // Atualizar o estado local da prova
+      setProva(prev => prev ? { ...prev, nome: novoNome.trim() } : null);
+      setEditandoNome(false);
+    } catch (err) {
+      console.error("Erro ao salvar nome da prova:", err);
+      alert("Erro ao salvar nome da prova.");
+    }
+  };
+
+  const handleCancelarEdicaoNome = () => {
+    setEditandoNome(false);
+    setNovoNome("");
+  };
+
   return (
     <>
       <div
@@ -83,18 +123,65 @@ export const VisualizarProvaModal = ({
           ref={contentRef}
           className="bg-white w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl shadow-lg flex flex-col"
         >
-          <div className="sticky top-0 z-10 bg-white px-6 py-4 border-b border-gray-200 grid items-center grid-rows-2 grid-cols-2">
-            <h2 className="text-xl font-bold text-blue-700">{prova?.nome}</h2>
+          <div className="sticky top-0 z-10 bg-white px-6 py-4">
+           <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4 flex-1">
+              {editandoNome ? (
+                <div className="flex items-center gap-2 flex-1">
+                  <input
+                    type="text"
+                    value={novoNome}
+                    onChange={(e) => setNovoNome(e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xl font-bold text-blue-700"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSalvarNome();
+                      } else if (e.key === "Escape") {
+                        handleCancelarEdicaoNome();
+                      }
+                    }}
+                  />
+                  <button
+                    onClick={handleSalvarNome}
+                    className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm cursor-pointer"
+                  >
+                    Salvar
+                  </button>
+                  <button
+                    onClick={handleCancelarEdicaoNome}
+                    className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-xl font-bold text-blue-700">{prova?.nome}</h2>
+                  {!modoVisualizacao && (
+                    <button
+                      onClick={handleEditarNome}
+                      className="text-blue-700 font-medium hover:underline hover:bg-gray-200 flex items-center gap-1 px-2 py-1 rounded cursor-pointer transition"
+                    >
+                      <SquarePen className="h-4" />
+                      Editar nome
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-800 text-2xl font-light grid justify-end"
+              className="text-gray-500 hover:text-gray-800 text-2xl font-light cursor-pointer"
             >
               &times;
             </button>
+          </div>
+
             {!modoVisualizacao && (
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="rounded-lg py-1.5 px-2.25 bg-blue-600 text-white text-sm mt-2 w-max col-start-2 justify-self-end"              
+                className="rounded-lg py-1.5 px-2.25 bg-blue-600 text-white text-sm mt-2 w-max flex justify-self-end cursor-pointer"              
               >
                 + Adicionar nova questão
               </button>
