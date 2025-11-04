@@ -8,6 +8,7 @@ interface VisualizarProvaModalProps {
   provaId: number;
   onClose: () => void;
   modoVisualizacao?: boolean; // true quando aberto via botão "eye", false quando via "squarepen"
+  onUpdate?: () => void; // callback para notificar atualização da prova
 }
 
 interface Alternativa {
@@ -34,6 +35,7 @@ export const VisualizarProvaModal = ({
   provaId,
   onClose,
   modoVisualizacao = false,
+  onUpdate,
 }: VisualizarProvaModalProps) => {
   const [prova, setProva] = useState<Prova | null>(null);
   const [questoes, setQuestoes] = useState<Questao[]>([]);
@@ -102,6 +104,11 @@ export const VisualizarProvaModal = ({
       // Atualizar o estado local da prova
       setProva(prev => prev ? { ...prev, nome: novoNome.trim() } : null);
       setEditandoNome(false);
+      
+      // Notificar atualização para atualizar a lista de provas
+      if (onUpdate) {
+        onUpdate();
+      }
     } catch (err) {
       console.error("Erro ao salvar nome da prova:", err);
       alert("Erro ao salvar nome da prova.");

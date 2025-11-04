@@ -63,6 +63,7 @@ export default function ProvasPage() {
           provaId={visualizarId}
           onClose={() => setVisualizarId(null)}
           modoVisualizacao={modoVisualizacao}
+          onUpdate={() => setReload(true)}
         />
       )}
       <div>
