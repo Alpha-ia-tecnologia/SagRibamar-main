@@ -124,6 +124,13 @@ export const TabelaHabilidadesBNCC = () => {
         params.append("prova_id", filtros.provaId);
       }
 
+      // Adiciona os demais filtros do dashboard
+      if (filtros.regiaoId) params.append("regiao_id", filtros.regiaoId);
+      if (filtros.grupoId) params.append("grupo_id", filtros.grupoId);
+      if (filtros.escolaId) params.append("escola_id", filtros.escolaId);
+      if (filtros.serie) params.append("serie", filtros.serie);
+      if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
+
       const res = await api.get(`/api/dashboard/bncc-questoes?${params.toString()}`);
       
       if (!res.ok) {
