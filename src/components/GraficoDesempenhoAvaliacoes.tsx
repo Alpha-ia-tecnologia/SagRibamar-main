@@ -89,13 +89,21 @@ export const GraficoDesempenhoAvaliacoes = () => {
         title: {
           display: true,
           text: "Avaliações",
+          font: {
+            size: 14
+          },
+        },
+        ticks: {
+          font: {
+            size: 0 //tamnho do titulo da prova
+          },
         },
       },
     },
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow mt-6">
+    <div className="bg-white p-6 rounded-xl shadow-md ">
       <h2 className="text-lg font-semibold mb-4 text-gray-800">
         Notas Médias por Avaliação
       </h2>

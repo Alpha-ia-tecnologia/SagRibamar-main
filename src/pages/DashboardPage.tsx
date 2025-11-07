@@ -11,6 +11,7 @@ import { RankingAlunos } from "../components/RankingAlunos";
 import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
 import { useApi } from "../utils/api";
 import Footer from "../components/Footer";
+import GraficoArea from "../components/GraficoArea";
 
 export const DashboardPage = () => {
   const { filtros } = useFiltroDashboard();
@@ -76,7 +77,11 @@ export const DashboardPage = () => {
         </div>
 
         <TabelaDesempenhoEscolas />
+
+        <div className="grid grid-cols-2 gap-4">
+        <GraficoArea />
         <GraficoDesempenhoAvaliacoes />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
           <GraficoComponentesCurriculares />

@@ -70,7 +70,7 @@ export const EditarQuestaoModal = ({
   const [alternativas, setAlternativas] = useState<Alternativa[]>([]);
   const [nivelEnsino, setNivelEnsino] = useState("ANOS_INICIAIS");
   const [serie, setSerie] = useState("PRIMEIRO_ANO");
-  const [dificuldade, setDificuldade] = useState("FACIL");
+  const [area, setArea] = useState("Selecione uma Área");
   const [pontos, setPontos] = useState(1);
   const [componenteId, setComponenteId] = useState(0);
   const [componentes, setComponentes] = useState<ComponenteCurricular[]>([]);
@@ -96,7 +96,9 @@ export const EditarQuestaoModal = ({
     "SEGUNDA_SERIE",
     "TERCEIRA_SERIE",
   ];
-  const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
+  // const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
+
+  const areas = ["Humanas", "Exatas", "Natureza", "Linguagens"]
 
   useEffect(() => {
     let questaoData: any = null;
@@ -115,7 +117,7 @@ export const EditarQuestaoModal = ({
         setAlternativas(data.alternativas || []);
         setNivelEnsino(data.nivel_ensino || "ANOS_INICIAIS");
         setSerie(data.serie || "PRIMEIRO_ANO");
-        setDificuldade(data.dificuldade || "FACIL");
+        setArea(data.area || "Selecione uma Área");
         setPontos(data.pontos || 1);
         setComponenteId(data.componente_curricular_id || 4);
         setOrdem(data.ordem || null);
@@ -225,7 +227,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       enunciado,
       imagem_url: imagemUrl,
       nivel_ensino: nivelEnsino,
-      dificuldade,
+      area,
       serie,
       pontos,
       componente_curricular_id: componenteId,
@@ -320,11 +322,11 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           </select>
 
           <select
-            value={dificuldade}
-            onChange={(e) => setDificuldade(e.target.value)}
+            value={area}
+            onChange={(e) => setArea(e.target.value)}
             className="p-3 border rounded-xl"
           >
-            {dificuldades.map((d) => (
+            {areas.map((d) => (
               <option key={d} value={d}>
                 {formatarTextoSelect(d)}
               </option>

@@ -73,7 +73,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
 
   const [nivelEnsino, setNivelEnsino] = useState("ANOS_INICIAIS");
   const [serie, setSerie] = useState("PRIMEIRO_ANO");
-  const [dificuldade, setDificuldade] = useState("FACIL");
+  const [area, setArea] = useState("Selecione uma Área");
   const [pontos, setPontos] = useState(1);
   const [componenteId, setComponenteId] = useState(1);
   const [componentes, setComponentes] = useState<ComponenteCurricular[]>([]);
@@ -93,7 +93,9 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     "SEGUNDA_SERIE", "TERCEIRA_SERIE", "PRIMEIRO_E_SEGUNDO_ANOS",
     "TERCEIRO_AO_QUINTO_ANO", "PRIMEIRO_AO_QUINTO_ANO", "EJA"
   ];
-  const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
+  // const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
+
+  const areas = ["Humanas", "Exatas", "Natureza", "Linguagens"]
 
   useEffect(() => {
     api.get(`/api/componentes-curriculares`)
@@ -176,7 +178,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     ]);
     setNivelEnsino("ANOS_INICIAIS");
     setSerie("PRIMEIRO_ANO");
-    setDificuldade("FACIL");
+    setArea("Selecione uma área");
     setPontos(1);
     setComponenteId(0);
     setCodigosBNCC([]);
@@ -223,7 +225,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
       enunciado,
       imagem_url: imagemUrl,
       nivel_ensino: nivelEnsino,
-      dificuldade,
+      area,
       serie,
       pontos,
       prova_id: provaIdAtual,
@@ -317,9 +319,9 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
           </select>
 
           <select 
-          value={dificuldade} 
-          onChange={(e) => setDificuldade(e.target.value)} className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
-            {dificuldades.map(d => <option key={d} value={d}>{formatarTextoSelect(d)}</option>)}
+          value={area} 
+          onChange={(e) => setArea(e.target.value)} className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
+            {areas.map(d => <option key={d} value={d}>{formatarTextoSelect(d)}</option>)}
           </select>
 
           <select value={componenteId} onChange={(e) => setComponenteId(Number(e.target.value))} className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
