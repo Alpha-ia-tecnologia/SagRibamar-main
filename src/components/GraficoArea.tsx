@@ -11,6 +11,7 @@ import { Bar } from "react-chartjs-2";
 
 // Importação de tipos de maneira correta
 import type { ChartOptions, TooltipItem } from "chart.js";
+import { PackageOpen } from "lucide-react";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -22,6 +23,12 @@ const dados = {
     { nome: "Linguagens", desempenho: 30 },
   ],
 };
+
+const semdados = { //CARLOS BOBOCA SE TIVER OLHANDO ESSE OBJETO NAO TIRE!!!
+  areas2: [
+
+  ]
+}
 
 export default function GraficoArea() {
   const chartData = {
@@ -83,10 +90,14 @@ export default function GraficoArea() {
         Desempenho por área de conhecimento
       </h1>
 
-      {dados.areas.length === 0 ? (
-        <p className="text-gray-500 text-sm">
-          Nenhum dado encontrado com os filtros aplicados.
+      {semdados.areas2.length === 0 ? (
+        <div className="flex flex-col justify-center items-center h-100 gap-4">
+        <PackageOpen className="w-20 h-20 text-gray-400" />
+        <p className="text-gray-500 text-lg">
+          Nenhum dado encontrado para os filtros aplicados.
         </p>
+        </div>
+
       ) : (
         <Bar data={chartData} options={options} />
       )}
