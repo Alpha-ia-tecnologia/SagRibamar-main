@@ -225,7 +225,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
       enunciado,
       imagem_url: imagemUrl,
       nivel_ensino: nivelEnsino,
-      area: area && area !== "Selecione uma Área" ? area.toUpperCase() : area,
+      campo_conhecimento: area && area !== "Selecione uma Área" ? area.toUpperCase() : area,
       serie,
       pontos,
       prova_id: provaIdAtual,

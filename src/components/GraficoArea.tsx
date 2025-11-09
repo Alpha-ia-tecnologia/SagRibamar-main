@@ -24,7 +24,7 @@ const dados = {
   ],
 };
 
-const semdados = { //CARLOS BOBOCA SE TIVER OLHANDO ESSE OBJETO NAO TIRE!!!
+const semdados = { //TIRA QUE EU VOU CAGAR!!!
   areas2: [
 
   ]
