@@ -117,7 +117,11 @@ export const EditarQuestaoModal = ({
         setAlternativas(data.alternativas || []);
         setNivelEnsino(data.nivel_ensino || "ANOS_INICIAIS");
         setSerie(data.serie || "PRIMEIRO_ANO");
-        setArea(data.area || "Selecione uma Área");
+        // Converter área de maiúsculas para o formato do select (primeira letra maiúscula)
+        const areaFormatada = data.area 
+          ? data.area.charAt(0).toUpperCase() + data.area.slice(1).toLowerCase()
+          : "Selecione uma Área";
+        setArea(areaFormatada);
         setPontos(data.pontos || 1);
         setComponenteId(data.componente_curricular_id || 4);
         setOrdem(data.ordem || null);
@@ -227,7 +231,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       enunciado,
       imagem_url: imagemUrl,
       nivel_ensino: nivelEnsino,
-      area,
+      area: area && area !== "Selecione uma Área" ? area.toUpperCase() : area,
       serie,
       pontos,
       componente_curricular_id: componenteId,

@@ -178,7 +178,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     ]);
     setNivelEnsino("ANOS_INICIAIS");
     setSerie("PRIMEIRO_ANO");
-    setArea("Selecione uma área");
+    setArea("Selecione uma Área");
     setPontos(1);
     setComponenteId(0);
     setCodigosBNCC([]);
@@ -225,7 +225,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
       enunciado,
       imagem_url: imagemUrl,
       nivel_ensino: nivelEnsino,
-      area,
+      area: area && area !== "Selecione uma Área" ? area.toUpperCase() : area,
       serie,
       pontos,
       prova_id: provaIdAtual,
