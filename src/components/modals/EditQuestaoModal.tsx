@@ -70,7 +70,7 @@ export const EditarQuestaoModal = ({
   const [alternativas, setAlternativas] = useState<Alternativa[]>([]);
   const [nivelEnsino, setNivelEnsino] = useState("ANOS_INICIAIS");
   const [serie, setSerie] = useState("PRIMEIRO_ANO");
-  const [area, setArea] = useState("Selecione uma Área");
+  const [area, setArea] = useState("CIÊNCIAS HUMANAS");
   const [pontos, setPontos] = useState(1);
   const [componenteId, setComponenteId] = useState(0);
   const [componentes, setComponentes] = useState<ComponenteCurricular[]>([]);
@@ -98,7 +98,7 @@ export const EditarQuestaoModal = ({
   ];
   // const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
 
-  const areas = ["Humanas", "Exatas", "Natureza", "Linguagens"]
+  const areas = ["Ciências Humanas", "Ciências Exatas", "Ciências da Natureza", "Linguagens"]
 
   useEffect(() => {
     let questaoData: any = null;
@@ -231,7 +231,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       enunciado,
       imagem_url: imagemUrl,
       nivel_ensino: nivelEnsino,
-      campo_conhecimento: area && area !== "Selecione uma Área" ? area.toUpperCase() : area,
+      campo_conhecimento: area && area !== "CIÊNCIAS HUMANAS" ? area.toUpperCase() : area,
       serie,
       pontos,
       componente_curricular_id: componenteId,
