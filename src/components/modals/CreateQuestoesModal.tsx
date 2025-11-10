@@ -322,7 +322,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
           <select 
           value={area} 
           onChange={(e) => setArea(e.target.value)} className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
-            {areas.map(d => <option key={d} value={d}>{formatarTextoSelect(d)}</option>)}
+            {areas.map(d => <option key={d} value={d}>{d}</option>)}
           </select>
 
           <select value={componenteId} onChange={(e) => setComponenteId(Number(e.target.value))} className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">

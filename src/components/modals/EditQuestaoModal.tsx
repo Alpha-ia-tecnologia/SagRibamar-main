@@ -332,7 +332,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           >
             {areas.map((d) => (
               <option key={d} value={d}>
-                {formatarTextoSelect(d)}
+                {d}
               </option>
             ))}
           </select>
