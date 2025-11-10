@@ -33,9 +33,6 @@ const formatarTextoSelect = (texto: string) => {
     PRIMEIRA_SERIE: "1ª série",
     SEGUNDA_SERIE: "2ª série",
     TERCEIRA_SERIE: "3ª série",
-    PRIMEIRO_E_SEGUNDO_ANOS: "1° e 2° anos",
-    TERCEIRO_AO_QUINTO_ANO: "3° ao 5° ano",
-    PRIMEIRO_AO_QUINTO_ANO: "1° ao 5° ano",
     EJA: "EJA"
   };
 

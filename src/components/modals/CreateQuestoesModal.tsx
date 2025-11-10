@@ -34,9 +34,6 @@ const formatarTextoSelect = (texto: string) => {
     PRIMEIRA_SERIE: "1ª série",
     SEGUNDA_SERIE: "2ª série",
     TERCEIRA_SERIE: "3ª série",
-    PRIMEIRO_E_SEGUNDO_ANOS: "1° e 2° anos",
-    TERCEIRO_AO_QUINTO_ANO: "3° ao 5° ano",
-    PRIMEIRO_AO_QUINTO_ANO: "1° ao 5° ano",
     EJA: "EJA"
   };
 
@@ -90,8 +87,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
   const series = [
     "PRIMEIRO_ANO", "SEGUNDO_ANO", "TERCEIRO_ANO", "QUARTO_ANO", "QUINTO_ANO",
     "SEXTO_ANO", "SETIMO_ANO", "OITAVO_ANO", "NONO_ANO", "PRIMEIRA_SERIE",
-    "SEGUNDA_SERIE", "TERCEIRA_SERIE", "PRIMEIRO_E_SEGUNDO_ANOS",
-    "TERCEIRO_AO_QUINTO_ANO", "PRIMEIRO_AO_QUINTO_ANO", "EJA"
+    "SEGUNDA_SERIE", "TERCEIRA_SERIE", "EJA"
   ];
   // const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
 
@@ -178,7 +174,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     ]);
     setNivelEnsino("ANOS_INICIAIS");
     setSerie("PRIMEIRO_ANO");
-    setArea("Selecione uma Área");
+    setArea("CIÊNCIAS HUMANAS");
     setPontos(1);
     setComponenteId(0);
     setCodigosBNCC([]);
