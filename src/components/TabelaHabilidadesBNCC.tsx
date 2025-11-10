@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
 import { useLockBodyScroll } from "../hooks/useLockBodyScroll";
 import { useApi } from "../utils/api";
+import NoData from "./NoData";
 
 interface Habilidade {
   bncc_id: number;
@@ -264,6 +265,7 @@ export const TabelaHabilidadesBNCC = () => {
         )}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Habilidades BNCC / SAEB</h2>
+        
         <div className="flex gap-2">
           <button
             onClick={() => {
@@ -294,59 +296,65 @@ export const TabelaHabilidadesBNCC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-        {habilidades.map(h => {
-          const percentual = parseFloat(h.percentual_acertos as any);
-          const pct = isNaN(percentual) ? "0.00%" : percentual.toFixed(2) + "%";
+      {habilidades.length === 0 ? (
+        <NoData />
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            {habilidades.map(h => {
+              const percentual = parseFloat(h.percentual_acertos as any);
+              const pct = isNaN(percentual) ? "0.00%" : percentual.toFixed(2) + "%";
 
-          let bgColor;
+              let bgColor;
 
-          if (percentual >= 70) {
-            bgColor = "bg-green-100 text-green-800";
-          }
-          else if (percentual >= 50){
-            bgColor= "bg-yellow-100 text-yellow-800";
-          }
-          else {
-            bgColor= "bg-red-100 text-red-800";
-          }
+              if (percentual >= 70) {
+                bgColor = "bg-green-100 text-green-800";
+              }
+              else if (percentual >= 50){
+                bgColor= "bg-yellow-100 text-yellow-800";
+              }
+              else {
+                bgColor= "bg-red-100 text-red-800";
+              }
 
-          return (
-            <button
-              key={h.bncc_id}
-              onClick={() => setSelecionada(h)}
-              className={`${bgColor} p-4 rounded-lg text-left shadow hover:shadow-md transition`}
-            >
-              <p className="font-bold text-sm">{h.bncc_codigo}</p>
-              <p className="text-2xl font-extrabold">{pct}</p>
-              <p className="text-xs text-gray-600">
-                {h.total_questoes} {h.total_questoes > 1 ? "questões" : "questão"}
-              </p>
-            </button>
-          );
-        })}
-      </div>
+              return (
+                <button
+                  key={h.bncc_id}
+                  onClick={() => setSelecionada(h)}
+                  className={`${bgColor} p-4 rounded-lg text-left shadow hover:shadow-md transition`}
+                >
+                  <p className="font-bold text-sm">{h.bncc_codigo}</p>
+                  <p className="text-2xl font-extrabold">{pct}</p>
+                  <p className="text-xs text-gray-600">
+                    {h.total_questoes} {h.total_questoes > 1 ? "questões" : "questão"}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
 
-      <div className="flex justify-between items-center mt-6">
-        <p className="text-sm text-gray-500">
-          Mostrando {(page - 1) * 20 + 1} a {Math.min(page * 20, total)} de {total} resultados
-        </p>
-        <div className="flex gap-1 items-center">
-          <button
-            onClick={() => setPage(1)}
-            className="w-8 h-8 border rounded bg-white hover:bg-gray-100"
-          >
-            ‹
-          </button>
-          {renderPagination()}
-          <button
-            onClick={() => setPage(totalPages)}
-            className="w-8 h-8 border rounded bg-white hover:bg-gray-100"
-          >
-            ›
-          </button>
-        </div>
-      </div>
+          <div className="flex justify-between items-center mt-6">
+            <p className="text-sm text-gray-500">
+              Mostrando {(page - 1) * 20 + 1} a {Math.min(page * 20, total)} de {total} resultados
+            </p>
+            <div className="flex gap-1 items-center">
+              <button
+                onClick={() => setPage(1)}
+                className="w-8 h-8 border rounded bg-white hover:bg-gray-100"
+              >
+                ‹
+              </button>
+              {renderPagination()}
+              <button
+                onClick={() => setPage(totalPages)}
+                className="w-8 h-8 border rounded bg-white hover:bg-gray-100"
+              >
+                ›
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {selecionada && (
         <div 

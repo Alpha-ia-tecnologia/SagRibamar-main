@@ -11,7 +11,7 @@ import {
 import { Bar } from "react-chartjs-2";
 import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
 import { useApi } from "../utils/api";
-import { PackageOpen } from "lucide-react";
+import NoData from "./NoData";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -100,12 +100,7 @@ export const GraficoRankingRegioes = () => {
       <h2 className="text-lg font-semibold mb-4">Ranking das Regiões</h2>
 
       {dadosRegioes.length === 0 ? (        
-        <div className="flex flex-col justify-center items-center h-100 gap-4">
-        <PackageOpen className="w-20 h-20 text-gray-400" />
-        <p className="text-gray-500 text-lg">
-          Nenhum dado encontrado para os filtros aplicados.
-        </p>
-        </div>
+        <NoData />
       ) : (
         <Bar data={chartData} options={chartOptions} />
       )}
