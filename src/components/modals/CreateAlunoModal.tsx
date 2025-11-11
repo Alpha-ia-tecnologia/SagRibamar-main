@@ -94,14 +94,42 @@ export const CreateAlunoModal = ({ alunoId, onClose, onSuccess }: CreateAlunoMod
         : await api.post(`/api/alunos`, payload);
 
       if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Erro da API:", errorText);
-        throw new Error("Erro ao salvar aluno");}
+        let errorMessage = "Erro ao salvar aluno";
+        
+        try {
+          const errorText = await res.text();
+          console.error("Erro da API:", errorText);
+          
+          if (errorText && errorText.trim()) {
+            // Tenta parsear como JSON
+            try {
+              const errorData = JSON.parse(errorText);
+              // A API retorna { "error": "mensagem" }
+              errorMessage = errorData.error || errorData.message || errorData.detail || errorText.trim();
+            } catch {
+              // Se não for JSON, usa o texto direto
+              errorMessage = errorText.trim();
+            }
+          }
+        } catch (parseError) {
+          console.error("Erro ao ler resposta de erro:", parseError);
+        }
+        
+        alert(errorMessage);
+        setLoading(false);
+        return;
+      }
 
       onSuccess();
     } catch (err) {
-      alert("Erro ao salvar aluno");
-      console.log(err);
+      let errorMessage = "Erro ao salvar aluno";
+      
+      if (err instanceof Error && err.message !== "Erro ao salvar aluno") {
+        errorMessage = err.message;
+      }
+      
+      alert(errorMessage);
+      console.error("Erro ao salvar aluno:", err);
     } finally {
       setLoading(false);
     }
