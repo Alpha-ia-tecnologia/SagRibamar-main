@@ -30,9 +30,9 @@ const formatarTextoSelect = (texto: string) => {
   };
 
   const mapaTurnos: Record<string, string> = {
-    MANHA: "Matutino",
-    TARDE: "Vespertino",
-    NOITE: "Noturno"
+    MATUTINO: "Matutino",
+    VESPERTINO: "Vespertino",
+    NOTURNO: "Noturno"
   };
 
   return (
@@ -42,7 +42,7 @@ const formatarTextoSelect = (texto: string) => {
   );
 };
 
-const turnos = ["MANHA", "TARDE", "NOITE"] as const;
+const turnos = ["MATUTINO", "VESPERTINO", "NOTURNO"] as const;
 
 const series = [
   "PRIMEIRO_ANO",
@@ -124,12 +124,43 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
       const res = turmaId 
         ? await api.put(`/api/turmas/${turmaId}`, payload)
         : await api.post(`/api/turmas`, payload);
-
-      if (!res.ok) throw new Error("Erro ao salvar turma");
+      if (!res.ok) {
+        let errorMessage = "Erro ao salvar turma";
+        
+        try {
+          const errorText = await res.text();
+          console.error("Erro da API:", errorText);
+          
+          if (errorText && errorText.trim()) {
+            // Tenta parsear como JSON
+            try {
+              const errorData = JSON.parse(errorText);
+              // A API retorna { "error": "mensagem" }
+              errorMessage = errorData.error || errorData.message || errorData.detail || errorText.trim();
+            } catch {
+              // Se não for JSON, usa o texto direto
+              errorMessage = errorText.trim();
+            }
+          }
+        } catch (parseError) {
+          console.error("Erro ao ler resposta de erro:", parseError);
+        }
+        
+        alert(errorMessage);
+        setLoading(false);
+        return;
+      }
 
       onSuccess();
-    } catch {
-      alert("Erro ao salvar turma");
+    } catch (err) {
+      let errorMessage = "Erro ao salvar turma";
+      
+      if (err instanceof Error && err.message !== "Erro ao salvar turma") {
+        errorMessage = err.message;
+      }
+      
+      alert(errorMessage);
+      console.error("Erro ao salvar turma:", err);
     } finally {
       setLoading(false);
     }
