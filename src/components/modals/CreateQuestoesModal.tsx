@@ -70,7 +70,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
 
   const [nivelEnsino, setNivelEnsino] = useState("ANOS_INICIAIS");
   const [serie, setSerie] = useState("PRIMEIRO_ANO");
-  const [area, setArea] = useState("CIÊNCIAS HUMANAS");
+  const [area, setArea] = useState("Ciências Humanas");
   const [pontos, setPontos] = useState(1);
   const [componenteId, setComponenteId] = useState(1);
   const [componentes, setComponentes] = useState<ComponenteCurricular[]>([]);
@@ -174,7 +174,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     ]);
     setNivelEnsino("ANOS_INICIAIS");
     setSerie("PRIMEIRO_ANO");
-    setArea("CIÊNCIAS HUMANAS");
+    setArea("Ciências Humanas");
     setPontos(1);
     setComponenteId(0);
     setCodigosBNCC([]);
@@ -221,7 +221,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
       enunciado,
       imagem_url: imagemUrl,
       nivel_ensino: nivelEnsino,
-      campo_conhecimento: area && area !== "CIÊNCIAS HUMANAS" ? area.toUpperCase() : area,
+      campo_conhecimento: area || "Ciências Humanas",
       serie,
       pontos,
       prova_id: provaIdAtual,

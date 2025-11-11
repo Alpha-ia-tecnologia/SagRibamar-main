@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useApi } from "../../utils/api";
 
 interface CreateTurmaModalProps {
@@ -67,6 +67,7 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
   const [turno, setTurno] = useState<string>("");
   const [escolas, setEscolas] = useState<Escola[]>([]);
   const [loading, setLoading] = useState(false);
+  const dadosCarregadosRef = useRef(false);
   const api = useApi();
 
   useEffect(() => {
@@ -79,6 +80,31 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
 
     fetchEscolas();
   }, [api]);
+
+  // Buscar dados da turma se estiver editando
+  useEffect(() => {
+    if (turmaId && !dadosCarregadosRef.current) {
+      dadosCarregadosRef.current = true;
+      const fetchTurma = async () => {
+        try {
+          const res = await api.get(`/api/turmas/${turmaId}`);
+          if (!res.ok) throw new Error("Erro ao buscar turma");
+          
+          const data = await res.json();
+          setNome(data.nome || "");
+          setEscolaId(data.escola_id || "");
+          setSerie(data.serie || "");
+          setTurno(data.turno || "");
+        } catch (error) {
+          console.error("Erro ao carregar turma:", error);
+          alert("Erro ao carregar dados da turma");
+          dadosCarregadosRef.current = false; // Permite tentar novamente em caso de erro
+        }
+      };
+
+      fetchTurma();
+    }
+  }, [turmaId, api]);
 
   const handleSubmit = async () => {
     if (!nome.trim() || escolaId === "" || serie === "" || turno === "") {
@@ -126,11 +152,13 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
               }
               className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
             >
-              <option 
-              value=""
-              disabled>
-                Selecione uma escola
-              </option>
+              {!turmaId && (
+                <option 
+                value=""
+                disabled>
+                  Selecione uma escola
+                </option>
+              )}
               {escolas.map((escola) => (
                 <option 
                 key={escola.id} 
@@ -158,11 +186,13 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
               onChange={(e) => setSerie(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
               >
-                <option 
-                value=""
-                disabled>
-                  Selecione uma Série
-                </option>
+                {!turmaId && (
+                  <option 
+                  value=""
+                  disabled>
+                    Selecione uma Série
+                  </option>
+                )}
                 {series.map(s => (
                   <option 
                   key={s}
@@ -179,12 +209,13 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
               onChange={(e) => setTurno(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
             >
-              <option 
-              value=""
-              disabled>
-                Selecione um Turno
-              </option>
-
+              {!turmaId && (
+                <option 
+                value=""
+                disabled>
+                  Selecione um Turno
+                </option>
+              )}
               {turnos.map(t => 
               <option
               key={t}

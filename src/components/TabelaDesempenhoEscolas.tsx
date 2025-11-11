@@ -151,7 +151,7 @@ return (
               ) : (
                 <button
                   key={num}
-                  onClick={() => setPagina(num)}
+                  onClick={() => setPagina(num as number)}
                   className={`px-3 py-1.5 rounded-lg border text-sm transition ${
                     pagina === num
                       ? "bg-blue-600 text-white border-blue-600"

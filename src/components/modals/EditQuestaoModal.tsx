@@ -67,7 +67,7 @@ export const EditarQuestaoModal = ({
   const [alternativas, setAlternativas] = useState<Alternativa[]>([]);
   const [nivelEnsino, setNivelEnsino] = useState("ANOS_INICIAIS");
   const [serie, setSerie] = useState("PRIMEIRO_ANO");
-  const [area, setArea] = useState("CIÊNCIAS HUMANAS");
+  const [area, setArea] = useState("Ciências Humanas");
   const [pontos, setPontos] = useState(1);
   const [componenteId, setComponenteId] = useState(0);
   const [componentes, setComponentes] = useState<ComponenteCurricular[]>([]);
@@ -114,11 +114,8 @@ export const EditarQuestaoModal = ({
         setAlternativas(data.alternativas || []);
         setNivelEnsino(data.nivel_ensino || "ANOS_INICIAIS");
         setSerie(data.serie || "PRIMEIRO_ANO");
-        // Converter área de maiúsculas para o formato do select (primeira letra maiúscula)
-        const areaFormatada = data.area 
-          ? data.area.charAt(0).toUpperCase() + data.area.slice(1).toLowerCase()
-          : "Selecione uma Área";
-        setArea(areaFormatada);
+        // A API já retorna a área no formato correto
+        setArea(data.campo_conhecimento || "Ciências Humanas");
         setPontos(data.pontos || 1);
         setComponenteId(data.componente_curricular_id || 4);
         setOrdem(data.ordem || null);
@@ -228,7 +225,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       enunciado,
       imagem_url: imagemUrl,
       nivel_ensino: nivelEnsino,
-      campo_conhecimento: area && area !== "CIÊNCIAS HUMANAS" ? area.toUpperCase() : area,
+      campo_conhecimento: area || "Ciências Humanas",
       serie,
       pontos,
       componente_curricular_id: componenteId,
