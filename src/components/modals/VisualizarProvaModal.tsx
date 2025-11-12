@@ -207,7 +207,7 @@ export const VisualizarProvaModal = ({
                   className="p-4 border border-gray-200 rounded-xl shadow-sm bg-gray-50"
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <p className="font-semibold text-gray-800">
+                    <p className="font-semibold text-gray-800 whitespace-pre-line">
                       {index + 1}. {questao.enunciado}
                     </p>
                     {!modoVisualizacao && (
