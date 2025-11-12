@@ -44,9 +44,9 @@ const formatarTextoSelect = (texto: string) => {
   };
 
   const mapaTurnos: Record<string, string> = {
-    MANHA: "Matutino",
-    TARDE: "Vespertino",
-    NOITE: "Noturno"
+    MATUTINO: "Matutino",
+    VESPERTINO: "Vespertino",
+    NOTURNO: "Noturno"
   };
 
   return (
@@ -56,7 +56,7 @@ const formatarTextoSelect = (texto: string) => {
   );
 };
 
-const turnos = ["MANHA", "TARDE", "NOITE"] as const;
+const turnos = ["MATUTINO", "VESPERTINO", "NOTURNO"] as const;
 
 const series = [
   "PRIMEIRO_ANO",
