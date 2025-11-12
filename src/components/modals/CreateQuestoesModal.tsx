@@ -174,9 +174,9 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     ]);
     setNivelEnsino("ANOS_INICIAIS");
     setSerie("PRIMEIRO_ANO");
-    setArea("Ciências Humanas");
+    setArea("Linguagens");
     setPontos(1);
-    setComponenteId(0);
+    setComponenteId(1);
     setCodigosBNCC([]);
     setHabilidadesSelecionadas([]);
     setProficienciaSaebId(null);
