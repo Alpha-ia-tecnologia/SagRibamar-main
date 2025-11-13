@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ModalBNCCEdit } from "./ModalBNCCEdit";
 import { Trash2 } from "lucide-react";
 import { useApi } from "../../utils/api";
+import ReactQuill from "react-quill-new";
 
 interface EditarQuestaoModalProps {
   questaoId: number;
@@ -257,11 +258,22 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       <div className="bg-white w-full max-w-3xl p-6 rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto transition-all">
         <h2 className="text-xl font-bold mb-6 text-gray-800">Editar Questão - {ordem || questaoId}</h2>
 
-        <textarea
-          value={enunciado}
-          onChange={(e) => setEnunciado(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-xl mb-4"
-        />
+        <div className="mb-4">
+          <label className="text-sm font-medium text-gray-700 mb-2 block">Enunciado da Questão</label>
+          <ReactQuill
+            value={enunciado}
+            onChange={setEnunciado}
+            placeholder="Digite o enunciado da questão"
+            modules={{
+              toolbar: [
+                ['bold', 'italic'],
+              ],
+            }}
+            formats={['bold', 'italic']}
+            theme="snow"
+            className="bg-white rounded-xl"
+          />
+        </div>
 
        <label className="block mb-4">
   <span className="text-sm font-medium text-gray-700">
@@ -381,25 +393,36 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         )}
 
         {alternativas.map((alt, i) => (
-          <div key={i} className="flex items-center gap-3 mb-3">
+          <div key={i} className="flex items-start gap-3 mb-3">
             <input
               type="radio"
               name="correta"
               checked={alt.correta}
               onChange={() => marcarCorreta(i)}
-              className="accent-blue-600"
+              className="accent-blue-600 mt-2"
             />
-            <input
-              type="text"
-              value={alt.texto}
-              onChange={(e) => {
-                const novas = [...alternativas];
-                novas[i].texto = e.target.value;
-                setAlternativas(novas);
-              }}
-              placeholder={`Alternativa ${String.fromCharCode(65 + i)}`}
-              className="flex-1 p-3 border border-gray-300 rounded-xl"
-            />
+            <div className="flex-1">
+              <label className="text-sm font-medium text-gray-700 mb-1 block">
+                Alternativa {String.fromCharCode(65 + i)}
+              </label>
+              <ReactQuill
+                value={alt.texto}
+                onChange={(value) => {
+                  const novas = [...alternativas];
+                  novas[i].texto = value;
+                  setAlternativas(novas);
+                }}
+                placeholder={`Digite a alternativa ${String.fromCharCode(65 + i)}`}
+                modules={{
+                  toolbar: [
+                    ['bold', 'italic'],
+                  ],
+                }}
+                formats={['bold', 'italic']}
+                theme="snow"
+                className="bg-white rounded-xl"
+              />
+            </div>
           </div>
         ))}
 

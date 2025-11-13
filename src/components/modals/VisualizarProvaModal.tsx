@@ -207,14 +207,18 @@ export const VisualizarProvaModal = ({
                   className="p-4 border border-gray-200 rounded-xl shadow-sm bg-gray-50"
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <p className="font-semibold text-gray-800 whitespace-pre-line">
-                      {index + 1}. {questao.enunciado}
-                    </p>
+                    <div className="font-semibold text-gray-800 flex-1">
+                      <span>{index + 1}. </span>
+                      <span 
+                        dangerouslySetInnerHTML={{ __html: questao.enunciado || '' }}
+                        className="prose prose-sm max-w-none"
+                      />
+                    </div>
                     {!modoVisualizacao && (
                       <button
                         onClick={() => setQuestaoIdEmEdicao(questao.id)
                         }
-                        className="text-blue-600 hover:text-blue-800 transition text-sm"
+                        className="text-blue-600 hover:text-blue-800 transition text-sm ml-2"
                         title="Editar questão"
                       >
                         Editar
@@ -245,7 +249,10 @@ export const VisualizarProvaModal = ({
                         <span className="font-medium mr-2">
                           {String.fromCharCode(65 + i)}.
                         </span>
-                        {alt.texto}
+                        <span 
+                          dangerouslySetInnerHTML={{ __html: alt.texto || '' }}
+                          className="prose prose-sm max-w-none inline"
+                        />
                         {alt.correta && (
                           <span className="ml-2 text-green-600 font-semibold text-xs">
                             (correta)
