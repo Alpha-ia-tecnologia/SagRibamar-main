@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { ModalBNCC } from "./ModalBNCC";
 import { Trash2 } from "lucide-react";
-import { useApi } from "../../utils/api";
-import ReactQuill from "react-quill-new";
+import { useQuill } from "react-quilljs";
+import "quill/dist/quill.snow.css";
+import { useApi } from "../../utils/api"; 
 
 interface CreateQuestoesModalProps {
   provaId?: number;
@@ -55,6 +56,42 @@ const formatarTextoSelect = (texto: string) => {
     mapaNiveis[texto] ||
     mapaDificuldades[texto] ||
     texto.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+  );
+};
+
+// Componente wrapper para o Quill
+const QuillEditor = ({ value, onChange, placeholder }: { 
+  value: string; 
+  onChange: (value: string) => void; 
+  placeholder?: string 
+}) => {
+  const { quill, quillRef } = useQuill({
+    theme: 'snow',
+    modules: {
+      toolbar: [['bold', 'italic']],
+    },
+    formats: ['bold', 'italic'],
+    placeholder: placeholder || '',
+  });
+
+  useEffect(() => {
+    if (quill) {
+      quill.on('text-change', () => {
+        onChange(quill.root.innerHTML);
+      });
+    }
+  }, [quill, onChange]);
+
+  useEffect(() => {
+    if (quill && value !== quill.root.innerHTML) {
+      quill.root.innerHTML = value || '';
+    }
+  }, [quill, value]);
+
+  return (
+    <div className="bg-white rounded-xl">
+      <div ref={quillRef} />
+    </div>
   );
 };
 
@@ -266,19 +303,11 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
 
         <div className="mb-4">
           <label className="text-sm font-medium text-gray-700 mb-2 block">Enunciado da Questão</label>
-          <ReactQuill
-            value={enunciado}
-            onChange={setEnunciado}
-            placeholder="Digite o enunciado da questão"
-            modules={{
-              toolbar: [
-                ['bold', 'italic'],
-              ],
-            }}
-            formats={['bold', 'italic']}
-            theme="snow"
-            className="bg-white rounded-xl"
-          />
+            <QuillEditor
+              value={enunciado}
+              onChange={setEnunciado}
+              placeholder="Digite o enunciado da questão"
+            />
         </div>
 
         <label className="block mb-4">
@@ -387,24 +416,16 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
             <div className="flex-1">
               <label className="text-sm font-medium text-gray-700 mb-1 block">
                 Alternativa {String.fromCharCode(65 + i)}
-              </label>
-              <ReactQuill
-                value={alt.texto}
-                onChange={(value) => {
-                  const novas = [...alternativas];
-                  novas[i].texto = value;
-                  setAlternativas(novas);
-                }}
-                placeholder={`Digite a alternativa ${String.fromCharCode(65 + i)}`}
-                modules={{
-                  toolbar: [
-                    ['bold', 'italic'],
-                  ],
-                }}
-                formats={['bold', 'italic']}
-                theme="snow"
-                className="bg-white rounded-xl"
-              />
+              </label>           
+                <QuillEditor
+                  value={alt.texto}
+                  onChange={(value) => {
+                    const novas = [...alternativas];
+                    novas[i].texto = value;
+                    setAlternativas(novas);
+                  }}
+                  placeholder={`Digite a alternativa ${String.fromCharCode(65 + i)}`}
+                />
             </div>
           </div>
         ))}

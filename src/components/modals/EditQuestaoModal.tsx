@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { ModalBNCCEdit } from "./ModalBNCCEdit";
 import { Trash2 } from "lucide-react";
 import { useApi } from "../../utils/api";
-import ReactQuill from "react-quill-new";
+import { useQuill } from "react-quilljs";
+import "quill/dist/quill.snow.css";
 
 interface EditarQuestaoModalProps {
   questaoId: number;
@@ -34,26 +35,69 @@ const formatarTextoSelect = (texto: string) => {
     PRIMEIRA_SERIE: "1ª série",
     SEGUNDA_SERIE: "2ª série",
     TERCEIRA_SERIE: "3ª série",
-    EJA: "EJA"
+    EJA: "EJA",
   };
 
   const mapaNiveis: Record<string, string> = {
     ANOS_INICIAIS: "Anos iniciais",
     ANOS_FINAIS: "Anos finais",
-    ENSINO_MEDIO: "Ensino médio"
+    ENSINO_MEDIO: "Ensino médio",
   };
 
   const mapaDificuldades: Record<string, string> = {
     FACIL: "Fácil",
     MEDIO: "Média",
-    DIFICIL: "Difícil"
+    DIFICIL: "Difícil",
   };
 
   return (
     mapaSeries[texto] ||
     mapaNiveis[texto] ||
     mapaDificuldades[texto] ||
-    texto.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+    texto
+      .replace(/_/g, " ")
+      .toLowerCase()
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+  );
+};
+
+// Componente wrapper para o Quill
+const QuillEditor = ({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}) => {
+  const { quill, quillRef } = useQuill({
+    theme: "snow",
+    modules: {
+      toolbar: [["bold", "italic"]],
+    },
+    formats: ["bold", "italic"],
+    placeholder: placeholder || "",
+  });
+
+  useEffect(() => {
+    if (quill) {
+      quill.on("text-change", () => {
+        onChange(quill.root.innerHTML);
+      });
+    }
+  }, [quill, onChange]);
+
+  useEffect(() => {
+    if (quill && value !== quill.root.innerHTML) {
+      quill.root.innerHTML = value || "";
+    }
+  }, [quill, value]);
+
+  return (
+    <div className="bg-white rounded-xl">
+      <div ref={quillRef} />
+    </div>
   );
 };
 
@@ -74,8 +118,12 @@ export const EditarQuestaoModal = ({
   const [componentes, setComponentes] = useState<ComponenteCurricular[]>([]);
   const [codigosBNCC, setCodigosBNCC] = useState<number[]>([]);
   const [showModalBNCC, setShowModalBNCC] = useState(false);
-  const [habilidadesSelecionadas, setHabilidadesSelecionadas] = useState<{ id: number; codigo: string; nivel?: string }[]>([]);
-  const [proficienciaSaebId, setProficienciaSaebId] = useState<number | null>(null);
+  const [habilidadesSelecionadas, setHabilidadesSelecionadas] = useState<
+    { id: number; codigo: string; nivel?: string }[]
+  >([]);
+  const [proficienciaSaebId, setProficienciaSaebId] = useState<number | null>(
+    null
+  );
   const [ordem, setOrdem] = useState<number | null>(null);
   const api = useApi();
 
@@ -96,12 +144,18 @@ export const EditarQuestaoModal = ({
   ];
   // const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
 
-  const areas = ["Ciências Humanas", "Ciências Exatas", "Ciências da Natureza", "Linguagens"]
+  const areas = [
+    "Ciências Humanas",
+    "Ciências Exatas",
+    "Ciências da Natureza",
+    "Linguagens",
+  ];
 
   useEffect(() => {
     let questaoData: any = null;
-    
-    api.get(`/api/questoes/${questaoId}`)
+
+    api
+      .get(`/api/questoes/${questaoId}`)
       .then((res) => res.json())
       .then((data) => {
         questaoData = data;
@@ -109,7 +163,9 @@ export const EditarQuestaoModal = ({
         setImagemUrl(data.imagem_url || "");
         setImagemPreview(
           data.imagem_url
-            ? `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${data.imagem_url}`
+            ? `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${
+                data.imagem_url
+              }`
             : ""
         );
         setAlternativas(data.alternativas || []);
@@ -120,61 +176,69 @@ export const EditarQuestaoModal = ({
         setPontos(data.pontos || 1);
         setComponenteId(data.componente_curricular_id || 4);
         setOrdem(data.ordem || null);
-        
+
         // Handle codigosBNCC data properly
-        const codigosIds = Array.isArray(data.codigos_bncc) 
-          ? data.codigos_bncc.map((codigo: any): number | null => {
-              // A estrutura real é: { questao_id, bncc_id, bncc: { id, codigo, ... } }
-              if (typeof codigo === 'object' && codigo.bncc_id) {
-                return codigo.bncc_id;
-              } else if (typeof codigo === 'object' && codigo.bncc?.id) {
-                return codigo.bncc.id;
-              } else if (typeof codigo === 'number') {
-                return codigo;
-              }
-              return null;
-            }).filter((id: number | null): id is number => {
-              return id !== null;
-            })
+        const codigosIds = Array.isArray(data.codigos_bncc)
+          ? data.codigos_bncc
+              .map((codigo: any): number | null => {
+                // A estrutura real é: { questao_id, bncc_id, bncc: { id, codigo, ... } }
+                if (typeof codigo === "object" && codigo.bncc_id) {
+                  return codigo.bncc_id;
+                } else if (typeof codigo === "object" && codigo.bncc?.id) {
+                  return codigo.bncc.id;
+                } else if (typeof codigo === "number") {
+                  return codigo;
+                }
+                return null;
+              })
+              .filter((id: number | null): id is number => {
+                return id !== null;
+              })
           : [];
         setCodigosBNCC(codigosIds);
-        
+
         setProficienciaSaebId(data.proficiencia_saeb_id || null);
       });
 
-    api.get(`/api/componentes-curriculares`)
+    api
+      .get(`/api/componentes-curriculares`)
       .then((res) => res.json())
       .then((data) => setComponentes(data || []));
 
     // Carrega habilidades BNCC já vinculadas para exibição/remoção
-    api.get(`/api/bncc?questao_id=${questaoId}`)
+    api
+      .get(`/api/bncc?questao_id=${questaoId}`)
       .then((res) => res.json())
       .then(async (lista) => {
         if (Array.isArray(lista)) {
           const habilidadesComNivel = await Promise.all(
             lista.map(async (h: { id: number; codigo: string }) => {
               let nivelDescricao = "";
-              
+
               // Se há um ID de proficiência, buscar a descrição do nível
               if (questaoData?.proficiencia_saeb_id) {
                 try {
                   const res = await api.get(`/api/bncc/${h.id}/proficiencias`);
                   if (res.ok) {
                     const profData = await res.json();
-                    const proficiencia = profData.find((p: any) => p.id === questaoData.proficiencia_saeb_id);
+                    const proficiencia = profData.find(
+                      (p: any) => p.id === questaoData.proficiencia_saeb_id
+                    );
                     if (proficiencia) {
-                      nivelDescricao = `${proficiencia.nivel ?? ""}${proficiencia.nivel ? " - " : ""}${proficiencia.descricao ?? ""}`.trim();
+                      nivelDescricao = `${proficiencia.nivel ?? ""}${
+                        proficiencia.nivel ? " - " : ""
+                      }${proficiencia.descricao ?? ""}`.trim();
                     }
                   }
                 } catch (error) {
                   console.error("Erro ao buscar descrição do nível:", error);
                 }
               }
-              
-              return { 
-                id: h.id, 
-                codigo: h.codigo, 
-                nivel: nivelDescricao || undefined 
+
+              return {
+                id: h.id,
+                codigo: h.codigo,
+                nivel: nivelDescricao || undefined,
               };
             })
           );
@@ -184,34 +248,36 @@ export const EditarQuestaoModal = ({
       .catch(() => {});
   }, [questaoId]);
 
-const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  const formData = new FormData();
-  formData.append("imagem", file); 
+    const formData = new FormData();
+    formData.append("imagem", file);
 
-  try {
-    const res = await api.post(`/api/upload/questao-imagem`, formData, {
-      headers: {}, // Remove Content-Type para permitir que o browser defina o boundary
-    });
+    try {
+      const res = await api.post(`/api/upload/questao-imagem`, formData, {
+        headers: {}, // Remove Content-Type para permitir que o browser defina o boundary
+      });
 
-    const data = await res.json(); 
+      const data = await res.json();
 
-    if (!res.ok || !data.success) {
-      console.error("Erro ao enviar imagem:", data.message || res.statusText);
-      alert("Erro ao enviar imagem.");
-      return;
+      if (!res.ok || !data.success) {
+        console.error("Erro ao enviar imagem:", data.message || res.statusText);
+        alert("Erro ao enviar imagem.");
+        return;
+      }
+      setImagemUrl(data.imagePath);
+      setImagemPreview(
+        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${
+          data.imagePath
+        }`
+      );
+    } catch (err) {
+      console.error("Erro inesperado:", err);
+      alert("Erro inesperado ao enviar imagem.");
     }
-    setImagemUrl(data.imagePath);
-    setImagemPreview(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${data.imagePath}`);
-  } catch (err) {
-    console.error("Erro inesperado:", err);
-    alert("Erro inesperado ao enviar imagem.");
-  }
-};
-
-
+  };
 
   const marcarCorreta = (index: number) => {
     const novas = alternativas.map((alt, i) => ({
@@ -256,48 +322,49 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-50">
       <div className="bg-white w-full max-w-3xl p-6 rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto transition-all">
-        <h2 className="text-xl font-bold mb-6 text-gray-800">Editar Questão - {ordem || questaoId}</h2>
+        <h2 className="text-xl font-bold mb-6 text-gray-800">
+          Editar Questão - {ordem || questaoId}
+        </h2>
 
         <div className="mb-4">
-          <label className="text-sm font-medium text-gray-700 mb-2 block">Enunciado da Questão</label>
-          <ReactQuill
+          <label className="text-sm font-medium text-gray-700 mb-2 block">
+            Enunciado da Questão
+          </label>
+          <QuillEditor
             value={enunciado}
             onChange={setEnunciado}
             placeholder="Digite o enunciado da questão"
-            modules={{
-              toolbar: [
-                ['bold', 'italic'],
-              ],
-            }}
-            formats={['bold', 'italic']}
-            theme="snow"
-            className="bg-white rounded-xl"
           />
         </div>
 
-       <label className="block mb-4">
-  <span className="text-sm font-medium text-gray-700">
-    {imagemPreview ? "Inserir outro arquivo" : "Adicionar imagem"}
-  </span>
-  <input
-    type="file"
-    accept="image/*"
-    onChange={handleImageUpload}
-    className="w-full file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-  />
-</label>
+        <label className="block mb-4">
+          <span className="text-sm font-medium text-gray-700">
+            {imagemPreview ? "Inserir outro arquivo" : "Adicionar imagem"}
+          </span>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="w-full file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          />
+        </label>
 
         {imagemPreview && (
           <div className="mb-4">
             <div className="relative inline-block w-fit rounded-lg overflow-hidden border">
-            <img src={imagemPreview} alt="Preview" className="block h-48 w-auto" />
-              <button 
-              onClick={() => {
-                setImagemUrl("");
-                setImagemPreview("");
-              }}
+              <img
+                src={imagemPreview}
+                alt="Preview"
+                className="block h-48 w-auto"
+              />
+              <button
+                onClick={() => {
+                  setImagemUrl("");
+                  setImagemPreview("");
+                }}
                 className="absolute top-2 right-2 bg-white text-red-700 rounded-full px-2 py-1 shadow-md cursor-pointer border-black border-1"
-                title="Apagar imagem">
+                title="Apagar imagem"
+              >
                 <Trash2 className="h-5 w-4" />
               </button>
             </div>
@@ -322,13 +389,11 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
             onChange={(e) => setSerie(e.target.value)}
             className="p-3 border rounded-xl"
           >
-            {series.map((s) => 
-              <option 
-              key={s} 
-              value={s}>
+            {series.map((s) => (
+              <option key={s} value={s}>
                 {formatarTextoSelect(s)}
               </option>
-            )}
+            ))}
           </select>
 
           <select
@@ -363,24 +428,33 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           {habilidadesSelecionadas.length > 0
             ? (() => {
                 const maxToShow = 2;
-                const shown = habilidadesSelecionadas.slice(0, maxToShow).map(h => h.codigo).join(", ");
+                const shown = habilidadesSelecionadas
+                  .slice(0, maxToShow)
+                  .map((h) => h.codigo)
+                  .join(", ");
                 const remaining = habilidadesSelecionadas.length - maxToShow;
                 return remaining > 0 ? `${shown} +${remaining}` : shown;
               })()
-            : '+ Selecionar Habilidades BNCC/SAEB'}
+            : "+ Selecionar Habilidades BNCC/SAEB"}
         </button>
 
         {habilidadesSelecionadas.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-6">
             {habilidadesSelecionadas.map((h) => (
-              <span key={h.id} className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-full text-xs bg-blue-50 text-blue-700 border border-blue-200">
-                {h.codigo}{h.nivel && ` (${h.nivel})`}
+              <span
+                key={h.id}
+                className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-full text-xs bg-blue-50 text-blue-700 border border-blue-200"
+              >
+                {h.codigo}
+                {h.nivel && ` (${h.nivel})`}
                 <button
                   type="button"
                   onClick={() => {
                     // Remoção local
-                    setHabilidadesSelecionadas(prev => prev.filter(x => x.id !== h.id));
-                    setCodigosBNCC(prev => prev.filter(id => id !== h.id));
+                    setHabilidadesSelecionadas((prev) =>
+                      prev.filter((x) => x.id !== h.id)
+                    );
+                    setCodigosBNCC((prev) => prev.filter((id) => id !== h.id));
                   }}
                   className="ml-1 text-blue-600 hover:text-blue-800"
                   aria-label={`Remover ${h.codigo}`}
@@ -405,22 +479,16 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
               <label className="text-sm font-medium text-gray-700 mb-1 block">
                 Alternativa {String.fromCharCode(65 + i)}
               </label>
-              <ReactQuill
+              <QuillEditor
                 value={alt.texto}
                 onChange={(value) => {
                   const novas = [...alternativas];
                   novas[i].texto = value;
                   setAlternativas(novas);
                 }}
-                placeholder={`Digite a alternativa ${String.fromCharCode(65 + i)}`}
-                modules={{
-                  toolbar: [
-                    ['bold', 'italic'],
-                  ],
-                }}
-                formats={['bold', 'italic']}
-                theme="snow"
-                className="bg-white rounded-xl"
+                placeholder={`Digite a alternativa ${String.fromCharCode(
+                  65 + i
+                )}`}
               />
             </div>
           </div>
@@ -442,68 +510,78 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         </div>
       </div>
 
-    {showModalBNCC && (
-  <ModalBNCCEdit
-    questaoId={questaoId}
-    codigosSelecionados={codigosBNCC}
-    onClose={() => setShowModalBNCC(false)}
-    onSave={async (novosCodigos, profId) => {
-      setCodigosBNCC(novosCodigos);
-      setProficienciaSaebId(profId || null);
-      setShowModalBNCC(false);
-      
-      // Se não há códigos selecionados, limpa as habilidades
-      if (novosCodigos.length === 0) {
-        setHabilidadesSelecionadas([]);
-        return;
-      }
-      
-      // Busca as informações das novas habilidades selecionadas
-      try {
-        const habilidadesComNivel = await Promise.all(
-          novosCodigos.map(async (codigoId) => {
-            // Busca informações da habilidade
-            const resHabilidade = await api.get(`/api/bncc/${codigoId}`);
-            if (!resHabilidade.ok) return null;
-            
-            const habilidade = await resHabilidade.json();
-            let nivelDescricao = "";
-            
-            // Se há um ID de proficiência, buscar a descrição do nível
-            if (profId) {
-              try {
-                const resProficiencia = await api.get(`/api/bncc/${codigoId}/proficiencias`);
-                if (resProficiencia.ok) {
-                  const profData = await resProficiencia.json();
-                  const proficiencia = profData.find((p: any) => p.id === profId);
-                  if (proficiencia) {
-                    nivelDescricao = `${proficiencia.nivel ?? ""}${proficiencia.nivel ? " - " : ""}${proficiencia.descricao ?? ""}`.trim();
-                  }
-                }
-              } catch (error) {
-                console.error("Erro ao buscar descrição do nível:", error);
-              }
-            }
-            
-            return { 
-              id: habilidade.id, 
-              codigo: habilidade.codigo, 
-              nivel: nivelDescricao || undefined 
-            };
-          })
-        );
-        
-        // Filtra valores nulos e atualiza o estado
-        const habilidadesValidas = habilidadesComNivel.filter(h => h !== null);
-        setHabilidadesSelecionadas(habilidadesValidas);
-      } catch (error) {
-        console.error("Erro ao buscar habilidades:", error);
-        setHabilidadesSelecionadas([]);
-      }
-    }}
-  />
-)}
+      {showModalBNCC && (
+        <ModalBNCCEdit
+          questaoId={questaoId}
+          codigosSelecionados={codigosBNCC}
+          onClose={() => setShowModalBNCC(false)}
+          onSave={async (novosCodigos, profId) => {
+            setCodigosBNCC(novosCodigos);
+            setProficienciaSaebId(profId || null);
+            setShowModalBNCC(false);
 
+            // Se não há códigos selecionados, limpa as habilidades
+            if (novosCodigos.length === 0) {
+              setHabilidadesSelecionadas([]);
+              return;
+            }
+
+            // Busca as informações das novas habilidades selecionadas
+            try {
+              const habilidadesComNivel = await Promise.all(
+                novosCodigos.map(async (codigoId) => {
+                  // Busca informações da habilidade
+                  const resHabilidade = await api.get(`/api/bncc/${codigoId}`);
+                  if (!resHabilidade.ok) return null;
+
+                  const habilidade = await resHabilidade.json();
+                  let nivelDescricao = "";
+
+                  // Se há um ID de proficiência, buscar a descrição do nível
+                  if (profId) {
+                    try {
+                      const resProficiencia = await api.get(
+                        `/api/bncc/${codigoId}/proficiencias`
+                      );
+                      if (resProficiencia.ok) {
+                        const profData = await resProficiencia.json();
+                        const proficiencia = profData.find(
+                          (p: any) => p.id === profId
+                        );
+                        if (proficiencia) {
+                          nivelDescricao = `${proficiencia.nivel ?? ""}${
+                            proficiencia.nivel ? " - " : ""
+                          }${proficiencia.descricao ?? ""}`.trim();
+                        }
+                      }
+                    } catch (error) {
+                      console.error(
+                        "Erro ao buscar descrição do nível:",
+                        error
+                      );
+                    }
+                  }
+
+                  return {
+                    id: habilidade.id,
+                    codigo: habilidade.codigo,
+                    nivel: nivelDescricao || undefined,
+                  };
+                })
+              );
+
+              // Filtra valores nulos e atualiza o estado
+              const habilidadesValidas = habilidadesComNivel.filter(
+                (h) => h !== null
+              );
+              setHabilidadesSelecionadas(habilidadesValidas);
+            } catch (error) {
+              console.error("Erro ao buscar habilidades:", error);
+              setHabilidadesSelecionadas([]);
+            }
+          }}
+        />
+      )}
     </div>
   );
 };
