@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ModalBNCCEdit } from "./ModalBNCCEdit";
 import { Trash2 } from "lucide-react";
 import { useApi } from "../../utils/api";
@@ -71,26 +71,72 @@ const QuillEditor = ({
   onChange: (value: string) => void;
   placeholder?: string;
 }) => {
+  const isUpdatingRef = useRef(false);
   const { quill, quillRef } = useQuill({
     theme: "snow",
     modules: {
-      toolbar: [["bold", "italic"]],
+      toolbar: [
+        [{ header: [1, 2, 3, false] }],
+        ["bold", "italic", "underline", "strike"],
+        [{ list: "ordered" }, { list: "bullet" }],
+        [{ align: [] }],
+        ["link", "blockquote"],
+        [{ color: [] }, { background: [] }],
+        ["clean"],
+      ],
     },
-    formats: ["bold", "italic"],
+    formats: [
+      "header",
+      "bold",
+      "italic",
+      "underline",
+      "strike",
+      "list",
+      "bullet",
+      "align",
+      "link",
+      "blockquote",
+      "color",
+      "background",
+    ],
     placeholder: placeholder || "",
   });
 
   useEffect(() => {
     if (quill) {
-      quill.on("text-change", () => {
-        onChange(quill.root.innerHTML);
-      });
+      const handleTextChange = () => {
+        if (!isUpdatingRef.current) {
+          onChange(quill.root.innerHTML);
+        }
+      };
+      
+      quill.on("text-change", handleTextChange);
+      
+      return () => {
+        quill.off("text-change", handleTextChange);
+      };
     }
   }, [quill, onChange]);
 
   useEffect(() => {
-    if (quill && value !== quill.root.innerHTML) {
-      quill.root.innerHTML = value || "";
+    if (quill && value !== undefined) {
+      const currentContent = quill.root.innerHTML.trim();
+      const newValue = (value || "").trim();
+      
+      // Usar dangerouslyPasteHTML para preservar todos os formatos corretamente
+      // Só atualizar se o conteúdo for diferente
+      if (newValue !== currentContent) {
+        isUpdatingRef.current = true;
+        if (newValue === "") {
+          quill.setText("");
+        } else {
+          quill.clipboard.dangerouslyPasteHTML(newValue);
+        }
+        // Permitir eventos novamente após atualização
+        setTimeout(() => {
+          isUpdatingRef.current = false;
+        }, 0);
+      }
     }
   }, [quill, value]);
 

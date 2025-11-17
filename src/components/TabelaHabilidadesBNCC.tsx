@@ -511,9 +511,10 @@ export const TabelaHabilidadesBNCC = () => {
                                 <h5 className="font-medium text-gray-900 mb-1">
                                   Questão {questao.ordem}
                                 </h5>
-                                <p className="text-sm text-gray-600 mb-2">
-                                  {questao.enunciado}
-                                </p>
+                                <p 
+                                  className="text-sm text-gray-600 mb-2 prose prose-sm max-w-none"
+                                  dangerouslySetInnerHTML={{ __html: questao.enunciado || '' }}
+                                />
                                 <p>
                                   {questao.imagem_url && (
                                     <img
