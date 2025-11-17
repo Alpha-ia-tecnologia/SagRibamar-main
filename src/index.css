@@ -233,3 +233,25 @@ div[style*="text-align: justify"],
 span[style*="text-align: justify"] {
   text-align: justify !important;
 }
+
+/* Estilos do Tiptap Editor */
+.ProseMirror {
+  min-height: 100px;
+  outline: none;
+}
+
+.ProseMirror p {
+  margin: 0;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.ProseMirror-focused {
+  outline: none;
+}

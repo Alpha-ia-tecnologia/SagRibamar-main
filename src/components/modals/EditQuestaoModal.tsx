@@ -1,9 +1,8 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { ModalBNCCEdit } from "./ModalBNCCEdit";
 import { Trash2 } from "lucide-react";
 import { useApi } from "../../utils/api";
-import { useQuill } from "react-quilljs";
-import "quill/dist/quill.snow.css";
+import RichTextEditor from "../RichTextEditor";
 
 interface EditarQuestaoModalProps {
   questaoId: number;
@@ -58,92 +57,6 @@ const formatarTextoSelect = (texto: string) => {
       .replace(/_/g, " ")
       .toLowerCase()
       .replace(/\b\w/g, (c) => c.toUpperCase())
-  );
-};
-
-// Componente wrapper para o Quill
-const QuillEditor = ({
-  value,
-  onChange,
-  placeholder,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-}) => {
-  const isUpdatingRef = useRef(false);
-  const { quill, quillRef } = useQuill({
-    theme: "snow",
-    modules: {
-      toolbar: [
-        [{ header: [1, 2, 3, false] }],
-        ["bold", "italic", "underline", "strike"],
-        [{ list: "ordered" }, { list: "bullet" }],
-        [{ align: [] }],
-        ["link", "blockquote"],
-        [{ color: [] }, { background: [] }],
-        ["clean"],
-      ],
-    },
-    formats: [
-      "header",
-      "bold",
-      "italic",
-      "underline",
-      "strike",
-      "list",
-      "bullet",
-      "align",
-      "link",
-      "blockquote",
-      "color",
-      "background",
-    ],
-    placeholder: placeholder || "",
-  });
-
-  useEffect(() => {
-    if (quill) {
-      const handleTextChange = () => {
-        if (!isUpdatingRef.current) {
-          onChange(quill.root.innerHTML);
-        }
-      };
-      
-      quill.on("text-change", handleTextChange);
-      
-      return () => {
-        quill.off("text-change", handleTextChange);
-      };
-    }
-  }, [quill, onChange]);
-
-  useEffect(() => {
-    if (quill && value !== undefined) {
-      const currentContent = quill.root.innerHTML.trim();
-      const newValue = (value || "").trim();
-      
-      // Usar dangerouslyPasteHTML para preservar todos os formatos corretamente
-      // Só atualizar se o conteúdo for diferente
-      if (newValue !== currentContent) {
-        isUpdatingRef.current = true;
-        if (newValue === "") {
-          quill.setText("");
-        } else {
-          quill.clipboard.dangerouslyPasteHTML(newValue);
-        }
-        // Permitir eventos novamente após atualização
-        setTimeout(() => {
-          isUpdatingRef.current = false;
-        }, 0);
-      }
-    }
-  }, [quill, value]);
-
-  return (
-    <div className="bg-white rounded-xl">
-      <div ref={quillRef} />
-    </div>
   );
 };
 
@@ -376,7 +289,7 @@ export const EditarQuestaoModal = ({
           <label className="text-sm font-medium text-gray-700 mb-2 block">
             Enunciado da Questão
           </label>
-          <QuillEditor
+          <RichTextEditor
             value={enunciado}
             onChange={setEnunciado}
             placeholder="Digite o enunciado da questão"
@@ -408,7 +321,7 @@ export const EditarQuestaoModal = ({
                   setImagemUrl("");
                   setImagemPreview("");
                 }}
-                className="absolute top-2 right-2 bg-white text-red-700 rounded-full px-2 py-1 shadow-md cursor-pointer border-black border-1"
+                className="absolute top-2 right-2 bg-white text-red-700 rounded-full px-2 py-1 shadow-md cursor-pointer border-black border"
                 title="Apagar imagem"
               >
                 <Trash2 className="h-5 w-4" />
@@ -525,7 +438,7 @@ export const EditarQuestaoModal = ({
               <label className="text-sm font-medium text-gray-700 mb-1 block">
                 Alternativa {String.fromCharCode(65 + i)}
               </label>
-              <QuillEditor
+              <RichTextEditor
                 value={alt.texto}
                 onChange={(value) => {
                   const novas = [...alternativas];
