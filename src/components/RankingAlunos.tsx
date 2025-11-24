@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
 import { useApi } from "../utils/api";
 import NoData from "./NoData";
+import { Loading } from "./Loading";
 
 interface Aluno {
   aluno_id: number;
@@ -33,12 +34,14 @@ export const RankingAlunos = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);  
   const { filtros } = useFiltroDashboard();
   const api = useApi();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const params = new URLSearchParams();
         params.append("page", page.toString());
         params.append("limit", "20");
@@ -57,7 +60,11 @@ export const RankingAlunos = () => {
         setTotalPages(json.totalPages);
         setTotal(json.total);
       } catch (err) {
+        setLoading(false);
         console.error("Erro ao buscar ranking de alunos:", err);
+      }
+      finally {
+        setLoading(false);
       }
     };
 
@@ -127,7 +134,9 @@ export const RankingAlunos = () => {
   <div className="p-6 bg-white rounded-2xl shadow-md">
     <h2 className="text-xl font-semibold mb-5 text-gray-800">🏅 Ranking de Alunos</h2>
 
-    {alunos.length === 0 ? (
+    {loading ? (
+      <Loading />
+    ) : alunos.length === 0 ? (
       <NoData />
     ) : (
       <>

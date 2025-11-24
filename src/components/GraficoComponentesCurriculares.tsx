@@ -12,8 +12,16 @@ import { Bar } from "react-chartjs-2";
 import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
 import { useApi } from "../utils/api";
 import NoData from "./NoData";
+import { Loading } from "./Loading";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 interface DesempenhoComponente {
   componente_id: number;
@@ -26,10 +34,12 @@ interface DesempenhoComponente {
 
 export const GraficoComponentesCurriculares = () => {
   const [dados, setDados] = useState<DesempenhoComponente[]>([]);
+  const [loading, setLoading] = useState(false);
   const { filtros } = useFiltroDashboard();
   const api = useApi();
 
   useEffect(() => {
+    setLoading(true);
     const params = new URLSearchParams();
 
     if (filtros.regiaoId) params.append("regiao_id", filtros.regiaoId);
@@ -37,9 +47,12 @@ export const GraficoComponentesCurriculares = () => {
     if (filtros.escolaId) params.append("escola_id", filtros.escolaId);
     if (filtros.serie) params.append("serie", filtros.serie);
     if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
-    if (filtros.provaId) params.append("prova_id", filtros.provaId); 
+    if (filtros.provaId) params.append("prova_id", filtros.provaId);
 
-    api.get(`/api/dashboard/componentes-curriculares-desempenho?${params.toString()}`)
+    api
+      .get(
+        `/api/dashboard/componentes-curriculares-desempenho?${params.toString()}`
+      )
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -47,10 +60,15 @@ export const GraficoComponentesCurriculares = () => {
         } else {
           setDados([]);
         }
+        setLoading(false);
       })
       .catch((err) => {
-        console.error("Erro ao carregar desempenho de componentes curriculares", err);
+        console.error(
+          "Erro ao carregar desempenho de componentes curriculares",
+          err
+        );
         setDados([]);
+        setLoading(false);
       });
   }, [filtros]);
 
@@ -87,9 +105,13 @@ export const GraficoComponentesCurriculares = () => {
 
   return (
     <div className="bg-white rounded-xl shadow p-6">
-      <h2 className="text-lg font-semibold mb-4 text-gray-800">Análise de Componentes Curriculares</h2>
-      {dados.length === 0 ? (        
-        <NoData/>
+      <h2 className="text-lg font-semibold mb-4 text-gray-800">
+        Análise de Componentes Curriculares
+      </h2>
+      {loading ? (
+        <Loading />
+      ) : dados.length === 0 ? (
+        <NoData />
       ) : (
         <Bar data={chartData} options={chartOptions} />
       )}

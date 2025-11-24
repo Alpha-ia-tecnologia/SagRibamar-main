@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
 import { useApi } from "../utils/api";
 import NoData from "./NoData";
+import { Loading } from "./Loading";
 
 interface EscolaDesempenho {
   escola_id: number;
@@ -19,6 +20,7 @@ interface EscolaDesempenho {
 export const TabelaDesempenhoEscolas = () => {
   const { filtros } = useFiltroDashboard();
   const [dados, setDados] = useState<EscolaDesempenho[]>([]);
+  const [loading, setLoading] = useState(false)
   const [pagina, setPagina] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const [total, setTotal] = useState(0);
@@ -38,6 +40,7 @@ export const TabelaDesempenhoEscolas = () => {
     if (filtros.provaId) params.append("prova_id", filtros.provaId); 
     
     try {
+      setLoading(true)
       const res = await api.get(`/api/dashboard/school-performance?${params.toString()}`);
       const json = await res.json();
 
@@ -45,7 +48,11 @@ export const TabelaDesempenhoEscolas = () => {
       setTotalPaginas(json.totalPages || 1);
       setTotal(json.total || 0);
     } catch (error) {
+      setLoading(false)
       console.error("Erro ao carregar desempenho por escola:", error);
+    }
+    finally {
+      setLoading(false)
     }
   };
 
@@ -86,7 +93,9 @@ return (
   <div className="bg-white p-6 rounded-xl shadow mb-8">
     <h2 className="text-lg font-semibold mb-4 text-gray-800">Desempenho por Escolas</h2>
 
-    {dados.length === 0 ? (
+    {loading ? (
+      <Loading />
+    ) : dados.length === 0 ? (
       <NoData />
     ) : (
       <>
