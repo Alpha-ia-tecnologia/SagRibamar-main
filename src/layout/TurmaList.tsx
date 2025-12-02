@@ -40,7 +40,8 @@ const formatarTextoSelect = (texto: string) => {
     PRIMEIRA_SERIE: "1ª série",
     SEGUNDA_SERIE: "2ª série",
     TERCEIRA_SERIE: "3ª série",
-    EJA: "EJA"
+    EJA: "EJA",
+    TURMA_DE_HABILIDADES: "Turma Habilidades",
   };
 
   const mapaTurnos: Record<string, string> = {
@@ -72,6 +73,7 @@ const series = [
   "SEGUNDA_SERIE",
   "TERCEIRA_SERIE",
   "EJA",
+  "TURMA_DE_HABILIDADES"
 ] as const;
 
 export const TurmaList = ({

@@ -12,6 +12,11 @@ interface Escola {
   nome: string;
 }
 
+interface Serie {
+  value: string;
+  label: string;
+}
+
 const formatarTextoSelect = (texto: string) => {
   const mapaSeries: Record<string, string> = {
     PRIMEIRO_ANO: "1° ano",
@@ -44,28 +49,13 @@ const formatarTextoSelect = (texto: string) => {
 
 const turnos = ["MATUTINO", "VESPERTINO", "NOTURNO"] as const;
 
-const series = [
-  "PRIMEIRO_ANO",
-  "SEGUNDO_ANO",
-  "TERCEIRO_ANO",
-  "QUARTO_ANO",
-  "QUINTO_ANO",
-  "SEXTO_ANO",
-  "SETIMO_ANO",
-  "OITAVO_ANO",
-  "NONO_ANO",
-  "PRIMEIRA_SERIE",
-  "SEGUNDA_SERIE",
-  "TERCEIRA_SERIE",
-  "EJA",
-] as const;
-
 export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaModalProps) => {
   const [escolaId, setEscolaId] = useState<number | "">("");
   const [nome, setNome] = useState("");
   const [serie, setSerie] = useState<string>("");
   const [turno, setTurno] = useState<string>("");
   const [escolas, setEscolas] = useState<Escola[]>([]);
+  const [series, setSeries] = useState<Serie[]>([]);
   const [loading, setLoading] = useState(false);
   const dadosCarregadosRef = useRef(false);
   const api = useApi();
@@ -79,6 +69,22 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
     };
 
     fetchEscolas();
+  }, [api]);
+
+  useEffect(() => {
+    const fetchSeries = async () => {
+      try {
+        const res = await api.get(`/api/enums/series`);
+        if (!res.ok) throw new Error("Erro ao buscar séries");
+        const data: Serie[] = await res.json();
+        setSeries(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Erro ao buscar séries:", error);
+        setSeries([]);
+      }
+    };
+
+    fetchSeries();
   }, [api]);
 
   // Buscar dados da turma se estiver editando
@@ -226,9 +232,9 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
                 )}
                 {series.map(s => (
                   <option 
-                  key={s}
-                  value={s}>
-                    {formatarTextoSelect(s)}
+                  key={s.value}
+                  value={s.value}>
+                    {s.label}
                   </option>))}
              </select>
           </div>
