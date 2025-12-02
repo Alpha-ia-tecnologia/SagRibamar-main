@@ -41,6 +41,13 @@ const formatarTextoSelect = (texto: string) => {
     SEGUNDA_SERIE: "2ª série",
     TERCEIRA_SERIE: "3ª série",
     EJA: "EJA",
+    INFANTIL_I: "Infantil I",
+    INFANTIL_II: "Infantil II",
+    INFANTIL_III: "Infantil III",
+    PRE_I: "Pré I",
+    PRE_II: "Pré II",
+    PRE_III: "Pré III",
+    CRECHE: "Creche",
     TURMA_DE_HABILIDADES: "Turma Habilidades",
   };
 
@@ -73,6 +80,13 @@ const series = [
   "SEGUNDA_SERIE",
   "TERCEIRA_SERIE",
   "EJA",
+  "INFANTIL_I",
+  "INFANTIL_II",
+  "INFANTIL_III",
+  "PRE_I",
+  "PRE_II",
+  "PRE_III",
+  "CRECHE",
   "TURMA_DE_HABILIDADES"
 ] as const;
 
