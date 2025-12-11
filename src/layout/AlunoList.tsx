@@ -27,7 +27,8 @@ interface AlunoListProps {
   onEdit?: (id: number) => void;
   searchNome: string;
   escolaId: number | null;
-  turmaId: number | null; // ⬅️ Adicionado
+  turmaId: number | null;
+  serieId: string | null;
 }
 
 export const AlunoList = ({
@@ -37,6 +38,7 @@ export const AlunoList = ({
   searchNome,
   escolaId,
   turmaId,
+  serieId,
 }: AlunoListProps) => {
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [page, setPage] = useState(1);
@@ -55,6 +57,7 @@ export const AlunoList = ({
       if (searchNome.trim() !== "") queryParams.append("nome", searchNome);
       if (escolaId !== null) queryParams.append("escola_id", String(escolaId));
       if (turmaId !== null) queryParams.append("turma_id", String(turmaId));
+      if (serieId !== null) queryParams.append("serie", serieId);
 
       const res = await api.get(`/api/alunos?${queryParams.toString()}`);
 
@@ -69,7 +72,7 @@ export const AlunoList = ({
 
   useEffect(() => {
     fetchAlunos();
-  }, [page, searchNome, escolaId, turmaId]); 
+  }, [page, searchNome, escolaId, turmaId, serieId]); 
 
   useEffect(() => {
     if (reload) {

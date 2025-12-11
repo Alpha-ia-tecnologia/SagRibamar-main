@@ -17,6 +17,7 @@ export default function AlunosPage() {
   const [searchNome, setSearchNome] = useState("");
   const [escolaId, setEscolaId] = useState<number | null>(null);
   const [turmaId, setTurmaId] = useState<number | null>(null);
+  const [serieId, setSerieId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const [showImportModal, setShowImportModal] = useState(false);
@@ -37,11 +38,13 @@ export default function AlunosPage() {
   const handleFilter = (
     nome: string,
     escolaId: number | null,
-    turmaId: number | null
+    turmaId: number | null,
+    serieId: string | null
   ) => {
     setSearchNome(nome);
     setEscolaId(escolaId);
     setTurmaId(turmaId);
+    setSerieId(serieId);
   };
 
 const handleDownloadStudent = async () => {
@@ -156,6 +159,7 @@ const handleDownloadStudent = async () => {
           searchNome={searchNome}
           escolaId={escolaId}
           turmaId={turmaId}
+          serieId={serieId}
         />
       </div>
 
