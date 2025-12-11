@@ -18,8 +18,35 @@ export default function TurmasPage() {
 
   const [searchNome, setSearchNome] = useState("");
   const [escolaId, setEscolaId] = useState<number | null>(null);
+  const [serieId, setSerieId] = useState<string | null>(null);
   const [escolas, setEscolas] = useState<Escola[]>([]);
   const api = useApi();
+
+  const serieNomes: Record<string, string> = {
+    PRIMEIRO_ANO: "1° ano",
+    SEGUNDO_ANO: "2° ano",
+    TERCEIRO_ANO: "3° ano",
+    QUARTO_ANO: "4° ano",
+    QUINTO_ANO: "5° ano",
+    SEXTO_ANO: "6° ano",
+    SETIMO_ANO: "7° ano",
+    OITAVO_ANO: "8° ano",
+    NONO_ANO: "9° ano",
+    PRIMEIRA_SERIE: "1ª série",
+    SEGUNDA_SERIE: "2ª série",
+    TERCEIRA_SERIE: "3ª série",
+    EJA: "EJA",
+    INFANTIL_I: "Infantil I",
+    INFANTIL_II: "Infantil II",
+    INFANTIL_III: "Infantil III",
+    PRE_I: "Pré I",
+    PRE_II: "Pré II",
+    PRE_III: "Pré III",
+    CRECHE: "Creche",
+    TURMA_DE_HABILIDADES: "Turma Habilidades"
+  };
+
+  const todasSeries = Object.keys(serieNomes);
 
   useEffect(() => {
     const fetchEscolas = async () => {
@@ -68,17 +95,17 @@ export default function TurmasPage() {
 
         <div className="bg-white rounded-xl shadow-md p-6 mb-6">
           <h2 className="text-base font-semibold text-gray-700 mb-4">Buscar Turmas</h2>
-          <div className="flex flex-wrap gap-4 items-end">
+          <div className="flex gap-4 items-end flex-nowrap overflow-x-auto">
             <input
               type="text"
               placeholder="Digite o nome da turma..."
-              className="w-full md:w-1/2 px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              className="flex-1 min-w-[200px] px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
               value={searchNome}
               onChange={(e) => setSearchNome(e.target.value)}
             />
 
             <select
-              className="w-full md:w-1/4 px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              className="px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 min-w-[180px] flex-shrink-0"
               value={escolaId ?? ""}
               onChange={(e) =>
                 setEscolaId(e.target.value === "" ? null : parseInt(e.target.value))
@@ -93,9 +120,24 @@ export default function TurmasPage() {
                 ))}
             </select>
 
+            <select
+              className="px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 min-w-[160px] flex-shrink-0"
+              value={serieId ?? ""}
+              onChange={(e) =>
+                setSerieId(e.target.value === "" ? null : e.target.value)
+              }
+            >
+              <option value="">Todas as séries</option>
+              {todasSeries.map((serie) => (
+                <option key={serie} value={serie}>
+                  {serieNomes[serie]}
+                </option>
+              ))}
+            </select>
+
             <button
               onClick={handleFilter}
-              className="bg-blue-600 text-white px-5 py-2 rounded-xl hover:bg-blue-700 transition-all duration-200"
+              className="bg-blue-600 text-white px-5 py-2 rounded-xl hover:bg-blue-700 transition-all duration-200 flex-shrink-0 whitespace-nowrap"
             >
               Filtrar
             </button>
@@ -108,6 +150,7 @@ export default function TurmasPage() {
           onEdit={handleEdit}
           searchNome={searchNome}
           escolaId={escolaId}
+          serieId={serieId}
         />
       </div>
 

@@ -24,6 +24,7 @@ interface TurmaListProps {
   onEdit?: (id: number) => void;
   searchNome: string;
   escolaId: number | null;
+  serieId: string | null;
 }
 
 const formatarTextoSelect = (texto: string) => {
@@ -96,6 +97,7 @@ export const TurmaList = ({
   onEdit,
   searchNome,
   escolaId,
+  serieId,
 }: TurmaListProps) => {
   const [turmas, setTurmas] = useState<Turma[]>([]);
   const [page, setPage] = useState(1);
@@ -113,6 +115,7 @@ export const TurmaList = ({
 
       if (searchNome.trim() !== "") queryParams.append("nome", searchNome);
       if (escolaId !== null) queryParams.append("escola_id", String(escolaId));
+      if (serieId !== null) queryParams.append("serie", serieId);
 
       const res = await api.get(`/api/turmas?${queryParams.toString()}`);
 
@@ -127,7 +130,7 @@ export const TurmaList = ({
 
   useEffect(() => {
     fetchTurmas();
-  }, [page, searchNome, escolaId]);
+  }, [page, searchNome, escolaId, serieId]);
 
   useEffect(() => {
     if (reload) {
