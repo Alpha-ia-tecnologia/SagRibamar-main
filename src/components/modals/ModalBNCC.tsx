@@ -26,8 +26,13 @@ interface Serie {
   label: string;
 }
 
+interface ComponenteCurricular {
+  id: number;
+  nome: string;
+}
+
 interface ModalBNCCProps {
-  componenteCurricularId: number;
+  componenteCurricularId?: number;
   onClose: () => void;
   onSelect: (habilidades: HabilidadeBNCC[], proficienciaId: number | null) => void;
 }
@@ -38,10 +43,16 @@ export const ModalBNCC = ({
   onSelect
 }: ModalBNCCProps) => {
   const [habilidades, setHabilidades] = useState<HabilidadeBNCC[]>([]);
+  const [habilidadesFiltradas, setHabilidadesFiltradas] = useState<HabilidadeBNCC[]>([]);
   const [selecionada, setSelecionada] = useState<number | null>(null);
   const [serieFiltro, setSerieFiltro] = useState("");
   const [saebFiltro, setSaebFiltro] = useState("");
   const [nivelFiltro, setNivelFiltro] = useState("");
+  const [componenteFiltro, setComponenteFiltro] = useState<number | "">(
+    componenteCurricularId || ""
+  );
+  const [pesquisa, setPesquisa] = useState("");
+  const [componentes, setComponentes] = useState<ComponenteCurricular[]>([]);
   const [niveis, setNiveis] = useState<NivelNormalizado[]>([]);
   const [series, setSeries] = useState<Serie[]>([]);
   const [showCreateHabilidadeModal,setShowCreateHabilidadeModal] = useState(false);
@@ -60,11 +71,42 @@ export const ModalBNCC = ({
     }
   };
 
+  const fetchComponentes = async () => {
+    try {
+      const res = await api.get(`/api/componentes-curriculares`);
+      if (!res.ok) throw new Error("Erro ao buscar componentes curriculares");
+      const data: ComponenteCurricular[] = await res.json();
+      setComponentes(data || []);
+    } catch (error) {
+      console.error("Erro ao buscar componentes curriculares:", error);
+      setComponentes([]);
+    }
+  };
+
+  // Função para filtrar habilidades por pesquisa
+  const filtrarHabilidades = (lista: HabilidadeBNCC[], termo: string) => {
+    if (!termo.trim()) {
+      setHabilidadesFiltradas(lista);
+      return;
+    }
+
+    const termoLower = termo.toLowerCase().trim();
+    const filtradas = lista.filter((h) => {
+      const codigoMatch = h.codigo.toLowerCase().includes(termoLower);
+      const descricaoMatch = h.descricao.toLowerCase().includes(termoLower);
+      return codigoMatch || descricaoMatch;
+    });
+    setHabilidadesFiltradas(filtradas);
+  };
+
   const fetchHabilidades = async () => {
     const params = new URLSearchParams();
 
-    if (componenteCurricularId)
-      params.append("componente_curricular_id", componenteCurricularId.toString());
+    // Usa o componente do filtro se selecionado, senão usa o prop
+    const componenteId = componenteFiltro !== "" ? componenteFiltro : componenteCurricularId;
+    if (componenteId) {
+      params.append("componente_curricular_id", componenteId.toString());
+    }
     if (serieFiltro) params.append("serie", serieFiltro);
 
     if (saebFiltro === "true") {
@@ -79,21 +121,39 @@ export const ModalBNCC = ({
       const res = await api.get(`/api/bncc?${params.toString()}`);
       if (!res.ok) throw new Error("Erro ao buscar habilidades BNCC");
       const data: unknown = await res.json();
-      setHabilidades(Array.isArray(data) ? (data as HabilidadeBNCC[]) : []);
+      const habilidadesData = Array.isArray(data) ? (data as HabilidadeBNCC[]) : [];
+      setHabilidades(habilidadesData);
+      // Aplica o filtro de pesquisa imediatamente
+      filtrarHabilidades(habilidadesData, pesquisa);
     } catch (error) {
       console.error("Erro ao buscar habilidades BNCC:", error);
       setHabilidades([]);
+      setHabilidadesFiltradas([]);
     }
   };
 
   useEffect(() => {
     fetchSeries();
+    fetchComponentes();
   }, []);
+
+  // Atualiza o filtro quando o componenteCurricularId prop mudar
+  useEffect(() => {
+    if (componenteCurricularId && componenteFiltro === "") {
+      setComponenteFiltro(componenteCurricularId);
+    }
+  }, [componenteCurricularId]);
 
   useEffect(() => {
     fetchHabilidades();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serieFiltro, saebFiltro, componenteCurricularId, refreshKey]);
+  }, [serieFiltro, saebFiltro, componenteFiltro, componenteCurricularId, refreshKey]);
+
+  // Efeito para filtrar habilidades quando a pesquisa mudar
+  useEffect(() => {
+    filtrarHabilidades(habilidades, pesquisa);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pesquisa, habilidades]);
 
   useEffect(() => {
     const fetchNiveisPorBNCC = async () => {
@@ -147,7 +207,9 @@ export const ModalBNCC = ({
       return;
     }
 
-    const escolhida = habilidades.find((h) => h.id === selecionada);
+    // Busca na lista filtrada primeiro, senão na lista completa
+    const escolhida = habilidadesFiltradas.find((h) => h.id === selecionada) || 
+                      habilidades.find((h) => h.id === selecionada);
     const profId = nivelFiltro ? Number(nivelFiltro) : null;
     onSelect(escolhida ? [escolhida] : [], profId);
     onClose();
@@ -155,7 +217,7 @@ export const ModalBNCC = ({
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div className="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl p-8">
+      <div className="bg-white w-full max-w-4xl max-h-screen overflow-y-auto rounded-2xl shadow-2xl p-8">
         <div className="flex justify-between">
         <h2 className="text-2xl font-semibold text-gray-800 inline">
           Selecionar Habilidades da BNCC
@@ -165,7 +227,32 @@ export const ModalBNCC = ({
         onClick={() => setShowCreateHabilidadeModal(true)}>
           Não achou a Habilidade? Cadastre clicando aqui!</button>
         </div>
-        <div className="grid grid-cols-3 gap-4 my-6">
+        
+        {/* Campo de pesquisa */}
+        <div className="my-3">
+          <input
+            type="text"
+            placeholder="Pesquisar por código ou descrição..."
+            value={pesquisa}
+            onChange={(e) => setPesquisa(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6">
+          <select
+            value={componenteFiltro}
+            onChange={(e) => setComponenteFiltro(e.target.value === "" ? "" : Number(e.target.value))}
+            className="p-3 border border-gray-300 rounded-xl text-sm"
+          >
+            <option value="">Todos os Componentes</option>
+            {componentes.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.nome}
+              </option>
+            ))}
+          </select>
+
           <select
             value={serieFiltro}
             onChange={(e) => setSerieFiltro(e.target.value)}
@@ -208,13 +295,15 @@ export const ModalBNCC = ({
           </select>
         </div>
 
-        <div className="border border-gray-200 rounded-xl overflow-y-auto max-h-[300px] mb-2">
-          {habilidades.length === 0 ? (
+        <div className="border border-gray-200 rounded-xl overflow-y-auto max-h-[200px] mb-2">
+          {habilidadesFiltradas.length === 0 ? (
             <p className="text-gray-500 text-sm text-center py-6">
-              Nenhuma habilidade encontrada.
+              {pesquisa.trim() 
+                ? "Nenhuma habilidade encontrada com o termo pesquisado." 
+                : "Nenhuma habilidade encontrada."}
             </p>
           ) : (
-            habilidades.map((h) => (
+            habilidadesFiltradas.map((h) => (
               <div
                 key={h.id}
                 className="p-4 border-b last:border-b-0 flex items-start gap-3 hover:bg-gray-300 transition cursor-pointer"
@@ -237,9 +326,15 @@ export const ModalBNCC = ({
           )}
         </div>
 
-        {selecionada == null && habilidades.length > 0 && (
+        {selecionada == null && habilidadesFiltradas.length > 0 && (
           <p className="text-xs text-red-600 mb-4">
             Selecione uma habilidade para continuar.
+          </p>
+        )}
+        
+        {pesquisa.trim() && habilidadesFiltradas.length > 0 && (
+          <p className="text-xs text-gray-500 mb-4">
+            Mostrando {habilidadesFiltradas.length} de {habilidades.length} habilidade(s)
           </p>
         )}
 

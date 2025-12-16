@@ -64,14 +64,86 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
         : await api.post(`/api/register`, payload);
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || "Erro ao salvar usuário");
+        let errorMessage = "Erro ao salvar usuário";
+        
+        try {
+          // Tenta ler o texto da resposta primeiro
+          const errorText = await res.text();
+          console.error("Erro da API:", errorText);
+          
+          if (errorText && errorText.trim()) {
+            // Tenta parsear como JSON
+            try {
+              const errorData = JSON.parse(errorText);
+              
+              // Verifica diferentes campos possíveis na resposta de erro
+              errorMessage = errorData.error || errorData.message || errorData.detail || errorData.msg || errorText.trim();
+              
+              // Tratamento específico para email duplicado
+              const errorLower = errorMessage.toLowerCase();
+              if (errorLower.includes("email") && (errorLower.includes("já existe") || errorLower.includes("ja existe") || 
+                  errorLower.includes("duplicado") || errorLower.includes("unique") || errorLower.includes("already exists") ||
+                  errorLower.includes("constraint") || errorLower.includes("violation"))) {
+                errorMessage = "Este email já está cadastrado. Por favor, use outro email.";
+              }
+              // Tratamento para senha muito curta
+              else if (errorLower.includes("senha") && (errorLower.includes("curta") || errorLower.includes("mínimo") || 
+                  errorLower.includes("minimum") || errorLower.includes("length"))) {
+                errorMessage = "A senha deve ter pelo menos 6 caracteres.";
+              }
+              // Tratamento para campos obrigatórios
+              else if (errorLower.includes("obrigatório") || errorLower.includes("required") || 
+                      errorLower.includes("campo")) {
+                errorMessage = "Por favor, preencha todos os campos obrigatórios.";
+              }
+              // Tratamento para tipo de usuário inválido
+              else if (errorLower.includes("tipo") && (errorLower.includes("inválido") || errorLower.includes("invalid"))) {
+                errorMessage = "Tipo de usuário inválido. Selecione um tipo válido.";
+              }
+            } catch {
+              // Se não for JSON, verifica se o texto contém informações sobre email duplicado
+              const errorLower = errorText.toLowerCase();
+              if (errorLower.includes("email") && (errorLower.includes("já existe") || errorLower.includes("ja existe") || 
+                  errorLower.includes("duplicado") || errorLower.includes("unique") || errorLower.includes("already exists"))) {
+                errorMessage = "Este email já está cadastrado. Por favor, use outro email.";
+              } else {
+                errorMessage = errorText.trim();
+              }
+            }
+          }
+        } catch (parseError) {
+          console.error("Erro ao ler resposta de erro:", parseError);
+          // Mantém a mensagem padrão se não conseguir ler a resposta
+        }
+        
+        setError(errorMessage);
+        setLoading(false);
+        return;
       }
 
       onSuccess?.();
       onClose();
     } catch (err: any) {
-      setError(err.message);
+      let errorMessage = "Erro ao salvar usuário";
+      
+      // Tratamento para erros de rede
+      if (err.message && err.message.includes("fetch")) {
+        errorMessage = "Erro de conexão. Verifique sua internet e tente novamente.";
+      }
+      // Tratamento para outros erros
+      else if (err instanceof Error && err.message && err.message !== "Erro ao salvar usuário") {
+        errorMessage = err.message;
+        
+        // Verifica se é erro de email duplicado na mensagem
+        const errorLower = errorMessage.toLowerCase();
+        if (errorLower.includes("email") && (errorLower.includes("já existe") || errorLower.includes("ja existe") || 
+            errorLower.includes("duplicado") || errorLower.includes("unique") || errorLower.includes("already exists"))) {
+          errorMessage = "Este email já está cadastrado. Por favor, use outro email.";
+        }
+      }
+      
+      setError(errorMessage);
+      console.error("Erro ao salvar usuário:", err);
     } finally {
       setLoading(false);
     }
