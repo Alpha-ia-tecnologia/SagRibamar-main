@@ -59,14 +59,14 @@ export const SchoolFilter = ({ onFilter }: SchoolFilterProps) => {
           <input
             type="text"
             placeholder="Digite o nome da escola..."
-            className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
+            className="w-full p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
           />
         </div>
 
         <select
-          className="w-full md:w-auto px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
+          className="w-full md:w-auto p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
           value={regiaoId}
           onChange={(e) =>
             setRegiaoId(e.target.value === "" ? "" : parseInt(e.target.value))
@@ -81,7 +81,7 @@ export const SchoolFilter = ({ onFilter }: SchoolFilterProps) => {
         </select>
 
         <select
-          className="w-full md:w-auto px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
+          className="w-full md:w-auto p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
           value={grupoId}
           onChange={(e) =>
             setGrupoId(e.target.value === "" ? "" : parseInt(e.target.value))

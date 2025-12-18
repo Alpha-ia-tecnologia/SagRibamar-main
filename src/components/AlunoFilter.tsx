@@ -98,8 +98,8 @@ export const AlunoFilter = ({ onFilter }: AlunoFilterProps) => {
 
   return (
     <div className="bg-white rounded-lg shadow p-4 mb-6">
-      <h2 className="text-sm font-semibold text-gray-700 mb-3">Buscar Alunos</h2>
-      <div className="flex gap-3 items-end flex-nowrap overflow-x-auto">
+      <h2 className="text-base font-semibold text-gray-700 mb-3">Buscar Alunos</h2>
+      <div className="flex gap-3 items-end flex-wrap">
         <div className="flex items-center flex-1 min-w-[200px] relative">
           <span className="absolute left-3 text-gray-400">
             <i className="fas fa-search" />
@@ -107,14 +107,14 @@ export const AlunoFilter = ({ onFilter }: AlunoFilterProps) => {
           <input
             type="text"
             placeholder="Digite o nome do aluno..."
-            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
           />
         </div>
 
         <select
-          className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[180px] flex-shrink-0"
+          className="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[180px] shrink-0"
           value={escolaId}
           onChange={(e) => setEscolaId(e.target.value === "" ? "" : parseInt(e.target.value))}
         >
@@ -127,7 +127,7 @@ export const AlunoFilter = ({ onFilter }: AlunoFilterProps) => {
         </select>
 
         <select
-          className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[180px] flex-shrink-0"
+          className="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[180px] shrink-0"
           value={turmaId}
           onChange={(e) => setTurmaId(e.target.value === "" ? "" : parseInt(e.target.value))}
         >
@@ -140,7 +140,7 @@ export const AlunoFilter = ({ onFilter }: AlunoFilterProps) => {
         </select>
 
         <select
-          className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[160px] flex-shrink-0"
+          className="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-40 shrink-0"
           value={serieId}
           onChange={(e) => setSerieId(e.target.value === "" ? "" : e.target.value)}
         >
@@ -154,7 +154,7 @@ export const AlunoFilter = ({ onFilter }: AlunoFilterProps) => {
 
         <button
           onClick={handleFilter}
-          className="bg-blue-600 text-white px-5 py-2 rounded-xl hover:bg-blue-700 transition-all duration-200 flex-shrink-0 whitespace-nowrap"
+          className="bg-blue-600 text-white px-5 py-2 rounded-xl hover:bg-blue-700 transition-all duration-200 shrink-0 whitespace-nowrap"
         >
           Filtrar
         </button>

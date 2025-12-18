@@ -95,17 +95,17 @@ export default function TurmasPage() {
 
         <div className="bg-white rounded-xl shadow-md p-6 mb-6">
           <h2 className="text-base font-semibold text-gray-700 mb-4">Buscar Turmas</h2>
-          <div className="flex gap-4 items-end flex-nowrap overflow-x-auto">
+          <div className="flex gap-4 items-end flex-nowrap ">
             <input
               type="text"
               placeholder="Digite o nome da turma..."
-              className="flex-1 min-w-[200px] px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              className="flex-1 min-w-[200px] p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
               value={searchNome}
               onChange={(e) => setSearchNome(e.target.value)}
             />
 
             <select
-              className="px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 min-w-[180px] flex-shrink-0"
+              className="p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 min-w-[180px] shrink-0"
               value={escolaId ?? ""}
               onChange={(e) =>
                 setEscolaId(e.target.value === "" ? null : parseInt(e.target.value))
@@ -121,7 +121,7 @@ export default function TurmasPage() {
             </select>
 
             <select
-              className="px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 min-w-[160px] flex-shrink-0"
+              className="p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 min-w-40 shrink-0"
               value={serieId ?? ""}
               onChange={(e) =>
                 setSerieId(e.target.value === "" ? null : e.target.value)
@@ -137,7 +137,7 @@ export default function TurmasPage() {
 
             <button
               onClick={handleFilter}
-              className="bg-blue-600 text-white px-5 py-2 rounded-xl hover:bg-blue-700 transition-all duration-200 flex-shrink-0 whitespace-nowrap"
+              className="bg-blue-600 text-white px-5 py-2 rounded-xl hover:bg-blue-700 transition-all duration-200 shrink-0 whitespace-nowrap"
             >
               Filtrar
             </button>
