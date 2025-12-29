@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { EditarQuestaoModal } from "./EditQuestaoModal";
 import { CreateQuestoesModal } from "./CreateQuestoesModal";
+import SelectTypeAddQuestao from "./SelectTypeAddQuestao";
 import { useApi } from "../../utils/api";
 import { SquarePen } from "lucide-react";
 
@@ -283,9 +284,10 @@ export const VisualizarProvaModal = ({
         />
       )}
 
-      {showCreateModal && (
-        <CreateQuestoesModal
+      {showCreateModal && prova && (
+        <SelectTypeAddQuestao
           provaId={provaId}
+          tituloProva={prova.nome}
           onClose={() => setShowCreateModal(false)}
           onSuccess={() => {
             setShowCreateModal(false);

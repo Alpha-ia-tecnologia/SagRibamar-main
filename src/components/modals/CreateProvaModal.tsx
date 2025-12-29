@@ -1,15 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CreateQuestoesModal } from "../modals/CreateQuestoesModal";
-
 interface ProvaModalProps {
   provaId: number | null;
+  tituloProva?: string;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export const CreateProvaModal = ({ provaId, onClose, onSuccess }: ProvaModalProps) => {
-  const [titulo, setTitulo] = useState("");
+export const CreateProvaModal = ({ provaId, tituloProva, onClose, onSuccess }: ProvaModalProps) => {
+  const [titulo, setTitulo] = useState(tituloProva || "");
   const [mostrarQuestoesModal, setMostrarQuestoesModal] = useState(false);
+
+  // Se o título vier como prop, abre direto o modal de questões
+  useEffect(() => {
+    if (tituloProva && tituloProva.trim() && !provaId) {
+      setMostrarQuestoesModal(true);
+    }
+  }, [tituloProva, provaId]);
 
   const handleSubmit = () => {
     if (!titulo.trim()) {
@@ -27,6 +34,21 @@ export const CreateProvaModal = ({ provaId, onClose, onSuccess }: ProvaModalProp
   const handleCancelarQuestoes = () => {
     setMostrarQuestoesModal(false);
   };
+
+  // Se o título já foi fornecido, não mostra o formulário, vai direto para questões
+  if (tituloProva && tituloProva.trim() && !provaId) {
+    return (
+      <>
+        {mostrarQuestoesModal && (
+          <CreateQuestoesModal
+            tituloProva={titulo}
+            onClose={onClose}
+            onSuccess={onSuccess}
+          />
+        )}
+      </>
+    );
+  }
 
   return (
     <>
