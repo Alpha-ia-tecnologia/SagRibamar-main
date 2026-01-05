@@ -19,6 +19,7 @@ export default function SelectTypeTest({ onClose, onSuccess }: SelectTypeTestPro
       return;
     }
     setShowModalBanco(true);
+    setProvaId(null)
   };
 
   const handleCriarManual = () => {

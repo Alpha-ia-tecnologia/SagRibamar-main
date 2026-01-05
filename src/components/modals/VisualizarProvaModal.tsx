@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { EditarQuestaoModal } from "./EditQuestaoModal";
-import { CreateQuestoesModal } from "./CreateQuestoesModal";
 import SelectTypeAddQuestao from "./SelectTypeAddQuestao";
 import { useApi } from "../../utils/api";
 import { SquarePen } from "lucide-react";
