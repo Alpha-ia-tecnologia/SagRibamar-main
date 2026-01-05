@@ -9,6 +9,7 @@ interface Escola {
 interface Turma {
   id: number;
   nome: string;
+  serie: string;
 }
 
 interface AlunoFilterProps {
@@ -19,6 +20,7 @@ export const AlunoFilter = ({ onFilter }: AlunoFilterProps) => {
   const [nome, setNome] = useState("");
   const [escolas, setEscolas] = useState<Escola[]>([]);
   const [turmas, setTurmas] = useState<Turma[]>([]);
+  const [seriesDisponiveis, setSeriesDisponiveis] = useState<string[]>([]);
   const [escolaId, setEscolaId] = useState<number | "">("");
   const [turmaId, setTurmaId] = useState<number | "">("");
   const [serieId, setSerieId] = useState<string | "">("");
@@ -63,6 +65,8 @@ export const AlunoFilter = ({ onFilter }: AlunoFilterProps) => {
   useEffect(() => {
     if (escolaId === "") {
       setTurmas([]);
+      setSeriesDisponiveis([]);
+      setSerieId("");
       setTurmaId("");
       return;
     }
@@ -70,11 +74,28 @@ export const AlunoFilter = ({ onFilter }: AlunoFilterProps) => {
     const fetchTurmas = async () => {
       const res = await api.get(`/api/turmas?escola_id=${escolaId}&limit=2000`);
       const data = await res.json();
-      setTurmas(Array.isArray(data.data) ? data.data : data);
+      const turmasData: Turma[] = Array.isArray(data.data) ? data.data : data;
+      setTurmas(turmasData);
+
+      // Extrair séries únicas das turmas da escola
+      const seriesUnicas = [...new Set(turmasData.map(t => t.serie).filter(Boolean))];
+      setSeriesDisponiveis(seriesUnicas);
     };
 
+    setSerieId("");
+    setTurmaId("");
     fetchTurmas();
   }, [escolaId]);
+
+  // Resetar turma quando série mudar
+  useEffect(() => {
+    setTurmaId("");
+  }, [serieId]);
+
+  // Filtrar turmas pela série selecionada
+  const turmasFiltradas = serieId === ""
+    ? turmas
+    : turmas.filter(t => t.serie === serieId);
 
   // Aplica filtro automaticamente quando qualquer valor mudar
   useEffect(() => {
@@ -127,27 +148,27 @@ export const AlunoFilter = ({ onFilter }: AlunoFilterProps) => {
         </select>
 
         <select
-          className="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[180px] shrink-0"
-          value={turmaId}
-          onChange={(e) => setTurmaId(e.target.value === "" ? "" : parseInt(e.target.value))}
-        >
-          <option value="">Todas as turmas</option>
-          {turmas.map((turma) => (
-            <option key={turma.id} value={turma.id}>
-              {turma.nome}
-            </option>
-          ))}
-        </select>
-
-        <select
           className="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-40 shrink-0"
           value={serieId}
           onChange={(e) => setSerieId(e.target.value === "" ? "" : e.target.value)}
         >
           <option value="">Todas as séries</option>
-          {todasSeries.map((serie) => (
+          {(escolaId !== "" ? seriesDisponiveis : todasSeries).map((serie) => (
             <option key={serie} value={serie}>
               {serieNomes[serie]}
+            </option>
+          ))}
+        </select>
+
+        <select
+          className="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[180px] shrink-0"
+          value={turmaId}
+          onChange={(e) => setTurmaId(e.target.value === "" ? "" : parseInt(e.target.value))}
+        >
+          <option value="">Todas as turmas</option>
+          {turmasFiltradas.map((turma) => (
+            <option key={turma.id} value={turma.id}>
+              {turma.nome}
             </option>
           ))}
         </select>

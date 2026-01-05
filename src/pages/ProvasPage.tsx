@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Header } from "../components/Header";
 import { PageHeader } from "../ui/PageHeader";
 import { ProvaList } from "../layout/ProvaList";
-import { CreateProvaModal } from "../components/modals/CreateProvaModal";
 import { VisualizarProvaModal } from "../components/modals/VisualizarProvaModal";
 import Footer from "../components/Footer";
+import SelectTypeTest from "../components/modals/SelectTypeTest";
 
 export default function ProvasPage() {
   const [showModal, setShowModal] = useState(false);
@@ -12,12 +12,6 @@ export default function ProvasPage() {
   const [reload, setReload] = useState(false);
   const [visualizarId, setVisualizarId] = useState<number | null>(null);
   const [modoVisualizacao, setModoVisualizacao] = useState<boolean>(false); 
-
-  const handleSuccess = () => {
-    setShowModal(false);
-    setEditId(null);
-    setReload(true);
-  };
 
   const handleEdit = (id: number) => {
     setEditId(id);
@@ -51,10 +45,12 @@ export default function ProvasPage() {
       </div>
 
       {showModal && (
-        <CreateProvaModal
-          provaId={editId}
+        <SelectTypeTest
           onClose={() => setShowModal(false)}
-          onSuccess={handleSuccess}
+          onSuccess={() => {
+            setShowModal(false);
+            setReload(true);
+          }}
         />
       )}
 
