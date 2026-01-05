@@ -8,7 +8,7 @@ import SelectTypeTest from "../components/modals/SelectTypeTest";
 
 export default function ProvasPage() {
   const [showModal, setShowModal] = useState(false);
-  const [editId, setEditId] = useState<number | null>(null);
+  const [, setEditId] = useState<number | null>(null);
   const [reload, setReload] = useState(false);
   const [visualizarId, setVisualizarId] = useState<number | null>(null);
   const [modoVisualizacao, setModoVisualizacao] = useState<boolean>(false); 
