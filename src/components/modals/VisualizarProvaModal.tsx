@@ -15,6 +15,7 @@ interface Alternativa {
   id: number;
   texto: string;
   correta: boolean;
+  imagem_url?: string;
 }
 
 interface Questao {
@@ -236,7 +237,7 @@ export const VisualizarProvaModal = ({
                     />
                   )}
 
-                  <ul className="space-y-1">
+                  <ul className="space-y-2">
                     {questao.alternativas.map((alt, i) => (
                       <li
                         key={alt.id}
@@ -246,18 +247,31 @@ export const VisualizarProvaModal = ({
                             : ""
                         }`}
                       >
-                        <span className="font-medium mr-2">
-                          {String.fromCharCode(65 + i)}.
-                        </span>
-                        <span 
-                          dangerouslySetInnerHTML={{ __html: alt.texto || '' }}
-                          className="prose prose-sm max-w-none inline"
-                        />
-                        {alt.correta && (
-                          <span className="ml-2 text-green-600 font-semibold text-xs">
-                            (correta)
+                        <div className="flex items-start gap-2">
+                          <span className="font-medium">
+                            {String.fromCharCode(65 + i)}.
                           </span>
-                        )}
+                          <div className="flex-1">
+                            <span
+                              dangerouslySetInnerHTML={{ __html: alt.texto || '' }}
+                              className="prose prose-sm max-w-none inline"
+                            />
+                            {alt.correta && (
+                              <span className="ml-2 text-green-600 font-semibold text-xs">
+                                (correta)
+                              </span>
+                            )}
+                            {alt.imagem_url && (
+                              <img
+                                src={`${
+                                  window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL
+                                }/${alt.imagem_url}`}
+                                alt={`Imagem da alternativa ${String.fromCharCode(65 + i)}`}
+                                className="mt-2 max-h-32 rounded-lg border"
+                              />
+                            )}
+                          </div>
+                        </div>
                       </li>
                     ))}
                   </ul>
