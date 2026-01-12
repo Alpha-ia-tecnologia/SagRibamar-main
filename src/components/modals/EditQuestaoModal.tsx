@@ -13,6 +13,7 @@ interface EditarQuestaoModalProps {
 interface Alternativa {
   texto: string;
   correta: boolean;
+  imagem_url?: string;
 }
 
 interface ComponenteCurricular {
@@ -69,6 +70,7 @@ export const EditarQuestaoModal = ({
   const [imagemUrl, setImagemUrl] = useState("");
   const [imagemPreview, setImagemPreview] = useState("");
   const [alternativas, setAlternativas] = useState<Alternativa[]>([]);
+  const [alternativasImagemPreview, setAlternativasImagemPreview] = useState<string[]>([]);
   const [nivelEnsino, setNivelEnsino] = useState("ANOS_INICIAIS");
   const [serie, setSerie] = useState("PRIMEIRO_ANO");
   const [area, setArea] = useState("Ciências Humanas");
@@ -127,7 +129,15 @@ export const EditarQuestaoModal = ({
               }`
             : ""
         );
-        setAlternativas(data.alternativas || []);
+        const alts = data.alternativas || [];
+        setAlternativas(alts);
+        // Carregar previews das imagens das alternativas existentes
+        const previews = alts.map((alt: Alternativa) =>
+          alt.imagem_url
+            ? `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${alt.imagem_url}`
+            : ""
+        );
+        setAlternativasImagemPreview(previews);
         setNivelEnsino(data.nivel_ensino || "ANOS_INICIAIS");
         setSerie(data.serie || "PRIMEIRO_ANO");
         // A API já retorna a área no formato correto
@@ -236,6 +246,49 @@ export const EditarQuestaoModal = ({
       console.error("Erro inesperado:", err);
       alert("Erro inesperado ao enviar imagem.");
     }
+  };
+
+  const handleAlternativaImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("imagem", file);
+
+    try {
+      const res = await api.post(`/api/upload/questao-imagem`, formData, {
+        headers: {},
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        console.error("Erro ao enviar imagem:", data.message || res.statusText);
+        alert("Erro ao enviar imagem.");
+        return;
+      }
+
+      const novasAlternativas = [...alternativas];
+      novasAlternativas[index].imagem_url = data.imagePath;
+      setAlternativas(novasAlternativas);
+
+      const novosPreviews = [...alternativasImagemPreview];
+      novosPreviews[index] = `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${data.imagePath}`;
+      setAlternativasImagemPreview(novosPreviews);
+    } catch (err) {
+      console.error("Erro inesperado:", err);
+      alert("Erro inesperado ao enviar imagem.");
+    }
+  };
+
+  const removerImagemAlternativa = (index: number) => {
+    const novasAlternativas = [...alternativas];
+    novasAlternativas[index].imagem_url = "";
+    setAlternativas(novasAlternativas);
+
+    const novosPreviews = [...alternativasImagemPreview];
+    novosPreviews[index] = "";
+    setAlternativasImagemPreview(novosPreviews);
   };
 
   const marcarCorreta = (index: number) => {
@@ -426,7 +479,7 @@ export const EditarQuestaoModal = ({
         )}
 
         {alternativas.map((alt, i) => (
-          <div key={i} className="flex items-start gap-3 mb-3">
+          <div key={i} className="flex items-start gap-3 mb-4 p-3 border border-gray-200 rounded-xl bg-gray-50">
             <input
               type="radio"
               name="correta"
@@ -449,6 +502,34 @@ export const EditarQuestaoModal = ({
                   65 + i
                 )}`}
               />
+
+              <div className="mt-2">
+                <label className="block">
+                  <span className="text-xs text-gray-500 mb-1 block">
+                    {alternativasImagemPreview[i] ? "Substituir imagem" : "Adicionar imagem (opcional)"}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleAlternativaImageUpload(e, i)}
+                    className="w-full text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                </label>
+                {alternativasImagemPreview[i] && (
+                  <div className="mt-2">
+                    <div className="relative inline-block w-fit rounded-lg overflow-hidden border">
+                      <img src={alternativasImagemPreview[i]} alt={`Preview alternativa ${String.fromCharCode(65 + i)}`} className="block h-32 w-auto" />
+                      <button
+                        onClick={() => removerImagemAlternativa(i)}
+                        className="absolute top-1 right-1 bg-white text-red-700 rounded-full p-1 shadow-md cursor-pointer border-black border"
+                        title="Apagar imagem"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ))}

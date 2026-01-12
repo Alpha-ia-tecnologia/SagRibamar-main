@@ -14,6 +14,7 @@ interface CreateQuestoesModalProps {
 interface Alternativa {
   texto: string;
   correta: boolean;
+  imagem_url?: string;
 }
 
 interface ComponenteCurricular {
@@ -63,11 +64,12 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
   const [imagemUrl, setImagemUrl] = useState("");
   const [imagemPreview, setImagemPreview] = useState("");
   const [alternativas, setAlternativas] = useState<Alternativa[]>([
-    { texto: "", correta: true },
-    { texto: "", correta: false },
-    { texto: "", correta: false },
-    { texto: "", correta: false },
+    { texto: "", correta: true, imagem_url: "" },
+    { texto: "", correta: false, imagem_url: "" },
+    { texto: "", correta: false, imagem_url: "" },
+    { texto: "", correta: false, imagem_url: "" },
   ]);
+  const [alternativasImagemPreview, setAlternativasImagemPreview] = useState<string[]>(["", "", "", ""]);
 
   const [nivelEnsino, setNivelEnsino] = useState("ANOS_INICIAIS");
   const [serie, setSerie] = useState("PRIMEIRO_ANO");
@@ -163,16 +165,72 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     }
   };
 
+  const handleAlternativaImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("imagem", file);
+
+    try {
+      const res = await api.post(`/api/upload/questao-imagem`, formData, {
+        headers: {},
+      });
+
+      const contentType = res.headers.get("content-type");
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Erro ao enviar imagem:", errorText);
+        alert("Erro ao enviar imagem.");
+        return;
+      }
+
+      if (contentType?.includes("application/json")) {
+        const data = await res.json();
+        if (data.success && data.imagePath) {
+          const novasAlternativas = [...alternativas];
+          novasAlternativas[index].imagem_url = data.imagePath;
+          setAlternativas(novasAlternativas);
+
+          const novosPreviews = [...alternativasImagemPreview];
+          novosPreviews[index] = `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${data.imagePath}`;
+          setAlternativasImagemPreview(novosPreviews);
+        } else {
+          alert("Erro no upload: " + (data.message || "Resposta inválida"));
+        }
+      } else {
+        const text = await res.text();
+        console.error("Resposta inesperada:", text);
+        alert("Resposta inesperada ao enviar imagem.");
+      }
+    } catch (err) {
+      console.error("Erro no upload da imagem:", err);
+      alert("Erro inesperado ao enviar imagem.");
+    }
+  };
+
+  const removerImagemAlternativa = (index: number) => {
+    const novasAlternativas = [...alternativas];
+    novasAlternativas[index].imagem_url = "";
+    setAlternativas(novasAlternativas);
+
+    const novosPreviews = [...alternativasImagemPreview];
+    novosPreviews[index] = "";
+    setAlternativasImagemPreview(novosPreviews);
+  };
+
   const limparFormulario = () => {
     setEnunciado("");
     setImagemUrl("");
     setImagemPreview("");
     setAlternativas([
-      { texto: "", correta: true },
-      { texto: "", correta: false },
-      { texto: "", correta: false },
-      { texto: "", correta: false },
+      { texto: "", correta: true, imagem_url: "" },
+      { texto: "", correta: false, imagem_url: "" },
+      { texto: "", correta: false, imagem_url: "" },
+      { texto: "", correta: false, imagem_url: "" },
     ]);
+    setAlternativasImagemPreview(["", "", "", ""]);
     setNivelEnsino("ANOS_INICIAIS");
     setSerie("PRIMEIRO_ANO");
     setArea("Linguagens");
@@ -182,7 +240,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     setHabilidadesSelecionadas([]);
     setProficienciaSaebId(null);
     setFoiSalva(false);
-    
+
     // Atualizar próximo número quando adicionar nova questão
     if (provaCriada) {
       buscarProximoNumero(provaCriada);
@@ -368,7 +426,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
         )}
 
         {alternativas.map((alt, i) => (
-          <div key={i} className="flex items-start gap-3 mb-3">
+          <div key={i} className="flex items-start gap-3 mb-4 p-3 border border-gray-200 rounded-xl bg-gray-100">
             <input
               type="radio"
               name="correta"
@@ -379,16 +437,44 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
             <div className="flex-1">
               <label className="text-sm font-medium text-gray-700 mb-1 block">
                 Alternativa {String.fromCharCode(65 + i)}
-              </label>           
-                <RichTextEditor
-                  value={alt.texto}
-                  onChange={(value) => {
-                    const novas = [...alternativas];
-                    novas[i].texto = value;
-                    setAlternativas(novas);
-                  }}
-                  placeholder={`Digite a alternativa ${String.fromCharCode(65 + i)}`}
-                />
+              </label>
+              <RichTextEditor
+                value={alt.texto}
+                onChange={(value) => {
+                  const novas = [...alternativas];
+                  novas[i].texto = value;
+                  setAlternativas(novas);
+                }}
+                placeholder={`Digite a alternativa ${String.fromCharCode(65 + i)}`}
+              />
+
+              <div className="mt-2">
+                <label className="block">
+                  <span className="text-xs text-gray-500 mb-1 block">
+                    {alternativasImagemPreview[i] ? "Substituir imagem" : "Adicionar imagem (opcional)"}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleAlternativaImageUpload(e, i)}
+                    className="w-full text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                </label>
+                {alternativasImagemPreview[i] && (
+                  <div className="mt-2">
+                    <div className="relative inline-block w-fit rounded-lg overflow-hidden border">
+                      <img src={alternativasImagemPreview[i]} alt={`Preview alternativa ${String.fromCharCode(65 + i)}`} className="block h-32 w-auto" />
+                      <button
+                        onClick={() => removerImagemAlternativa(i)}
+                        className="absolute top-1 right-1 bg-white text-red-700 rounded-full p-1 shadow-md cursor-pointer border-black border"
+                        title="Apagar imagem"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ))}
