@@ -14,7 +14,7 @@ export const FiltroAvaliacoes = () => {
   const [escolaId, setEscolaId] = useState("");
   const [serie, setSerie] = useState("");
   const [turmaId, setTurmaId] = useState("");
-  const [provaId, setProvaId] = useState("");
+  const [provaIds, setProvaIds] = useState<string[]>([]);
   const [filtro, setFiltro] = useState("acertos");
 
   const { setFiltros } = useFiltroDashboard();
@@ -26,7 +26,7 @@ export const FiltroAvaliacoes = () => {
       escolaId,
       serie,
       turmaId,
-      provaId,
+      provaId: provaIds.join(","),
       filtro,
     });
   };
@@ -41,14 +41,16 @@ export const FiltroAvaliacoes = () => {
         <SelectEscola regiaoId={regiaoId} grupoId={grupoId} value={escolaId} onChange={setEscolaId} />
         <SelectSerie escolaId={escolaId} value={serie} onChange={setSerie} />
         <SelectTurma escolaId={escolaId} serie={serie} value={turmaId} onChange={setTurmaId} />
-        <SelectProvas value={provaId} onChange={setProvaId} />
+        <SelectProvas value={provaIds} onChange={setProvaIds} />
         <SelectResultado value={filtro} onChange={setFiltro} />
-        <button
-          onClick={handleAplicarFiltros}
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Aplicar Filtros
-        </button>
+        <div className="flex items-end">
+          <button
+            onClick={handleAplicarFiltros}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Aplicar Filtros
+          </button>
+        </div>
       </div>
     </div>
   );
