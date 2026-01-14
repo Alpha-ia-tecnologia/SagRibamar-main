@@ -201,6 +201,11 @@ export const TabelaHabilidadesBNCC = () => {
     fetchData();
   }, [page, filtros, filtroOrdem]);
 
+  // Reseta a paginação para página 1 quando os filtros do dashboard mudarem
+  useEffect(() => {
+    setPage(1);
+  }, [filtros]);
+
   const renderPagination = () => {
     const pagesToShow = [];
     const startPage = Math.max(2, page - 1);

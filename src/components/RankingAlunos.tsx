@@ -71,6 +71,11 @@ export const RankingAlunos = () => {
     fetchData();
   }, [page, filtros]);
 
+  // Reseta a paginação para página 1 quando os filtros mudarem
+  useEffect(() => {
+    setPage(1);
+  }, [filtros]);
+
   const renderPagination = () => {
     const buttons = [];
     const delta = 2;

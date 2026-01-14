@@ -132,6 +132,11 @@ export const TurmaList = ({
     fetchTurmas();
   }, [page, searchNome, escolaId, serieId]);
 
+  // Reseta a paginação para página 1 quando os filtros mudarem
+  useEffect(() => {
+    setPage(1);
+  }, [searchNome, escolaId, serieId]);
+
   useEffect(() => {
     if (reload) {
       fetchTurmas().then(() => onReloadDone?.());
