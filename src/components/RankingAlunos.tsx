@@ -149,7 +149,7 @@ export const RankingAlunos = () => {
                 <th className="px-4 py-3">Escola</th>
                 <th className="px-4 py-3">Turma</th>
                 <th className="px-4 py-3">Desempenho</th>
-                <th className="px-4 py-3">Notas</th>
+                <th className="px-4 py-3">Maior Nota</th>
               </tr>
             </thead>
 
