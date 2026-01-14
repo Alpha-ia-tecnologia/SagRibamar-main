@@ -17,7 +17,7 @@ interface Aluno {
   grupo_nome: string;
   total_desempenhos: number;
   media_geral: number;
-  maior_nota: number;
+  maior_nota: string;
   menor_nota: number;
 }
 
