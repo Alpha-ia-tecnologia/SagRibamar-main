@@ -176,7 +176,7 @@ export const RankingAlunos = () => {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-gray-600">
-                      {aluno.maior_nota} / {aluno.menor_nota}
+                      {aluno.maior_nota} / 10
                     </td>
                   </tr>
                 );
