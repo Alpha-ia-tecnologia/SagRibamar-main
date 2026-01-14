@@ -72,6 +72,11 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
     fetchEscolas();
   }, [page, searchNome, regiaoId, grupoId]);
 
+  // Reseta a paginação para página 1 quando os filtros mudarem
+  useEffect(() => {
+    setPage(1);
+  }, [searchNome, regiaoId, grupoId]);
+
   useEffect(() => {
     if (reload) {
       fetchEscolas().then(() => onReloadDone?.());

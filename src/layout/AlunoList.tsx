@@ -72,7 +72,12 @@ export const AlunoList = ({
 
   useEffect(() => {
     fetchAlunos();
-  }, [page, searchNome, escolaId, turmaId, serieId]); 
+  }, [page, searchNome, escolaId, turmaId, serieId]);
+
+  // Reseta a paginação para página 1 quando os filtros mudarem
+  useEffect(() => {
+    setPage(1);
+  }, [searchNome, escolaId, turmaId, serieId]);
 
   useEffect(() => {
     if (reload) {
