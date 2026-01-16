@@ -22,6 +22,8 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [tipoUsuario, setTipoUsuario] = useState("");
+  const [ativo, setAtivo] = useState(true);
+  const [dataExpiracao, setDataExpiracao] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const api = useApi();
@@ -38,6 +40,8 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
         setNome(data.nome || "");
         setEmail(data.email || "");
         setTipoUsuario(data.tipo_usuario || "");
+        setAtivo(data.ativo !== undefined ? data.ativo : true);
+        setDataExpiracao(data.data_expiracao || "");
       } catch (err: any) {
         setError(err.message || "Erro ao carregar usuário");
       }
@@ -56,6 +60,8 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
       email,
       senha,
       tipo_usuario: tipoUsuario,
+      ativo,
+      data_expiracao: dataExpiracao || null,
     };
 
     try {
@@ -222,6 +228,43 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
                 </option>
               ))}
             </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">
+              Válido até
+            </label>
+            <input
+              type="date"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              value={dataExpiracao}
+              onChange={(e) => setDataExpiracao(e.target.value)}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Deixe em branco para acesso sem prazo de expiração
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-gray-700">
+              Status do Usuário
+            </label>
+            <button
+              type="button"
+              onClick={() => setAtivo(!ativo)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                ativo ? "bg-green-500" : "bg-gray-300"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  ativo ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+            <span className={`text-sm font-medium ${ativo ? "text-green-600" : "text-gray-500"}`}>
+              {ativo ? "Ativo" : "Inativo"}
+            </span>
           </div>
 
           {error && <p className="text-red-600 text-sm">{error}</p>}
