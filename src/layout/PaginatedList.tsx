@@ -12,6 +12,12 @@ import {
 } from "@heroicons/react/24/outline";
 import { UsersIcon as UsersSolid } from "@heroicons/react/24/solid";
 
+interface StatusConta {
+  status: "ativo" | "expirado" | "expirando" | "desativado";
+  mensagem: string;
+  tipo: string;
+}
+
 interface Usuario {
   id: number;
   nome: string;
@@ -19,6 +25,7 @@ interface Usuario {
   tipo_usuario: string;
   ativo?: boolean;
   data_expiracao?: string;
+  status_conta?: StatusConta;
 }
 
 interface PaginatedListProps {
@@ -79,14 +86,22 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
     const rota = usuario.ativo ? "desativar" : "ativar";
 
     try {
-      const res = await api.put(`/api/usuarios/${rota}/${id}`, {});
+      const res = await api.patch(`/api/usuarios/${rota}/${id}`, {});
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || `Erro ao ${rota} usuário`);
+        const text = await res.text();
+        let errorMessage = `Erro ao ${rota} usuário`;
+        try {
+          const data = JSON.parse(text);
+          errorMessage = data.message || errorMessage;
+        } catch {
+          if (text && !text.includes("<!DOCTYPE")) {
+            errorMessage = text;
+          }
+        }
+        throw new Error(errorMessage);
       }
 
-      // Atualiza a lista apos sucesso
       fetchUsuarios();
     } catch (err: any) {
       alert(err.message || `Erro ao ${rota} usuário.`);
@@ -168,6 +183,7 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
                 tipo_usuario={usuario.tipo_usuario}
                 ativo={usuario.ativo !== undefined ? usuario.ativo : true}
                 data_expiracao={usuario.data_expiracao}
+                status_conta={usuario.status_conta}
                 index={index}
                 onEdit={() => setEditingUserId(usuario.id)}
                 onDelete={() => {

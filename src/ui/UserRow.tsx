@@ -2,12 +2,19 @@ import { Badge } from "../components/Badge";
 import { IconButton } from "../components/IconButton";
 import { EnvelopeIcon, ClockIcon } from "@heroicons/react/24/outline";
 
+type StatusConta = {
+  status: "ativo" | "expirado" | "expirando" | "desativado";
+  mensagem: string;
+  tipo: string;
+};
+
 type UserRowProps = {
   nome: string;
   email: string;
   tipo_usuario: string;
   ativo?: boolean;
   data_expiracao?: string;
+  status_conta?: StatusConta;
   onEdit: () => void;
   onDelete: () => void;
   onToggleStatus?: () => void;
@@ -19,7 +26,7 @@ export const UserRow = ({
   email,
   tipo_usuario,
   ativo = true,
-  data_expiracao,
+  status_conta,
   onEdit,
   onDelete,
   onToggleStatus,
@@ -34,27 +41,25 @@ export const UserRow = ({
     return name.slice(0, 2).toUpperCase();
   };
 
-  // Funcao para calcular tempo restante
-  const getTempoRestante = (dataExp: string | undefined) => {
-    if (!dataExp) return null;
+  // Funcao para obter estilo do status baseado na API
+  const getStatusStyle = (status: StatusConta | undefined) => {
+    if (!status) return null;
 
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-    const expiracao = new Date(dataExp);
-    expiracao.setHours(0, 0, 0, 0);
+    const cores: Record<string, string> = {
+      ativo: "text-green-600 bg-green-50",
+      expirando: "text-amber-600 bg-amber-50",
+      expirado: "text-red-600 bg-red-50",
+      desativado: "text-gray-600 bg-gray-100",
+    };
 
-    const diffTime = expiracao.getTime() - hoje.getTime();
-    const diffDias = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDias < 0) return { texto: "Expirado", cor: "text-red-600 bg-red-50" };
-    if (diffDias === 0) return { texto: "Expira hoje", cor: "text-red-600 bg-red-50" };
-    if (diffDias === 1) return { texto: "Expira amanhã", cor: "text-amber-600 bg-amber-50" };
-    if (diffDias <= 7) return { texto: `${diffDias} dias restantes`, cor: "text-amber-600 bg-amber-50" };
-    if (diffDias <= 30) return { texto: `${diffDias} dias restantes`, cor: "text-yellow-600 bg-yellow-50" };
-    return { texto: `${diffDias} dias restantes`, cor: "text-green-600 bg-green-50" };
+    return {
+      texto: status.mensagem,
+      cor: cores[status.status] || "text-gray-600 bg-gray-100",
+      status: status.status,
+    };
   };
 
-  const tempoRestante = getTempoRestante(data_expiracao);
+  const statusInfo = getStatusStyle(status_conta);
 
   return (
     <div className="group px-6 py-4 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-transparent transition-all duration-200">
@@ -83,19 +88,27 @@ export const UserRow = ({
         </div>
 
         <div className="flex items-center gap-4">
-          {/* Tempo Disponivel */}
-          {tempoRestante && (
-            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${tempoRestante.cor}`}>
+          {/* Status da Conta (mensagem da API) */}
+          {statusInfo && statusInfo.texto && (
+            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${statusInfo.cor}`}>
               <ClockIcon className="w-3.5 h-3.5" />
-              <span>{tempoRestante.texto}</span>
+              <span>{statusInfo.texto}</span>
             </div>
           )}
 
-          {/* Status Badge */}
+          {/* Status Badge baseado no status_conta da API */}
           <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+            statusInfo?.status === "ativo" ? "bg-green-100 text-green-700" :
+            statusInfo?.status === "expirando" ? "bg-amber-100 text-amber-700" :
+            statusInfo?.status === "expirado" ? "bg-red-100 text-red-700" :
+            statusInfo?.status === "desativado" ? "bg-gray-200 text-gray-700" :
             ativo ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
           }`}>
-            {ativo ? "Ativo" : "Inativo"}
+            {statusInfo?.status === "ativo" ? "Ativo" :
+             statusInfo?.status === "expirando" ? "Expirando" :
+             statusInfo?.status === "expirado" ? "Expirado" :
+             statusInfo?.status === "desativado" ? "Desativado" :
+             ativo ? "Ativo" : "Inativo"}
           </span>
 
           <Badge text={tipo_usuario} />

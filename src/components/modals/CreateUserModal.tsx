@@ -41,7 +41,14 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
         setEmail(data.email || "");
         setTipoUsuario(data.tipo_usuario || "");
         setAtivo(data.ativo !== undefined ? data.ativo : true);
-        setDataExpiracao(data.data_expiracao || "");
+        // Formata a data ISO para YYYY-MM-DD (formato do input date)
+        if (data.data_expiracao) {
+          const date = new Date(data.data_expiracao);
+          const formatted = date.toISOString().split('T')[0];
+          setDataExpiracao(formatted);
+        } else {
+          setDataExpiracao("");
+        }
       } catch (err: any) {
         setError(err.message || "Erro ao carregar usuário");
       }
@@ -55,13 +62,18 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
     setLoading(true);
     setError("");
 
+    // Converte a data para formato ISO se houver valor
+    const dataExpiracaoISO = dataExpiracao
+      ? new Date(dataExpiracao + "T00:00:00").toISOString()
+      : null;
+
     const payload = {
       nome,
       email,
       senha,
       tipo_usuario: tipoUsuario,
       ativo,
-      data_expiracao: dataExpiracao || null,
+      data_expiracao: dataExpiracaoISO,
     };
 
     try {
