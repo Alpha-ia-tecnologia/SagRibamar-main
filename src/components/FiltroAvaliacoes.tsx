@@ -12,9 +12,9 @@ export const FiltroAvaliacoes = () => {
   const [regiaoId, setRegiaoId] = useState("");
   const [grupoId, setGrupoId] = useState("");
   const [escolaId, setEscolaId] = useState("");
-  const [serie, setSerie] = useState("");
+  const [series, setSeries] = useState<string[]>([]);
   const [turmaId, setTurmaId] = useState("");
-  const [provaId, setProvaId] = useState("");
+  const [provaIds, setProvaIds] = useState<string[]>([]);
   const [filtro, setFiltro] = useState("acertos");
 
   const { setFiltros } = useFiltroDashboard();
@@ -24,11 +24,22 @@ export const FiltroAvaliacoes = () => {
       regiaoId,
       grupoId,
       escolaId,
-      serie,
+      serie: series.join(","),
       turmaId,
-      provaId,
+      provaId: provaIds.join(","),
       filtro,
     });
+  };
+
+  const handleResetarFiltros = () => {
+    setRegiaoId("");
+    setGrupoId("");
+    setEscolaId("");
+    setSeries([]);
+    setTurmaId("");
+    setProvaIds([]);
+    setFiltro("acertos");
+    setFiltros({});
   };
 
   return (
@@ -39,16 +50,24 @@ export const FiltroAvaliacoes = () => {
         <SelectRegiao value={regiaoId} onChange={setRegiaoId} />
         <SelectGrupo regiaoId={regiaoId} value={grupoId} onChange={setGrupoId} />
         <SelectEscola regiaoId={regiaoId} grupoId={grupoId} value={escolaId} onChange={setEscolaId} />
-        <SelectSerie escolaId={escolaId} value={serie} onChange={setSerie} />
-        <SelectTurma escolaId={escolaId} serie={serie} value={turmaId} onChange={setTurmaId} />
-        <SelectProvas value={provaId} onChange={setProvaId} />
+        <SelectSerie escolaId={escolaId} value={series} onChange={setSeries} />
+        <SelectTurma escolaId={escolaId} serie={series.join(",")} value={turmaId} onChange={setTurmaId} />
+        <SelectProvas value={provaIds} onChange={setProvaIds} />
         <SelectResultado value={filtro} onChange={setFiltro} />
-        <button
-          onClick={handleAplicarFiltros}
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Aplicar Filtros
-        </button>
+        <div className="flex items-end gap-2">
+          <button
+            onClick={handleAplicarFiltros}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Aplicar Filtros
+          </button>
+          <button
+            onClick={handleResetarFiltros}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+          >
+            Resetar Filtros
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -14,3 +14,244 @@ body {
  padding: 0;
  box-sizing: border-box;
 }
+
+/* Estilos para renderização de conteúdo HTML do Quill */
+.prose h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0.67em 0;
+}
+
+.prose h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.75em 0;
+}
+
+.prose h3 {
+  font-size: 1.17em;
+  font-weight: bold;
+  margin: 0.83em 0;
+}
+
+.prose blockquote {
+  margin: 1em 0;
+  padding-left: 1em;
+  border-left: 4px solid #ccc;
+  font-style: italic;
+}
+
+.prose a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.prose a:hover {
+  color: #1d4ed8;
+}
+
+/* Alinhamento de texto - suportar tanto classes Quill quanto atributos style */
+.prose [style*="text-align: center"],
+.prose [style*="text-align:center"],
+.prose .ql-align-center,
+.ql-align-center,
+.prose [class*="ql-align-center"] {
+  text-align: center !important;
+}
+
+.prose [style*="text-align: right"],
+.prose [style*="text-align:right"],
+.prose .ql-align-right,
+.ql-align-right,
+.prose [class*="ql-align-right"] {
+  text-align: right !important;
+}
+
+.prose [style*="text-align: left"],
+.prose [style*="text-align:left"],
+.prose .ql-align-left,
+.ql-align-left,
+.prose [class*="ql-align-left"] {
+  text-align: left !important;
+}
+
+.prose [style*="text-align: justify"],
+.prose [style*="text-align:justify"],
+.prose .ql-align-justify,
+.ql-align-justify,
+.prose [class*="ql-align-justify"] {
+  text-align: justify !important;
+}
+
+/* Aplicar alinhamento também em elementos filhos */
+.prose p[style*="text-align"],
+.prose div[style*="text-align"],
+.prose span[style*="text-align"],
+.prose p[class*="ql-align"],
+.prose div[class*="ql-align"],
+.prose span[class*="ql-align"] {
+  display: block;
+}
+
+.prose u {
+  text-decoration: underline;
+}
+
+.prose s,
+.prose strike {
+  text-decoration: line-through;
+}
+
+/* Estilos para listas apenas no conteúdo do Quill (visualização) */
+/* Listas não ordenadas - garantir que sempre apareçam com disc (bolinhas) */
+.prose ul,
+.prose ul[class*="ql-"],
+.prose ul[class*="bullet"],
+.prose ul[data-list="bullet"] {
+  margin: 1em 0;
+  padding-left: 2em;
+  list-style-type: disc !important;
+}
+
+/* Listas ordenadas - garantir que sempre apareçam com decimal (números) */
+.prose ol,
+.prose ol[class*="ql-"],
+.prose ol[class*="ordered"],
+.prose ol[data-list="ordered"] {
+  margin: 1em 0;
+  padding-left: 2em;
+  list-style-type: decimal !important;
+}
+
+.prose li {
+  margin: 0.5em 0;
+  display: list-item;
+}
+
+/* Estilos para listas no editor Quill */
+/* Listas não ordenadas - garantir disc (bolinhas) */
+.ql-editor ul,
+.ql-container ul,
+.ql-editor ul[class*="bullet"],
+.ql-container ul[class*="bullet"],
+.ql-editor ul[data-list="bullet"],
+.ql-container ul[data-list="bullet"] {
+  list-style-type: disc !important;
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+/* Listas ordenadas - garantir decimal (números) */
+.ql-editor ol,
+.ql-container ol,
+.ql-editor ol[class*="ordered"],
+.ql-container ol[class*="ordered"],
+.ql-editor ol[data-list="ordered"],
+.ql-container ol[data-list="ordered"] {
+  list-style-type: decimal !important;
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.ql-editor li,
+.ql-container li {
+  display: list-item;
+  margin: 0.25em 0;
+}
+
+/* Garantir alinhamento no editor Quill */
+.ql-editor [class*="ql-align-center"],
+.ql-editor [style*="text-align: center"],
+.ql-container [class*="ql-align-center"],
+.ql-container [style*="text-align: center"] {
+  text-align: center !important;
+}
+
+.ql-editor [class*="ql-align-right"],
+.ql-editor [style*="text-align: right"],
+.ql-container [class*="ql-align-right"],
+.ql-container [style*="text-align: right"] {
+  text-align: right !important;
+}
+
+.ql-editor [class*="ql-align-justify"],
+.ql-editor [style*="text-align: justify"],
+.ql-container [class*="ql-align-justify"],
+.ql-container [style*="text-align: justify"] {
+  text-align: justify !important;
+}
+
+/* Garantir que elementos com alinhamento do Quill funcionem globalmente */
+/* Alinhamento center */
+[class*="ql-align-center"],
+[style*="text-align: center"],
+[style*="text-align:center"],
+p[class*="ql-align-center"],
+div[class*="ql-align-center"],
+span[class*="ql-align-center"],
+p[style*="text-align: center"],
+div[style*="text-align: center"],
+span[style*="text-align: center"] {
+  text-align: center !important;
+}
+
+/* Alinhamento right */
+[class*="ql-align-right"],
+[style*="text-align: right"],
+[style*="text-align:right"],
+p[class*="ql-align-right"],
+div[class*="ql-align-right"],
+span[class*="ql-align-right"],
+p[style*="text-align: right"],
+div[style*="text-align: right"],
+span[style*="text-align: right"] {
+  text-align: right !important;
+}
+
+/* Alinhamento left */
+[class*="ql-align-left"],
+[style*="text-align: left"],
+[style*="text-align:left"],
+p[class*="ql-align-left"],
+div[class*="ql-align-left"],
+span[class*="ql-align-left"],
+p[style*="text-align: left"],
+div[style*="text-align: left"],
+span[style*="text-align: left"] {
+  text-align: left !important;
+}
+
+/* Alinhamento justify */
+[class*="ql-align-justify"],
+[style*="text-align: justify"],
+[style*="text-align:justify"],
+p[class*="ql-align-justify"],
+div[class*="ql-align-justify"],
+span[class*="ql-align-justify"],
+p[style*="text-align: justify"],
+div[style*="text-align: justify"],
+span[style*="text-align: justify"] {
+  text-align: justify !important;
+}
+
+/* Estilos do Tiptap Editor */
+.ProseMirror {
+  min-height: 100px;
+  outline: none;
+}
+
+.ProseMirror p {
+  margin: 0;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.ProseMirror-focused {
+  outline: none;
+}

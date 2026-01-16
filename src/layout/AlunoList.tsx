@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { IconButton } from "../components/IconButton";
+import { useApi } from "../utils/api";
+import { ConfirmDialog } from "../components/modals/ConfirmDialog";
 
 interface Turma {
   id: number;
@@ -25,7 +27,8 @@ interface AlunoListProps {
   onEdit?: (id: number) => void;
   searchNome: string;
   escolaId: number | null;
-  turmaId: number | null; // ⬅️ Adicionado
+  turmaId: number | null;
+  serieId: string | null;
 }
 
 export const AlunoList = ({
@@ -35,11 +38,15 @@ export const AlunoList = ({
   searchNome,
   escolaId,
   turmaId,
+  serieId,
 }: AlunoListProps) => {
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [confirmationDelete, setConfirmationDelete] = useState(false);
+  const [alunoIdSelecionado, setAlunoIdSelecionado] = useState<number | null>(null);
+  const api = useApi();
 
   const fetchAlunos = async () => {
     try {
@@ -50,10 +57,9 @@ export const AlunoList = ({
       if (searchNome.trim() !== "") queryParams.append("nome", searchNome);
       if (escolaId !== null) queryParams.append("escola_id", String(escolaId));
       if (turmaId !== null) queryParams.append("turma_id", String(turmaId));
+      if (serieId !== null) queryParams.append("serie", serieId);
 
-      const res = await fetch(
-        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/alunos?${queryParams.toString()}`
-      );
+      const res = await api.get(`/api/alunos?${queryParams.toString()}`);
 
       const data = await res.json();
       setAlunos(data.data || []);
@@ -66,7 +72,12 @@ export const AlunoList = ({
 
   useEffect(() => {
     fetchAlunos();
-  }, [page, searchNome, escolaId, turmaId]); 
+  }, [page, searchNome, escolaId, turmaId, serieId]);
+
+  // Reseta a paginação para página 1 quando os filtros mudarem
+  useEffect(() => {
+    setPage(1);
+  }, [searchNome, escolaId, turmaId, serieId]);
 
   useEffect(() => {
     if (reload) {
@@ -75,13 +86,8 @@ export const AlunoList = ({
   }, [reload, onReloadDone]);
 
   const handleDelete = async (id: number) => {
-    const confirmDelete = window.confirm("Deseja excluir este aluno?");
-    if (!confirmDelete) return;
-
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/alunos/${id}`, {
-        method: "DELETE",
-      });
+      const res = await api.delete(`/api/alunos/${id}`);
 
       if (!res.ok) throw new Error("Erro ao excluir");
 
@@ -146,7 +152,12 @@ export const AlunoList = ({
           </div>
           <div className="flex gap-3">
             <IconButton type="edit" onClick={() => onEdit?.(aluno.id)} />
-            <IconButton type="delete" onClick={() => handleDelete(aluno.id)} />
+            <IconButton 
+            type="delete" 
+            onClick={() => {
+              setAlunoIdSelecionado(aluno.id);
+              setConfirmationDelete(true);
+            }} />
           </div>
         </div>
       ))}
@@ -196,6 +207,29 @@ export const AlunoList = ({
           >
             &gt;
           </button>
+
+          {confirmationDelete && (
+            <ConfirmDialog
+              isOpen={confirmationDelete}
+              title="Tem certeza que deseja excluir esse aluno?"
+              description="Ao excluir o aluno, todas as informações relacionadas a ele serão perdidas."
+              warning="Essa ação não poderá ser desfeita."
+              confirmText="Excluir"
+              cancelText="Cancelar"
+              onConfirm= {() => {
+                if (alunoIdSelecionado !== null) {
+                  handleDelete(alunoIdSelecionado);
+                  setAlunoIdSelecionado(null);
+                  setConfirmationDelete(false);
+                }
+              }}
+              onCancel={() => {
+                setConfirmationDelete(false);
+                setAlunoIdSelecionado(null);
+              }}
+              />
+          )}
+
         </div>
       </div>
     </div>

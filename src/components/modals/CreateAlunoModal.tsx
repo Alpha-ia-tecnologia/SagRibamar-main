@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useApi } from "../../utils/api";
 
 interface CreateAlunoModalProps {
   alunoId: number | null;
@@ -23,17 +24,18 @@ export const CreateAlunoModal = ({ alunoId, onClose, onSuccess }: CreateAlunoMod
   const [turmaId, setTurmaId] = useState<number | "">("");
   const [escolas, setEscolas] = useState<Escola[]>([]);
   const [loading, setLoading] = useState(false);
+  const api = useApi();
 
   useEffect(() => {
     const fetchEscolas = async () => {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas?limit=9000`);
+      const res = await api.get(`/api/escolas?limit=9000`);
       const data = await res.json();
       const lista = Array.isArray(data) ? data : data.data;
       setEscolas(Array.isArray(lista) ? lista : []);
     };
 
     fetchEscolas();
-  }, []);
+  }, [api]);
 
   useEffect(() => {
     if (escolaId === "") {
@@ -43,9 +45,7 @@ export const CreateAlunoModal = ({ alunoId, onClose, onSuccess }: CreateAlunoMod
     }
 
     const fetchTurmas = async () => {
-      const res = await fetch(
-        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/turmas?escola_id=${escolaId}&limit=9000`
-      );
+      const res = await api.get(`/api/turmas?escola_id=${escolaId}&limit=9000`);
       const data = await res.json();
       const lista = Array.isArray(data) ? data : data.data;
       setTurmas(Array.isArray(lista) ? lista : []);
@@ -57,7 +57,7 @@ export const CreateAlunoModal = ({ alunoId, onClose, onSuccess }: CreateAlunoMod
   useEffect(() => {
     if (alunoId !== null) {
       const fetchAluno = async () => {
-        const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/alunos/${alunoId}`);
+        const res = await api.get(`/api/alunos/${alunoId}`);
         const data = await res.json();
         setNome(data.nome || "");
         setEscolaId(data.escola_id || "");
@@ -65,7 +65,7 @@ export const CreateAlunoModal = ({ alunoId, onClose, onSuccess }: CreateAlunoMod
 
         // Força atualização das turmas após obter a escola
         if (data.escola_id) {
-          const turmasRes = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/turmas?escola_id=${data.escola_id}&limit=9000`);
+          const turmasRes = await api.get(`/api/turmas?escola_id=${data.escola_id}&limit=9000`);
           const turmasData = await turmasRes.json();
           const lista = Array.isArray(turmasData) ? turmasData : turmasData.data;
           setTurmas(Array.isArray(lista) ? lista : []);
@@ -89,24 +89,47 @@ export const CreateAlunoModal = ({ alunoId, onClose, onSuccess }: CreateAlunoMod
     };
 
     try {
-      const res = await fetch(
-        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/alunos${alunoId ? `/${alunoId}` : ""}`,
-        {
-          method: alunoId ? "PUT" : "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const res = alunoId 
+        ? await api.put(`/api/alunos/${alunoId}`, payload)
+        : await api.post(`/api/alunos`, payload);
 
       if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Erro da API:", errorText);
-        throw new Error("Erro ao salvar aluno");}
+        let errorMessage = "Erro ao salvar aluno";
+        
+        try {
+          const errorText = await res.text();
+          console.error("Erro da API:", errorText);
+          
+          if (errorText && errorText.trim()) {
+            // Tenta parsear como JSON
+            try {
+              const errorData = JSON.parse(errorText);
+              // A API retorna { "error": "mensagem" }
+              errorMessage = errorData.error || errorData.message || errorData.detail || errorText.trim();
+            } catch {
+              // Se não for JSON, usa o texto direto
+              errorMessage = errorText.trim();
+            }
+          }
+        } catch (parseError) {
+          console.error("Erro ao ler resposta de erro:", parseError);
+        }
+        
+        alert(errorMessage);
+        setLoading(false);
+        return;
+      }
 
       onSuccess();
     } catch (err) {
-      alert("Erro ao salvar aluno");
-      console.log(err);
+      let errorMessage = "Erro ao salvar aluno";
+      
+      if (err instanceof Error && err.message !== "Erro ao salvar aluno") {
+        errorMessage = err.message;
+      }
+      
+      alert(errorMessage);
+      console.error("Erro ao salvar aluno:", err);
     } finally {
       setLoading(false);
     }

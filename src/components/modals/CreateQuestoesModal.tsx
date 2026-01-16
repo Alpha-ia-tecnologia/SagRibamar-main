@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { ModalBNCC } from "./ModalBNCC";
 import { Trash2 } from "lucide-react";
+import RichTextEditor from '../RichTextEditor';
+import { useApi } from "../../utils/api"; 
 
 interface CreateQuestoesModalProps {
   provaId?: number;
@@ -12,6 +14,7 @@ interface CreateQuestoesModalProps {
 interface Alternativa {
   texto: string;
   correta: boolean;
+  imagem_url?: string;
 }
 
 interface ComponenteCurricular {
@@ -33,9 +36,6 @@ const formatarTextoSelect = (texto: string) => {
     PRIMEIRA_SERIE: "1ª série",
     SEGUNDA_SERIE: "2ª série",
     TERCEIRA_SERIE: "3ª série",
-    PRIMEIRO_E_SEGUNDO_ANOS: "1° e 2° anos",
-    TERCEIRO_AO_QUINTO_ANO: "3° ao 5° ano",
-    PRIMEIRO_AO_QUINTO_ANO: "1° ao 5° ano",
     EJA: "EJA"
   };
 
@@ -64,17 +64,18 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
   const [imagemUrl, setImagemUrl] = useState("");
   const [imagemPreview, setImagemPreview] = useState("");
   const [alternativas, setAlternativas] = useState<Alternativa[]>([
-    { texto: "", correta: true },
-    { texto: "", correta: false },
-    { texto: "", correta: false },
-    { texto: "", correta: false },
+    { texto: "", correta: true, imagem_url: "" },
+    { texto: "", correta: false, imagem_url: "" },
+    { texto: "", correta: false, imagem_url: "" },
+    { texto: "", correta: false, imagem_url: "" },
   ]);
+  const [alternativasImagemPreview, setAlternativasImagemPreview] = useState<string[]>(["", "", "", ""]);
 
   const [nivelEnsino, setNivelEnsino] = useState("ANOS_INICIAIS");
   const [serie, setSerie] = useState("PRIMEIRO_ANO");
-  const [dificuldade, setDificuldade] = useState("FACIL");
+  const [area, setArea] = useState("Ciências Humanas");
   const [pontos, setPontos] = useState(1);
-  const [componenteId, setComponenteId] = useState(0);
+  const [componenteId, setComponenteId] = useState(1);
   const [componentes, setComponentes] = useState<ComponenteCurricular[]>([]);
   const [codigosBNCC, setCodigosBNCC] = useState<number[]>([]);
   const [habilidadesSelecionadas, setHabilidadesSelecionadas] = useState<{ id: number; codigo: string; nivel?: string }[]>([]);
@@ -82,21 +83,47 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
   const [foiSalva, setFoiSalva] = useState(false);
   const [proficienciaSaebId, setProficienciaSaebId] = useState<number | null>(null);
   const [provaCriada, setProvaCriada] = useState<number | null>(provaId || null);
+  const [proximoNumero, setProximoNumero] = useState<number>(1);
+  const api = useApi();
 
   const niveis = ["ANOS_INICIAIS", "ANOS_FINAIS", "ENSINO_MEDIO"];
   const series = [
     "PRIMEIRO_ANO", "SEGUNDO_ANO", "TERCEIRO_ANO", "QUARTO_ANO", "QUINTO_ANO",
     "SEXTO_ANO", "SETIMO_ANO", "OITAVO_ANO", "NONO_ANO", "PRIMEIRA_SERIE",
-    "SEGUNDA_SERIE", "TERCEIRA_SERIE", "PRIMEIRO_E_SEGUNDO_ANOS",
-    "TERCEIRO_AO_QUINTO_ANO", "PRIMEIRO_AO_QUINTO_ANO", "EJA"
+    "SEGUNDA_SERIE", "TERCEIRA_SERIE", "EJA"
   ];
-  const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
+  // const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
+
+  const areas = ["Ciências Humanas", "Ciências Exatas", "Ciências da Natureza", "Linguagens"]
 
   useEffect(() => {
-    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/componentes-curriculares`)
+    api.get(`/api/componentes-curriculares`)
       .then(res => res.json())
       .then(data => setComponentes(data || []));
-  }, []);
+  }, [api]);
+
+  // Função para buscar o próximo número da questão
+  const buscarProximoNumero = async (provaIdAtual: number) => {
+    try {
+      const res = await api.get(`/api/provas/${provaIdAtual}/questoes-detalhadas`);
+      if (res.ok) {
+        const data = await res.json();
+        const questoes = data.questoes || [];
+        const proximoNum = questoes.length + 1;
+        setProximoNumero(proximoNum);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar próximo número:", error);
+      setProximoNumero(1);
+    }
+  };
+
+  // Buscar próximo número quando provaId for definido
+  useEffect(() => {
+    if (provaId) {
+      buscarProximoNumero(provaId);
+    }
+  }, [provaId]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -106,9 +133,8 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     formData.append("imagem", file);
 
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/upload/questao-imagem`, {
-        method: "POST",
-        body: formData,
+      const res = await api.post(`/api/upload/questao-imagem`, formData, {
+        headers: {}, // Remove Content-Type para permitir que o browser defina o boundary
       });
 
       const contentType = res.headers.get("content-type");
@@ -139,39 +165,95 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     }
   };
 
+  const handleAlternativaImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("imagem", file);
+
+    try {
+      const res = await api.post(`/api/upload/questao-imagem`, formData, {
+        headers: {},
+      });
+
+      const contentType = res.headers.get("content-type");
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Erro ao enviar imagem:", errorText);
+        alert("Erro ao enviar imagem.");
+        return;
+      }
+
+      if (contentType?.includes("application/json")) {
+        const data = await res.json();
+        if (data.success && data.imagePath) {
+          const novasAlternativas = [...alternativas];
+          novasAlternativas[index].imagem_url = data.imagePath;
+          setAlternativas(novasAlternativas);
+
+          const novosPreviews = [...alternativasImagemPreview];
+          novosPreviews[index] = `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${data.imagePath}`;
+          setAlternativasImagemPreview(novosPreviews);
+        } else {
+          alert("Erro no upload: " + (data.message || "Resposta inválida"));
+        }
+      } else {
+        const text = await res.text();
+        console.error("Resposta inesperada:", text);
+        alert("Resposta inesperada ao enviar imagem.");
+      }
+    } catch (err) {
+      console.error("Erro no upload da imagem:", err);
+      alert("Erro inesperado ao enviar imagem.");
+    }
+  };
+
+  const removerImagemAlternativa = (index: number) => {
+    const novasAlternativas = [...alternativas];
+    novasAlternativas[index].imagem_url = "";
+    setAlternativas(novasAlternativas);
+
+    const novosPreviews = [...alternativasImagemPreview];
+    novosPreviews[index] = "";
+    setAlternativasImagemPreview(novosPreviews);
+  };
+
   const limparFormulario = () => {
     setEnunciado("");
     setImagemUrl("");
     setImagemPreview("");
     setAlternativas([
-      { texto: "", correta: true },
-      { texto: "", correta: false },
-      { texto: "", correta: false },
-      { texto: "", correta: false },
+      { texto: "", correta: true, imagem_url: "" },
+      { texto: "", correta: false, imagem_url: "" },
+      { texto: "", correta: false, imagem_url: "" },
+      { texto: "", correta: false, imagem_url: "" },
     ]);
+    setAlternativasImagemPreview(["", "", "", ""]);
     setNivelEnsino("ANOS_INICIAIS");
     setSerie("PRIMEIRO_ANO");
-    setDificuldade("FACIL");
+    setArea("Linguagens");
     setPontos(1);
-    setComponenteId(0);
+    setComponenteId(1);
     setCodigosBNCC([]);
     setHabilidadesSelecionadas([]);
     setProficienciaSaebId(null);
     setFoiSalva(false);
-    // Não resetar provaCriada para manter a prova já criada
+
+    // Atualizar próximo número quando adicionar nova questão
+    if (provaCriada) {
+      buscarProximoNumero(provaCriada);
+    }
   };
 
   const handleSubmit = async () => {
-    let provaIdAtual = provaCriada;
+    let provaIdAtual: number | null = provaCriada;
 
     // Se não há prova criada ainda, criar uma nova
     if (!provaIdAtual && tituloProva) {
       try {
-        const provaRes = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/provas`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nome: tituloProva }),
-        });
+        const provaRes = await api.post(`/api/provas`, { nome: tituloProva });
 
         if (!provaRes.ok) {
           const errorText = await provaRes.text();
@@ -183,6 +265,10 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
         const provaSalva = await provaRes.json();
         provaIdAtual = provaSalva.id;
         setProvaCriada(provaIdAtual);
+        // Buscar próximo número para a nova prova criada
+        if (provaIdAtual) {
+          buscarProximoNumero(provaIdAtual);
+        }
       } catch (err) {
         alert("Erro ao criar prova. Veja o console para mais informações.");
         console.error(err);
@@ -194,7 +280,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
       enunciado,
       imagem_url: imagemUrl,
       nivel_ensino: nivelEnsino,
-      dificuldade,
+      campo_conhecimento: area || "Ciências Humanas",
       serie,
       pontos,
       prova_id: provaIdAtual,
@@ -205,11 +291,8 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
     };
 
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/questoes`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+      const res = await api.post(`/api/questoes`, payload);
+      console.log("aqui está o payload", payload);
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -237,14 +320,16 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-50">
       <div className="bg-white w-full max-w-3xl p-6 rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto transition-all">
-        <h2 className="text-xl font-bold mb-6 text-gray-800">Adicionar Questão</h2>
+        <h2 className="text-xl font-bold mb-6 text-gray-800">Adicionar Questão - {proximoNumero}</h2>
 
-        <textarea
-          value={enunciado}
-          onChange={(e) => setEnunciado(e.target.value)}
-          placeholder="Digite o enunciado da questão"
-          className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4 transition-all"
-        />
+        <div className="mb-4">
+          <label className="text-sm font-medium text-gray-700 mb-2 block">Enunciado da Questão</label>
+            <RichTextEditor
+              value={enunciado}
+              onChange={setEnunciado}
+              placeholder="Digite o enunciado da questão"
+            />
+        </div>
 
         <label className="block mb-4">
           <span className="text-sm font-medium text-gray-700 mb-2 block">Adicionar Imagem</span>
@@ -265,7 +350,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
                 setImagemUrl("");
                 setImagemPreview("");
               }}
-                className="absolute top-2 right-2 bg-white text-red-700 rounded-full px-2 py-1 shadow-md cursor-pointer border-black border-1"
+                className="absolute top-2 right-2 bg-white text-red-700 rounded-full px-2 py-1 shadow-md cursor-pointer border-black border"
                 title="Apagar imagem">
                 <Trash2 className="h-5 w-4" />
               </button>
@@ -278,12 +363,23 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
             {niveis.map(n => <option key={n} value={n}>{formatarTextoSelect(n)}</option>)}
           </select>
 
-          <select value={serie} onChange={(e) => setSerie(e.target.value)} className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
-            {series.map(s => <option key={s} value={s}>{formatarTextoSelect(s)}</option>)}
+          <select 
+          value={serie} 
+          onChange={(e) => setSerie(e.target.value)} 
+          className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+          >
+            {series.map(s => 
+            <option 
+            key={s} 
+            value={s}>
+              {formatarTextoSelect(s)}
+            </option>)}
           </select>
 
-          <select value={dificuldade} onChange={(e) => setDificuldade(e.target.value)} className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
-            {dificuldades.map(d => <option key={d} value={d}>{formatarTextoSelect(d)}</option>)}
+          <select 
+          value={area} 
+          onChange={(e) => setArea(e.target.value)} className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
+            {areas.map(d => <option key={d} value={d}>{d}</option>)}
           </select>
 
           <select value={componenteId} onChange={(e) => setComponenteId(Number(e.target.value))} className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
@@ -330,25 +426,56 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
         )}
 
         {alternativas.map((alt, i) => (
-          <div key={i} className="flex items-center gap-3 mb-3">
+          <div key={i} className="flex items-start gap-3 mb-4 p-3 border border-gray-200 rounded-xl bg-gray-100">
             <input
               type="radio"
               name="correta"
               checked={alt.correta}
               onChange={() => marcarCorreta(i)}
-              className="accent-blue-600"
+              className="accent-blue-600 mt-2"
             />
-            <input
-              type="text"
-              value={alt.texto}
-              onChange={(e) => {
-                const novas = [...alternativas];
-                novas[i].texto = e.target.value;
-                setAlternativas(novas);
-              }}
-              placeholder={`Alternativa ${String.fromCharCode(65 + i)}`}
-              className="flex-1 p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-            />
+            <div className="flex-1">
+              <label className="text-sm font-medium text-gray-700 mb-1 block">
+                Alternativa {String.fromCharCode(65 + i)}
+              </label>
+              <RichTextEditor
+                value={alt.texto}
+                onChange={(value) => {
+                  const novas = [...alternativas];
+                  novas[i].texto = value;
+                  setAlternativas(novas);
+                }}
+                placeholder={`Digite a alternativa ${String.fromCharCode(65 + i)}`}
+              />
+
+              <div className="mt-2">
+                <label className="block">
+                  <span className="text-xs text-gray-500 mb-1 block">
+                    {alternativasImagemPreview[i] ? "Substituir imagem" : "Adicionar imagem (opcional)"}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleAlternativaImageUpload(e, i)}
+                    className="w-full text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                </label>
+                {alternativasImagemPreview[i] && (
+                  <div className="mt-2">
+                    <div className="relative inline-block w-fit rounded-lg overflow-hidden border">
+                      <img src={alternativasImagemPreview[i]} alt={`Preview alternativa ${String.fromCharCode(65 + i)}`} className="block h-32 w-auto" />
+                      <button
+                        onClick={() => removerImagemAlternativa(i)}
+                        className="absolute top-1 right-1 bg-white text-red-700 rounded-full p-1 shadow-md cursor-pointer border-black border"
+                        title="Apagar imagem"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         ))}
 
@@ -392,7 +519,7 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
             // Se há um ID de proficiência, buscar a descrição do nível
             if (profId) {
               try {
-                const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${habilidades[0]?.id}/proficiencias`);
+                const res = await api.get(`/api/bncc/${habilidades[0]?.id}/proficiencias`);
                 if (res.ok) {
                   const data = await res.json();
                   const proficiencia = data.find((p: any) => p.id === profId);

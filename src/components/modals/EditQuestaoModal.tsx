@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { ModalBNCCEdit } from "./ModalBNCCEdit";
 import { Trash2 } from "lucide-react";
+import { useApi } from "../../utils/api";
+import RichTextEditor from "../RichTextEditor";
 
 interface EditarQuestaoModalProps {
   questaoId: number;
@@ -11,12 +13,53 @@ interface EditarQuestaoModalProps {
 interface Alternativa {
   texto: string;
   correta: boolean;
+  imagem_url?: string;
 }
 
 interface ComponenteCurricular {
   id: number;
   nome: string;
 }
+
+const formatarTextoSelect = (texto: string) => {
+  const mapaSeries: Record<string, string> = {
+    PRIMEIRO_ANO: "1° ano",
+    SEGUNDO_ANO: "2° ano",
+    TERCEIRO_ANO: "3° ano",
+    QUARTO_ANO: "4° ano",
+    QUINTO_ANO: "5° ano",
+    SEXTO_ANO: "6° ano",
+    SETIMO_ANO: "7° ano",
+    OITAVO_ANO: "8° ano",
+    NONO_ANO: "9° ano",
+    PRIMEIRA_SERIE: "1ª série",
+    SEGUNDA_SERIE: "2ª série",
+    TERCEIRA_SERIE: "3ª série",
+    EJA: "EJA",
+  };
+
+  const mapaNiveis: Record<string, string> = {
+    ANOS_INICIAIS: "Anos iniciais",
+    ANOS_FINAIS: "Anos finais",
+    ENSINO_MEDIO: "Ensino médio",
+  };
+
+  const mapaDificuldades: Record<string, string> = {
+    FACIL: "Fácil",
+    MEDIO: "Média",
+    DIFICIL: "Difícil",
+  };
+
+  return (
+    mapaSeries[texto] ||
+    mapaNiveis[texto] ||
+    mapaDificuldades[texto] ||
+    texto
+      .replace(/_/g, " ")
+      .toLowerCase()
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+  );
+};
 
 export const EditarQuestaoModal = ({
   questaoId,
@@ -27,17 +70,23 @@ export const EditarQuestaoModal = ({
   const [imagemUrl, setImagemUrl] = useState("");
   const [imagemPreview, setImagemPreview] = useState("");
   const [alternativas, setAlternativas] = useState<Alternativa[]>([]);
+  const [alternativasImagemPreview, setAlternativasImagemPreview] = useState<string[]>([]);
   const [nivelEnsino, setNivelEnsino] = useState("ANOS_INICIAIS");
   const [serie, setSerie] = useState("PRIMEIRO_ANO");
-  const [dificuldade, setDificuldade] = useState("FACIL");
+  const [area, setArea] = useState("Ciências Humanas");
   const [pontos, setPontos] = useState(1);
   const [componenteId, setComponenteId] = useState(0);
   const [componentes, setComponentes] = useState<ComponenteCurricular[]>([]);
   const [codigosBNCC, setCodigosBNCC] = useState<number[]>([]);
   const [showModalBNCC, setShowModalBNCC] = useState(false);
-  const [habilidadesSelecionadas, setHabilidadesSelecionadas] = useState<{ id: number; codigo: string; nivel?: string }[]>([]);
-  const [proficienciaSaebId, setProficienciaSaebId] = useState<number | null>(null);
+  const [habilidadesSelecionadas, setHabilidadesSelecionadas] = useState<
+    { id: number; codigo: string; nivel?: string }[]
+  >([]);
+  const [proficienciaSaebId, setProficienciaSaebId] = useState<number | null>(
+    null
+  );
   const [ordem, setOrdem] = useState<number | null>(null);
+  const api = useApi();
 
   const niveis = ["ANOS_INICIAIS", "ANOS_FINAIS", "ENSINO_MEDIO"];
   const series = [
@@ -54,12 +103,20 @@ export const EditarQuestaoModal = ({
     "SEGUNDA_SERIE",
     "TERCEIRA_SERIE",
   ];
-  const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
+  // const dificuldades = ["FACIL", "MEDIO", "DIFICIL"];
+
+  const areas = [
+    "Ciências Humanas",
+    "Ciências Exatas",
+    "Ciências da Natureza",
+    "Linguagens",
+  ];
 
   useEffect(() => {
     let questaoData: any = null;
-    
-    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/questoes/${questaoId}`)
+
+    api
+      .get(`/api/questoes/${questaoId}`)
       .then((res) => res.json())
       .then((data) => {
         questaoData = data;
@@ -67,71 +124,90 @@ export const EditarQuestaoModal = ({
         setImagemUrl(data.imagem_url || "");
         setImagemPreview(
           data.imagem_url
-            ? `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${data.imagem_url}`
+            ? `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${
+                data.imagem_url
+              }`
             : ""
         );
-        setAlternativas(data.alternativas || []);
+        const alts = data.alternativas || [];
+        setAlternativas(alts);
+        // Carregar previews das imagens das alternativas existentes
+        const previews = alts.map((alt: Alternativa) =>
+          alt.imagem_url
+            ? `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${alt.imagem_url}`
+            : ""
+        );
+        setAlternativasImagemPreview(previews);
         setNivelEnsino(data.nivel_ensino || "ANOS_INICIAIS");
         setSerie(data.serie || "PRIMEIRO_ANO");
-        setDificuldade(data.dificuldade || "FACIL");
+        // A API já retorna a área no formato correto
+        setArea(data.campo_conhecimento || "Ciências Humanas");
         setPontos(data.pontos || 1);
         setComponenteId(data.componente_curricular_id || 4);
         setOrdem(data.ordem || null);
-        
+
         // Handle codigosBNCC data properly
-        const codigosIds = Array.isArray(data.codigos_bncc) 
-          ? data.codigos_bncc.map((codigo: any): number | null => {
-              // A estrutura real é: { questao_id, bncc_id, bncc: { id, codigo, ... } }
-              if (typeof codigo === 'object' && codigo.bncc_id) {
-                return codigo.bncc_id;
-              } else if (typeof codigo === 'object' && codigo.bncc?.id) {
-                return codigo.bncc.id;
-              } else if (typeof codigo === 'number') {
-                return codigo;
-              }
-              return null;
-            }).filter((id: number | null): id is number => {
-              return id !== null;
-            })
+        const codigosIds = Array.isArray(data.codigos_bncc)
+          ? data.codigos_bncc
+              .map((codigo: any): number | null => {
+                // A estrutura real é: { questao_id, bncc_id, bncc: { id, codigo, ... } }
+                if (typeof codigo === "object" && codigo.bncc_id) {
+                  return codigo.bncc_id;
+                } else if (typeof codigo === "object" && codigo.bncc?.id) {
+                  return codigo.bncc.id;
+                } else if (typeof codigo === "number") {
+                  return codigo;
+                }
+                return null;
+              })
+              .filter((id: number | null): id is number => {
+                return id !== null;
+              })
           : [];
         setCodigosBNCC(codigosIds);
-        
+
         setProficienciaSaebId(data.proficiencia_saeb_id || null);
       });
 
-    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/componentes-curriculares`)
+    api
+      .get(`/api/componentes-curriculares`)
       .then((res) => res.json())
       .then((data) => setComponentes(data || []));
 
     // Carrega habilidades BNCC já vinculadas para exibição/remoção
-    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc?questao_id=${questaoId}`)
+    api
+      .get(`/api/bncc?questao_id=${questaoId}`)
       .then((res) => res.json())
       .then(async (lista) => {
         if (Array.isArray(lista)) {
           const habilidadesComNivel = await Promise.all(
             lista.map(async (h: { id: number; codigo: string }) => {
               let nivelDescricao = "";
-              
+
               // Se há um ID de proficiência, buscar a descrição do nível
               if (questaoData?.proficiencia_saeb_id) {
                 try {
-                  const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${h.id}/proficiencias`);
+                  const res = await api.get(`/api/bncc/${h.id}/proficiencias`);
                   if (res.ok) {
                     const profData = await res.json();
-                    const proficiencia = profData.find((p: any) => p.id === questaoData.proficiencia_saeb_id);
+                    const proficiencia = profData.find(
+                      (p: any) => p.id === questaoData.proficiencia_saeb_id
+                    );
                     if (proficiencia) {
-                      nivelDescricao = `${proficiencia.nivel ?? ""}${proficiencia.nivel ? " - " : ""}${proficiencia.descricao ?? ""}`.trim();
+                      nivelDescricao = `${proficiencia.nivel ?? ""}${
+                        proficiencia.nivel ? " - " : ""
+                      }${proficiencia.descricao ?? ""}`.trim();
                     }
                   }
                 } catch (error) {
                   console.error("Erro ao buscar descrição do nível:", error);
                 }
               }
-              
-              return { 
-                id: h.id, 
-                codigo: h.codigo, 
-                nivel: nivelDescricao || undefined 
+
+              return {
+                id: h.id,
+                codigo: h.codigo,
+                nivel: nivelDescricao || undefined,
               };
             })
           );
@@ -141,35 +217,79 @@ export const EditarQuestaoModal = ({
       .catch(() => {});
   }, [questaoId]);
 
-const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  const formData = new FormData();
-  formData.append("imagem", file); 
+    const formData = new FormData();
+    formData.append("imagem", file);
 
-  try {
-    const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/upload/questao-imagem`, {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const res = await api.post(`/api/upload/questao-imagem`, formData, {
+        headers: {}, // Remove Content-Type para permitir que o browser defina o boundary
+      });
 
-    const data = await res.json(); 
+      const data = await res.json();
 
-    if (!res.ok || !data.success) {
-      console.error("Erro ao enviar imagem:", data.message || res.statusText);
-      alert("Erro ao enviar imagem.");
-      return;
+      if (!res.ok || !data.success) {
+        console.error("Erro ao enviar imagem:", data.message || res.statusText);
+        alert("Erro ao enviar imagem.");
+        return;
+      }
+      setImagemUrl(data.imagePath);
+      setImagemPreview(
+        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${
+          data.imagePath
+        }`
+      );
+    } catch (err) {
+      console.error("Erro inesperado:", err);
+      alert("Erro inesperado ao enviar imagem.");
     }
-    setImagemUrl(data.imagePath);
-    setImagemPreview(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${data.imagePath}`);
-  } catch (err) {
-    console.error("Erro inesperado:", err);
-    alert("Erro inesperado ao enviar imagem.");
-  }
-};
+  };
 
+  const handleAlternativaImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
+    const formData = new FormData();
+    formData.append("imagem", file);
+
+    try {
+      const res = await api.post(`/api/upload/questao-imagem`, formData, {
+        headers: {},
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        console.error("Erro ao enviar imagem:", data.message || res.statusText);
+        alert("Erro ao enviar imagem.");
+        return;
+      }
+
+      const novasAlternativas = [...alternativas];
+      novasAlternativas[index].imagem_url = data.imagePath;
+      setAlternativas(novasAlternativas);
+
+      const novosPreviews = [...alternativasImagemPreview];
+      novosPreviews[index] = `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/${data.imagePath}`;
+      setAlternativasImagemPreview(novosPreviews);
+    } catch (err) {
+      console.error("Erro inesperado:", err);
+      alert("Erro inesperado ao enviar imagem.");
+    }
+  };
+
+  const removerImagemAlternativa = (index: number) => {
+    const novasAlternativas = [...alternativas];
+    novasAlternativas[index].imagem_url = "";
+    setAlternativas(novasAlternativas);
+
+    const novosPreviews = [...alternativasImagemPreview];
+    novosPreviews[index] = "";
+    setAlternativasImagemPreview(novosPreviews);
+  };
 
   const marcarCorreta = (index: number) => {
     const novas = alternativas.map((alt, i) => ({
@@ -184,7 +304,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       enunciado,
       imagem_url: imagemUrl,
       nivel_ensino: nivelEnsino,
-      dificuldade,
+      campo_conhecimento: area || "Ciências Humanas",
       serie,
       pontos,
       componente_curricular_id: componenteId,
@@ -194,14 +314,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     };
 
     try {
-      const res = await fetch(
-        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/questoes/${questaoId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const res = await api.put(`/api/questoes/${questaoId}`, payload);
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -221,37 +334,49 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-50">
       <div className="bg-white w-full max-w-3xl p-6 rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto transition-all">
-        <h2 className="text-xl font-bold mb-6 text-gray-800">Editar Questão - {ordem || questaoId}</h2>
+        <h2 className="text-xl font-bold mb-6 text-gray-800">
+          Editar Questão - {ordem || questaoId}
+        </h2>
 
-        <textarea
-          value={enunciado}
-          onChange={(e) => setEnunciado(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-xl mb-4"
-        />
+        <div className="mb-4">
+          <label className="text-sm font-medium text-gray-700 mb-2 block">
+            Enunciado da Questão
+          </label>
+          <RichTextEditor
+            value={enunciado}
+            onChange={setEnunciado}
+            placeholder="Digite o enunciado da questão"
+          />
+        </div>
 
-       <label className="block mb-4">
-  <span className="text-sm font-medium text-gray-700">
-    {imagemPreview ? "Inserir outro arquivo" : "Adicionar imagem"}
-  </span>
-  <input
-    type="file"
-    accept="image/*"
-    onChange={handleImageUpload}
-    className="w-full file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-  />
-</label>
+        <label className="block mb-4">
+          <span className="text-sm font-medium text-gray-700">
+            {imagemPreview ? "Inserir outro arquivo" : "Adicionar imagem"}
+          </span>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="w-full file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          />
+        </label>
 
         {imagemPreview && (
           <div className="mb-4">
             <div className="relative inline-block w-fit rounded-lg overflow-hidden border">
-            <img src={imagemPreview} alt="Preview" className="block h-48 w-auto" />
-              <button 
-              onClick={() => {
-                setImagemUrl("");
-                setImagemPreview("");
-              }}
-                className="absolute top-2 right-2 bg-white text-red-700 rounded-full px-2 py-1 shadow-md cursor-pointer border-black border-1"
-                title="Apagar imagem">
+              <img
+                src={imagemPreview}
+                alt="Preview"
+                className="block h-48 w-auto"
+              />
+              <button
+                onClick={() => {
+                  setImagemUrl("");
+                  setImagemPreview("");
+                }}
+                className="absolute top-2 right-2 bg-white text-red-700 rounded-full px-2 py-1 shadow-md cursor-pointer border-black border"
+                title="Apagar imagem"
+              >
                 <Trash2 className="h-5 w-4" />
               </button>
             </div>
@@ -266,7 +391,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           >
             {niveis.map((n) => (
               <option key={n} value={n}>
-                {n}
+                {formatarTextoSelect(n)}
               </option>
             ))}
           </select>
@@ -278,17 +403,17 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           >
             {series.map((s) => (
               <option key={s} value={s}>
-                {s}
+                {formatarTextoSelect(s)}
               </option>
             ))}
           </select>
 
           <select
-            value={dificuldade}
-            onChange={(e) => setDificuldade(e.target.value)}
+            value={area}
+            onChange={(e) => setArea(e.target.value)}
             className="p-3 border rounded-xl"
           >
-            {dificuldades.map((d) => (
+            {areas.map((d) => (
               <option key={d} value={d}>
                 {d}
               </option>
@@ -315,24 +440,33 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           {habilidadesSelecionadas.length > 0
             ? (() => {
                 const maxToShow = 2;
-                const shown = habilidadesSelecionadas.slice(0, maxToShow).map(h => h.codigo).join(", ");
+                const shown = habilidadesSelecionadas
+                  .slice(0, maxToShow)
+                  .map((h) => h.codigo)
+                  .join(", ");
                 const remaining = habilidadesSelecionadas.length - maxToShow;
                 return remaining > 0 ? `${shown} +${remaining}` : shown;
               })()
-            : '+ Selecionar Habilidades BNCC/SAEB'}
+            : "+ Selecionar Habilidades BNCC/SAEB"}
         </button>
 
         {habilidadesSelecionadas.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-6">
             {habilidadesSelecionadas.map((h) => (
-              <span key={h.id} className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-full text-xs bg-blue-50 text-blue-700 border border-blue-200">
-                {h.codigo}{h.nivel && ` (${h.nivel})`}
+              <span
+                key={h.id}
+                className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-full text-xs bg-blue-50 text-blue-700 border border-blue-200"
+              >
+                {h.codigo}
+                {h.nivel && ` (${h.nivel})`}
                 <button
                   type="button"
                   onClick={() => {
                     // Remoção local
-                    setHabilidadesSelecionadas(prev => prev.filter(x => x.id !== h.id));
-                    setCodigosBNCC(prev => prev.filter(id => id !== h.id));
+                    setHabilidadesSelecionadas((prev) =>
+                      prev.filter((x) => x.id !== h.id)
+                    );
+                    setCodigosBNCC((prev) => prev.filter((id) => id !== h.id));
                   }}
                   className="ml-1 text-blue-600 hover:text-blue-800"
                   aria-label={`Remover ${h.codigo}`}
@@ -345,25 +479,58 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         )}
 
         {alternativas.map((alt, i) => (
-          <div key={i} className="flex items-center gap-3 mb-3">
+          <div key={i} className="flex items-start gap-3 mb-4 p-3 border border-gray-200 rounded-xl bg-gray-50">
             <input
               type="radio"
               name="correta"
               checked={alt.correta}
               onChange={() => marcarCorreta(i)}
-              className="accent-blue-600"
+              className="accent-blue-600 mt-2"
             />
-            <input
-              type="text"
-              value={alt.texto}
-              onChange={(e) => {
-                const novas = [...alternativas];
-                novas[i].texto = e.target.value;
-                setAlternativas(novas);
-              }}
-              placeholder={`Alternativa ${String.fromCharCode(65 + i)}`}
-              className="flex-1 p-3 border border-gray-300 rounded-xl"
-            />
+            <div className="flex-1">
+              <label className="text-sm font-medium text-gray-700 mb-1 block">
+                Alternativa {String.fromCharCode(65 + i)}
+              </label>
+              <RichTextEditor
+                value={alt.texto}
+                onChange={(value) => {
+                  const novas = [...alternativas];
+                  novas[i].texto = value;
+                  setAlternativas(novas);
+                }}
+                placeholder={`Digite a alternativa ${String.fromCharCode(
+                  65 + i
+                )}`}
+              />
+
+              <div className="mt-2">
+                <label className="block">
+                  <span className="text-xs text-gray-500 mb-1 block">
+                    {alternativasImagemPreview[i] ? "Substituir imagem" : "Adicionar imagem (opcional)"}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleAlternativaImageUpload(e, i)}
+                    className="w-full text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                </label>
+                {alternativasImagemPreview[i] && (
+                  <div className="mt-2">
+                    <div className="relative inline-block w-fit rounded-lg overflow-hidden border">
+                      <img src={alternativasImagemPreview[i]} alt={`Preview alternativa ${String.fromCharCode(65 + i)}`} className="block h-32 w-auto" />
+                      <button
+                        onClick={() => removerImagemAlternativa(i)}
+                        className="absolute top-1 right-1 bg-white text-red-700 rounded-full p-1 shadow-md cursor-pointer border-black border"
+                        title="Apagar imagem"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         ))}
 
@@ -383,68 +550,78 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         </div>
       </div>
 
-    {showModalBNCC && (
-  <ModalBNCCEdit
-    questaoId={questaoId}
-    codigosSelecionados={codigosBNCC}
-    onClose={() => setShowModalBNCC(false)}
-    onSave={async (novosCodigos, profId) => {
-      setCodigosBNCC(novosCodigos);
-      setProficienciaSaebId(profId || null);
-      setShowModalBNCC(false);
-      
-      // Se não há códigos selecionados, limpa as habilidades
-      if (novosCodigos.length === 0) {
-        setHabilidadesSelecionadas([]);
-        return;
-      }
-      
-      // Busca as informações das novas habilidades selecionadas
-      try {
-        const habilidadesComNivel = await Promise.all(
-          novosCodigos.map(async (codigoId) => {
-            // Busca informações da habilidade
-            const resHabilidade = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${codigoId}`);
-            if (!resHabilidade.ok) return null;
-            
-            const habilidade = await resHabilidade.json();
-            let nivelDescricao = "";
-            
-            // Se há um ID de proficiência, buscar a descrição do nível
-            if (profId) {
-              try {
-                const resProficiencia = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc/${codigoId}/proficiencias`);
-                if (resProficiencia.ok) {
-                  const profData = await resProficiencia.json();
-                  const proficiencia = profData.find((p: any) => p.id === profId);
-                  if (proficiencia) {
-                    nivelDescricao = `${proficiencia.nivel ?? ""}${proficiencia.nivel ? " - " : ""}${proficiencia.descricao ?? ""}`.trim();
-                  }
-                }
-              } catch (error) {
-                console.error("Erro ao buscar descrição do nível:", error);
-              }
-            }
-            
-            return { 
-              id: habilidade.id, 
-              codigo: habilidade.codigo, 
-              nivel: nivelDescricao || undefined 
-            };
-          })
-        );
-        
-        // Filtra valores nulos e atualiza o estado
-        const habilidadesValidas = habilidadesComNivel.filter(h => h !== null);
-        setHabilidadesSelecionadas(habilidadesValidas);
-      } catch (error) {
-        console.error("Erro ao buscar habilidades:", error);
-        setHabilidadesSelecionadas([]);
-      }
-    }}
-  />
-)}
+      {showModalBNCC && (
+        <ModalBNCCEdit
+          questaoId={questaoId}
+          codigosSelecionados={codigosBNCC}
+          onClose={() => setShowModalBNCC(false)}
+          onSave={async (novosCodigos, profId) => {
+            setCodigosBNCC(novosCodigos);
+            setProficienciaSaebId(profId || null);
+            setShowModalBNCC(false);
 
+            // Se não há códigos selecionados, limpa as habilidades
+            if (novosCodigos.length === 0) {
+              setHabilidadesSelecionadas([]);
+              return;
+            }
+
+            // Busca as informações das novas habilidades selecionadas
+            try {
+              const habilidadesComNivel = await Promise.all(
+                novosCodigos.map(async (codigoId) => {
+                  // Busca informações da habilidade
+                  const resHabilidade = await api.get(`/api/bncc/${codigoId}`);
+                  if (!resHabilidade.ok) return null;
+
+                  const habilidade = await resHabilidade.json();
+                  let nivelDescricao = "";
+
+                  // Se há um ID de proficiência, buscar a descrição do nível
+                  if (profId) {
+                    try {
+                      const resProficiencia = await api.get(
+                        `/api/bncc/${codigoId}/proficiencias`
+                      );
+                      if (resProficiencia.ok) {
+                        const profData = await resProficiencia.json();
+                        const proficiencia = profData.find(
+                          (p: any) => p.id === profId
+                        );
+                        if (proficiencia) {
+                          nivelDescricao = `${proficiencia.nivel ?? ""}${
+                            proficiencia.nivel ? " - " : ""
+                          }${proficiencia.descricao ?? ""}`.trim();
+                        }
+                      }
+                    } catch (error) {
+                      console.error(
+                        "Erro ao buscar descrição do nível:",
+                        error
+                      );
+                    }
+                  }
+
+                  return {
+                    id: habilidade.id,
+                    codigo: habilidade.codigo,
+                    nivel: nivelDescricao || undefined,
+                  };
+                })
+              );
+
+              // Filtra valores nulos e atualiza o estado
+              const habilidadesValidas = habilidadesComNivel.filter(
+                (h) => h !== null
+              );
+              setHabilidadesSelecionadas(habilidadesValidas);
+            } catch (error) {
+              console.error("Erro ao buscar habilidades:", error);
+              setHabilidadesSelecionadas([]);
+            }
+          }}
+        />
+      )}
     </div>
   );
 };

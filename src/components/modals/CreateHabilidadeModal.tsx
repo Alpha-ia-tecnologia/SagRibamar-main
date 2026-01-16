@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { useApi } from "../../utils/api";
 
 interface CreateHabilidadeModalProps {
   onClose: () => void;
+  onHabilidadeCreated?: () => void;
 };
 interface Serie {
   value: string;
@@ -18,7 +20,7 @@ interface NivelSaeb {
   descricao: string;
 };
 
-export const CreateHabilidadeModal = ({onClose}: CreateHabilidadeModalProps) => {
+export const CreateHabilidadeModal = ({onClose, onHabilidadeCreated}: CreateHabilidadeModalProps) => {
   const [series, setSeries] = useState<Serie[]>([]);
   const [componenteId, setComponenteId] = useState<number>(0);
   const [componentes, setComponentes] = useState<ComponenteCurricular[]>([]);
@@ -33,10 +35,11 @@ export const CreateHabilidadeModal = ({onClose}: CreateHabilidadeModalProps) => 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [foiSalva, setFoiSalva] = useState(false);
+  const api = useApi();
 
   const fetchSeries = async () => {
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/enums/series`);
+      const res = await api.get(`/api/enums/series`);
       if (!res.ok) throw new Error("Erro ao buscar séries");
       const data: Serie[] = await res.json();
       setSeries(data);
@@ -50,7 +53,7 @@ export const CreateHabilidadeModal = ({onClose}: CreateHabilidadeModalProps) => 
   }, []);
 
   useEffect(() => {
-    fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/componentes-curriculares`)
+    api.get(`/api/componentes-curriculares`)
       .then(res => res.json())
       .then(data => setComponentes(data || []));
   }, []);
@@ -122,13 +125,7 @@ export const CreateHabilidadeModal = ({onClose}: CreateHabilidadeModalProps) => 
         componente_curricular_id: componenteId
       };
 
-      const response = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/bncc`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(habilidadeData)
-      });
+      const response = await api.post(`/api/bncc`, habilidadeData);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -140,16 +137,10 @@ export const CreateHabilidadeModal = ({onClose}: CreateHabilidadeModalProps) => 
       // Se for SAEB e houver níveis adicionados, criar os níveis de proficiência
       if (saeb && niveisSaeb.length > 0) {
         const niveisPromises = niveisSaeb.map(nivel => 
-          fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/proficiencias-saeb`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              nivel: nivel.nivel,
-              descricao: nivel.descricao,
-              bncc_id: habilidadeCriada.id
-            })
+          api.post(`/api/proficiencias-saeb`, {
+            nivel: nivel.nivel,
+            descricao: nivel.descricao,
+            bncc_id: habilidadeCriada.id
           })
         );
 
@@ -165,6 +156,11 @@ export const CreateHabilidadeModal = ({onClose}: CreateHabilidadeModalProps) => 
 
       setSuccess(true);
       setFoiSalva(true);
+      
+      // Chama o callback para atualizar as listas de habilidades
+      if (onHabilidadeCreated) {
+        onHabilidadeCreated();
+      }
 
     } catch (error) {
       console.error("Erro ao criar habilidade:", error);

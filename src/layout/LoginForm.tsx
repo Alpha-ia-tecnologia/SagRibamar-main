@@ -1,8 +1,10 @@
 import { InputField } from "../ui/InputField";
 import { Button } from "../components/Button";
+import { DynamicLogo } from "../components/DynamicLogo";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth"; 
+import { useAuth } from "../hooks/useAuth";
+import { getMunicipalityName } from "../utils/municipalityLogo"; 
 
 export const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -11,6 +13,7 @@ export const LoginForm = () => {
   const { login, loading, error } = useAuth(); 
 
   const appName = window.__ENV__?.APP_NAME ?? import.meta.env.VITE_APP_NAME ?? "SAG";
+  const municipalityName = getMunicipalityName();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,10 +28,21 @@ export const LoginForm = () => {
       onSubmit={handleSubmit}
       className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm"
     >
-      <h1 className="text-2xl font-bold text-center text-blue-600 mb-1">{appName}</h1>
-      <p className="text-center text-sm text-gray-600 mb-6">
-        Sistema de Avaliação e Gerenciamento
-      </p>
+      <div className="flex flex-col items-center mb-6">
+        <DynamicLogo 
+          className="mb-4"
+          alt={`Logo de ${municipalityName}`}
+          width={120}
+          height={120}
+        />
+        <h1 className="text-2xl font-bold text-center text-blue-600 mb-1">{appName}</h1>
+        <p className="text-center text-sm text-gray-600">
+          Sistema de Avaliação e Gerenciamento
+        </p>
+        <p className="text-center text-xs text-gray-500 mt-2">
+          {municipalityName}
+        </p>
+      </div>
 
       <InputField
         label="Email"

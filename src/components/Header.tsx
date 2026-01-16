@@ -1,11 +1,27 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { DynamicLogo } from "./DynamicLogo";
+import { getMunicipalityName } from "../utils/municipalityLogo";
 
 export const Header = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(sessionStorage.getItem("currentUser") || "{}");
   const [isOpen, setIsOpen] = useState(false);
+  
+  // Função segura para obter usuário do sessionStorage
+  const getUser = () => {
+    try {
+      const storedUser = sessionStorage.getItem("currentUser");
+      return storedUser ? JSON.parse(storedUser) : {};
+    } catch (error) {
+      console.error("Erro ao fazer parse do usuário:", error);
+      sessionStorage.removeItem("currentUser");
+      return {};
+    }
+  };
+  
+  const user = getUser();
+  const municipalityName = getMunicipalityName();
 
   const tipo = user?.tipo_usuario;
 
@@ -27,10 +43,16 @@ export const Header = () => {
   ];
 
   return (
-    <header className="bg-blue-600 text-white fixed top-0 left-0 right-0 shadow z-50">
-      <div className="max-w-screen-xl mx-auto px-1 py-3 flex items-center justify-between">
+    <header className="bg-blue-600 text-white sticky z-50 top-0">
+      <div className="py-3 flex items-center justify-between">
         {/* Logo */}
-        <span className="font-bold text-lg">SAG</span>
+        <div className="flex items-center gap-2">
+          <DynamicLogo
+            alt={`Logo de ${municipalityName}`}
+            width={90}
+          />
+          <span className="font-bold text-lg">SAG</span>
+        </div>
 
         {/* Menu Desktop */}
         <nav className="hidden md:flex items-center gap-0.5">
@@ -80,7 +102,15 @@ export const Header = () => {
         ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="flex justify-between items-center p-4 border-b border-blue-500">
-          <span className="font-bold text-lg">SAG</span>
+          <div className="flex items-center gap-2">
+            <DynamicLogo 
+              className="rounded-sm"
+              alt={`Logo de ${municipalityName}`}
+              width={24}
+              height={24}
+            />
+            <span className="font-bold text-lg">SAG</span>
+          </div>
           <button onClick={() => setIsOpen(false)}>
             <X size={24} />
           </button>

@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { IconButton } from "../components/IconButton";
-import { FileDown, SquarePen, TriangleAlert } from "lucide-react";
+import { FileDown, SquarePen } from "lucide-react";
+import { useApi } from "../utils/api";
+import { ConfirmDialog } from "../components/modals/ConfirmDialog";
+import { Loading } from "../components/Loading";
+
 
 interface Prova {
   id: number;
@@ -29,6 +33,7 @@ export const ProvaList = ({
   const [isLoading, setIsLoading] = useState(false);
   const [confirmationDelete, setConfirmationDelete] = useState(false);
   const [provaIdSelecionada, setProvaIdSelecionada] = useState<number | null>(null);
+  const api = useApi();
 
   const fetchProvas = async () => {
     try {
@@ -36,9 +41,7 @@ export const ProvaList = ({
       if ((searchTitulo ?? "").trim())
         queryParams.append("titulo", (searchTitulo ?? "").trim());
 
-      const res = await fetch(
-        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/provas?${queryParams.toString()}`
-      );
+      const res = await api.get(`/api/provas?${queryParams.toString()}`);
 
       const data = await res.json();
 
@@ -64,12 +67,7 @@ export const ProvaList = ({
 
   const handleDelete = async (id: number) => {
     try {
-      const res = await fetch(
-        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/provas/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const res = await api.delete(`/api/provas/${id}`);
 
       if (!res.ok) {
         const erro = await res.text();
@@ -133,13 +131,8 @@ const handleDownloadTest = async (id: number) => {
   return (
     <div className="p-4 bg-white rounded-xl shadow-sm mb-6 relative">
       {isLoading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="flex flex-col items-center bg-white rounded-xl p-6 shadow">
-            <div className="animate-spin rounded-full h-10 w-10 border-4 border-t-transparent border-blue-600"></div>
-            <p className="mt-5 text-md font-medium text-black">Gerando prova...</p>
-          </div>
-        </div>
-      )}
+        <Loading />
+        )}
     <div className="bg-white rounded-xl shadow overflow-hidden">
       <div className="px-5 py-3 bg-blue-50 border-b border-gray-200 font-semibold text-sm text-gray-800">
         Total: {provas.length} provas
@@ -193,40 +186,24 @@ const handleDownloadTest = async (id: number) => {
       ))}
         
         {confirmationDelete && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-            <div className="bg-white rounded-xl p-10 flex flex-col items-center">
-              <div className="text-red-600"> <TriangleAlert className="h-30 w-30" /></div>
-                  <p className="mt-5 text-xl font-medium text-black">
-                    Tem certeza que deseja excluir a prova?
-                  </p>
-                  <p className="mt-1 align-text-center">
-                      Esta ação não poderá ser desfeita.
-                  </p>
-                  <p className="mt-3 border-l-6 border-red-500 bg-red-100 text-red-900 font-medium px-4 py-2 rounded-lg">
-                    Todas as notas dos alunos associadas a esta prova também serão excluídas.
-                  </p>
-                      <div className="flex gap-5 mt-6">
-                  <button
-                    className="bg-red-600 text-white font-medium px-10 py-2 rounded-lg hover:bg-red-700 transition cursor-pointer"
-                    onClick={() => {
-                      if (provaIdSelecionada != null) handleDelete(provaIdSelecionada);
-                      setConfirmationDelete(false);
-                      setProvaIdSelecionada(null);
-                    }}
-                  >
-                    Excluir
-                  </button>
-                  <button className="bg-gray-300 text-gray-800 font-medium px-9 py-2 rounded-lg hover:text-amber-50 hover:bg-gray-500 transition cursor-pointer"
-                   onClick={() => {
-                    setConfirmationDelete(false);
-                    setProvaIdSelecionada(null);
-                   }}>
-                    Cancelar
-                  </button>
-                </div>
-            </div>
-          </div>
-        )}
+        <ConfirmDialog
+          isOpen={confirmationDelete}
+          title="Tem certeza que deseja excluir a prova?"
+          description="Esta ação não poderá ser desfeita."
+          warning="Todas as notas dos alunos associadas a esta prova também serão excluídas."
+          confirmText="Excluir"
+          cancelText="Cancelar"
+          onConfirm={() => {
+            if (provaIdSelecionada != null) handleDelete(provaIdSelecionada);
+            setConfirmationDelete(false);
+            setProvaIdSelecionada(null);
+          }}
+          onCancel={() => {
+          setConfirmationDelete(false);
+          setProvaIdSelecionada(null);
+          }}
+        />
+      )}
       
       {provas.length === 0 && (
         <div className="px-5 py-4 text-sm text-gray-500 text-center">

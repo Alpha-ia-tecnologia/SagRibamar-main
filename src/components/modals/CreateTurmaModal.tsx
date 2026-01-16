@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useApi } from "../../utils/api";
 
 interface CreateTurmaModalProps {
   turmaId: number | null;
@@ -11,26 +12,42 @@ interface Escola {
   nome: string;
 }
 
-const turnos = ["MANHA", "TARDE", "NOITE"] as const;
+interface Serie {
+  value: string;
+  label: string;
+}
 
-const series = [
-  "PRIMEIRO_ANO",
-  "SEGUNDO_ANO",
-  "TERCEIRO_ANO",
-  "QUARTO_ANO",
-  "QUINTO_ANO",
-  "SEXTO_ANO",
-  "SETIMO_ANO",
-  "OITAVO_ANO",
-  "NONO_ANO",
-  "PRIMEIRA_SERIE",
-  "SEGUNDA_SERIE",
-  "TERCEIRA_SERIE",
-  "PRIMEIRO_E_SEGUNDO_ANOS",
-  "TERCEIRO_AO_QUINTO_ANO",
-  "PRIMEIRO_AO_QUINTO_ANO",
-  "EJA",
-] as const;
+const formatarTextoSelect = (texto: string) => {
+  const mapaSeries: Record<string, string> = {
+    PRIMEIRO_ANO: "1° ano",
+    SEGUNDO_ANO: "2° ano",
+    TERCEIRO_ANO: "3° ano",
+    QUARTO_ANO: "4° ano",
+    QUINTO_ANO: "5° ano",
+    SEXTO_ANO: "6° ano",
+    SETIMO_ANO: "7° ano",
+    OITAVO_ANO: "8° ano",
+    NONO_ANO: "9° ano",
+    PRIMEIRA_SERIE: "1ª série",
+    SEGUNDA_SERIE: "2ª série",
+    TERCEIRA_SERIE: "3ª série",
+    EJA: "EJA"
+  };
+
+  const mapaTurnos: Record<string, string> = {
+    MATUTINO: "Matutino",
+    VESPERTINO: "Vespertino",
+    NOTURNO: "Noturno"
+  };
+
+  return (
+    mapaSeries[texto] ||
+    mapaTurnos[texto] ||
+    texto.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+  );
+};
+
+const turnos = ["MATUTINO", "VESPERTINO", "NOTURNO"] as const;
 
 export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaModalProps) => {
   const [escolaId, setEscolaId] = useState<number | "">("");
@@ -38,18 +55,62 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
   const [serie, setSerie] = useState<string>("");
   const [turno, setTurno] = useState<string>("");
   const [escolas, setEscolas] = useState<Escola[]>([]);
+  const [series, setSeries] = useState<Serie[]>([]);
   const [loading, setLoading] = useState(false);
+  const dadosCarregadosRef = useRef(false);
+  const api = useApi();
 
   useEffect(() => {
     const fetchEscolas = async () => {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas?limit=200`);
+      const res = await api.get(`/api/escolas?limit=200`);
       const data = await res.json();
       const lista = Array.isArray(data) ? data : data.data;
       setEscolas(Array.isArray(lista) ? lista : []);
     };
 
     fetchEscolas();
-  }, []);
+  }, [api]);
+
+  useEffect(() => {
+    const fetchSeries = async () => {
+      try {
+        const res = await api.get(`/api/enums/series`);
+        if (!res.ok) throw new Error("Erro ao buscar séries");
+        const data: Serie[] = await res.json();
+        setSeries(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Erro ao buscar séries:", error);
+        setSeries([]);
+      }
+    };
+
+    fetchSeries();
+  }, [api]);
+
+  // Buscar dados da turma se estiver editando
+  useEffect(() => {
+    if (turmaId && !dadosCarregadosRef.current) {
+      dadosCarregadosRef.current = true;
+      const fetchTurma = async () => {
+        try {
+          const res = await api.get(`/api/turmas/${turmaId}`);
+          if (!res.ok) throw new Error("Erro ao buscar turma");
+          
+          const data = await res.json();
+          setNome(data.nome || "");
+          setEscolaId(data.escola_id || "");
+          setSerie(data.serie || "");
+          setTurno(data.turno || "");
+        } catch (error) {
+          console.error("Erro ao carregar turma:", error);
+          alert("Erro ao carregar dados da turma");
+          dadosCarregadosRef.current = false; // Permite tentar novamente em caso de erro
+        }
+      };
+
+      fetchTurma();
+    }
+  }, [turmaId, api]);
 
   const handleSubmit = async () => {
     if (!nome.trim() || escolaId === "" || serie === "" || turno === "") {
@@ -66,17 +127,46 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
     };
 
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/turmas${turmaId ? `/${turmaId}` : ""}`, {
-        method: turmaId ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) throw new Error("Erro ao salvar turma");
+      const res = turmaId 
+        ? await api.put(`/api/turmas/${turmaId}`, payload)
+        : await api.post(`/api/turmas`, payload);
+      if (!res.ok) {
+        let errorMessage = "Erro ao salvar turma";
+        
+        try {
+          const errorText = await res.text();
+          console.error("Erro da API:", errorText);
+          
+          if (errorText && errorText.trim()) {
+            // Tenta parsear como JSON
+            try {
+              const errorData = JSON.parse(errorText);
+              // A API retorna { "error": "mensagem" }
+              errorMessage = errorData.error || errorData.message || errorData.detail || errorText.trim();
+            } catch {
+              // Se não for JSON, usa o texto direto
+              errorMessage = errorText.trim();
+            }
+          }
+        } catch (parseError) {
+          console.error("Erro ao ler resposta de erro:", parseError);
+        }
+        
+        alert(errorMessage);
+        setLoading(false);
+        return;
+      }
 
       onSuccess();
     } catch (err) {
-      alert("Erro ao salvar turma");
+      let errorMessage = "Erro ao salvar turma";
+      
+      if (err instanceof Error && err.message !== "Erro ao salvar turma") {
+        errorMessage = err.message;
+      }
+      
+      alert(errorMessage);
+      console.error("Erro ao salvar turma:", err);
     } finally {
       setLoading(false);
     }
@@ -99,9 +189,17 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
               }
               className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
             >
-              <option value="">Selecione uma escola</option>
+              {!turmaId && (
+                <option 
+                value=""
+                disabled>
+                  Selecione uma escola
+                </option>
+              )}
               {escolas.map((escola) => (
-                <option key={escola.id} value={escola.id}>
+                <option 
+                key={escola.id} 
+                value={escola.id}>
                   {escola.nome}
                 </option>
               ))}
@@ -124,14 +222,21 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
               value={serie}
               onChange={(e) => setSerie(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-            >
-              <option value="">Selecione a série</option>
-              {series.map((s) => (
-                <option key={s} value={s}>
-                  {s.replace(/_/g, " ").toLowerCase().replace(/^\w/, c => c.toUpperCase())}
-                </option>
-              ))}
-            </select>
+              >
+                {!turmaId && (
+                  <option 
+                  value=""
+                  disabled>
+                    Selecione uma Série
+                  </option>
+                )}
+                {series.map(s => (
+                  <option 
+                  key={s.value}
+                  value={s.value}>
+                    {s.label}
+                  </option>))}
+             </select>
           </div>
 
           <div>
@@ -141,12 +246,19 @@ export const CreateTurmaModal = ({ turmaId, onClose, onSuccess }: CreateTurmaMod
               onChange={(e) => setTurno(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
             >
-              <option value="">Selecione o turno</option>
-              {turnos.map((t) => (
-                <option key={t} value={t}>
-                  {t.charAt(0) + t.slice(1).toLowerCase()}
+              {!turmaId && (
+                <option 
+                value=""
+                disabled>
+                  Selecione um Turno
                 </option>
-              ))}
+              )}
+              {turnos.map(t => 
+              <option
+              key={t}
+              value={t}>
+                {formatarTextoSelect(t)}
+              </option>)}
             </select>
           </div>
         </div>

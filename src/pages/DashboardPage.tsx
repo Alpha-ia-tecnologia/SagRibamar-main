@@ -9,9 +9,13 @@ import { GraficoRankingRegioes } from "../components/GraficoRankingRegioes";
 import { TabelaHabilidadesBNCC } from "../components/TabelaHabilidadesBNCC";
 import { RankingAlunos } from "../components/RankingAlunos";
 import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
+import { useApi } from "../utils/api";
+import Footer from "../components/Footer";
+import GraficoArea from "../components/GraficoArea";
 
 export const DashboardPage = () => {
   const { filtros } = useFiltroDashboard();
+  const api = useApi();
 
   const handleExport = async () => {
     try {
@@ -25,11 +29,7 @@ export const DashboardPage = () => {
       if (filtros.filtro) params.append("tipo_filtro", filtros.filtro); 
       if (filtros.provaId) params.append("prova_id", filtros.provaId);   
 
-      const url = `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/dashboard/export-xlsx?${params.toString()}`;
-
-      const response = await fetch(url, {
-        method: "GET",
-      });
+      const response = await api.get(`/api/dashboard/export-xlsx?${params.toString()}`);
 
       if (!response.ok) {
         throw new Error("Erro ao exportar o arquivo");
@@ -53,7 +53,7 @@ export const DashboardPage = () => {
   return (
     <>
       <Header />
-      <div className="pt-20 p-12 bg-gray-100 min-h-screen">
+      <div className="p-12 bg-gray-100 min-h-screen">
         <PageHeader
           title="Dashboard"
           description="Visão geral do Sistema de Avaliação e Gerenciamento"
@@ -77,7 +77,11 @@ export const DashboardPage = () => {
         </div>
 
         <TabelaDesempenhoEscolas />
+
+        <div className="grid grid-cols-2 gap-4">
+        <GraficoArea />
         <GraficoDesempenhoAvaliacoes />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
           <GraficoComponentesCurriculares />
@@ -91,6 +95,10 @@ export const DashboardPage = () => {
         <div className="mt-8">
           <RankingAlunos />
         </div>
+      </div>
+      
+      <div>
+        <Footer />
       </div>
     </>
   );

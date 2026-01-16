@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { SuccessCheck } from "./Checked";
+import { useApi } from "../utils/api";
 
 interface Escola { id: number; nome: string; }
 interface Prova {
@@ -9,15 +10,27 @@ interface Prova {
 }
 
 const serieNomes: Record<string, string> = {
-  "PRIMEIRO_ANO": "1º Ano",
-  "SEGUNDO_ANO": "2º Ano",
-  "TERCEIRO_ANO": "3º Ano",
-  "QUARTO_ANO": "4º Ano",
-  "QUINTO_ANO": "5º Ano",
-  "SEXTO_ANO": "6º Ano",
-  "SETIMO_ANO": "7º Ano",
-  "OITAVO_ANO": "8º Ano",
-  "NONO_ANO": "9º Ano"
+    PRIMEIRO_ANO: "1° ano",
+    SEGUNDO_ANO: "2° ano",
+    TERCEIRO_ANO: "3° ano",
+    QUARTO_ANO: "4° ano",
+    QUINTO_ANO: "5° ano",
+    SEXTO_ANO: "6° ano",
+    SETIMO_ANO: "7° ano",
+    OITAVO_ANO: "8° ano",
+    NONO_ANO: "9° ano",
+    PRIMEIRA_SERIE: "1ª série",
+    SEGUNDA_SERIE: "2ª série",
+    TERCEIRA_SERIE: "3ª série",
+    EJA: "EJA",
+    INFANTIL_I: "Infantil I",
+    INFANTIL_II: "Infantil II",
+    INFANTIL_III: "Infantil III",
+    PRE_I: "Pré I",
+    PRE_II: "Pré II",
+    PRE_III: "Pré III",
+    CRECHE: "Creche",
+    TURMA_DE_HABILIDADES: "Turma Habilidades"
 };
 
 export const SelecaoEscolaSerieProva = () => {
@@ -30,43 +43,80 @@ export const SelecaoEscolaSerieProva = () => {
   const [provaSelecionada, setProvaSelecionada] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const api = useApi();
 
   useEffect(() => {
-    fetch(`${(window as any).__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas?page=1&limit=200`)
+    api.get(`/api/escolas?page=1&limit=200`)
       .then(res => res.json())
       .then(data => Array.isArray(data.data) ? setEscolas(data.data) : setEscolas([]))
       .catch(console.error);
   }, []);
 
   useEffect(() => {
-    if (!escolaSelecionada) return;
-    fetch(`${(window as any).__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/obter-series-escola?escola_id=${escolaSelecionada}`)
-      .then(res => res.json())
-      .then(data => Array.isArray(data) ? setSeries(data) : setSeries([]))
-      .catch(console.error);
-  }, [escolaSelecionada]);
+    if (escolaSelecionada) {
+      // Se há escola selecionada, busca as séries da escola
+      api.get(`/api/obter-series-escola?escola_id=${escolaSelecionada}`)
+        .then(res => res.json())
+        .then(data => {
+          const novasSeries = Array.isArray(data) ? data : [];
+          setSeries(novasSeries);
+        })
+        .catch(console.error);
+    } else {
+      // Se não há escola, carrega todas as séries disponíveis
+      api.get(`/api/enums/series`)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data) && data.length > 0) {
+            // Se os dados são objetos com value/label, extrai apenas os values
+            const seriesArray = data.map((s: any) => s.value || s);
+            setSeries(seriesArray);
+          } else {
+            // Fallback para as séries definidas no componente
+            setSeries(Object.keys(serieNomes));
+          }
+        })
+        .catch(() => {
+          // Fallback para as séries definidas no componente
+          setSeries(Object.keys(serieNomes));
+        });
+    }
+  }, [escolaSelecionada, api]);
+
+  // Verifica se a série selecionada ainda está disponível quando as séries mudarem
+  useEffect(() => {
+    if (serieSelecionada && series.length > 0 && !series.includes(serieSelecionada)) {
+      setSerieSelecionada(null);
+      setProvaSelecionada(null);
+      setProvas([]);
+    }
+  }, [series, serieSelecionada]);
 
   useEffect(() => {
     if (!serieSelecionada) return;
-    fetch(`${(window as any).__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/provas?serie=${serieSelecionada}`)
+    api.get(`/api/provas?serie=${serieSelecionada}`)
       .then(res => res.json())
       .then(data => Array.isArray(data) ? setProvas(data) : setProvas([]))
       .catch(console.error);
   }, [serieSelecionada]);
 
   const gerarGabarito = async () => {
-    if (!escolaSelecionada || !serieSelecionada || !provaSelecionada) {
-      alert("Selecione todos os campos antes de gerar o gabarito.");
+    if (!serieSelecionada || !provaSelecionada) {
+      alert("Selecione a série e a prova antes de gerar o gabarito.");
       return;
     }
 
     const prova = provas.find(p => p.id === provaSelecionada);
-    const payload = {
-      school_id: escolaSelecionada,
+    const payload: any = {
       exam_id: provaSelecionada,
       classroom_name: serieSelecionada,
       question: prova?._count?.questoes || 0
     };
+    
+    // Adiciona school_id apenas se uma escola foi selecionada
+    if (escolaSelecionada) {
+      payload.school_id = escolaSelecionada;
+    }
 
     setIsLoading(true);
     try {
@@ -85,14 +135,17 @@ export const SelecaoEscolaSerieProva = () => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", "gabarito.pdf");
+      const nomeEscola = escolaSelecionada 
+        ? escolas.find(escola => escola.id === escolaSelecionada)?.nome || "Escola"
+        : "";
+      const nomeArquivo = `${nomeEscola ? nomeEscola + "-" : ""}${serieNomes[serieSelecionada] || serieSelecionada}-${prova?.nome || "Prova"}.pdf`;
+      link.setAttribute("download", nomeArquivo);
       document.body.appendChild(link);
       link.click();
       link.remove();
       URL.revokeObjectURL(url);
       setSuccess (true);
       setTimeout(() => setSuccess(false), 4000);
-
     } catch (err) {
       console.error(err);
       alert("Falha ao gerar o gabarito.");
@@ -134,10 +187,11 @@ export const SelecaoEscolaSerieProva = () => {
           <select
             value={escolaSelecionada ?? ""}
             onChange={(e) => {
-              setEscolaSelecionada(Number(e.target.value) || null);
-              setSerieSelecionada(null);
+              const novaEscola = Number(e.target.value) || null;
+              setEscolaSelecionada(novaEscola);
+              // Não limpa a série selecionada, apenas recarrega as séries disponíveis
+              // Se a série atual não estiver nas novas séries, será limpa pelo useEffect
               setProvaSelecionada(null);
-              setSeries([]);
               setProvas([]);
             }}
             className="w-full p-2 border border-gray-300 rounded"
@@ -160,12 +214,10 @@ export const SelecaoEscolaSerieProva = () => {
               setProvaSelecionada(null);
               setProvas([]);
             }}
-            disabled={!escolaSelecionada || isLoading}
+            disabled={isLoading}
             className="w-full p-2 border border-gray-300 rounded bg-white"
           >
-            <option value="">
-              {escolaSelecionada ? "Selecione uma série" : "Selecione uma escola primeiro"}
-            </option>
+            <option value="">Selecione uma série</option>
             {series.map((serie) => (
               <option key={serie} value={serie}>
                 {serieNomes[serie] || serie}
@@ -198,7 +250,7 @@ export const SelecaoEscolaSerieProva = () => {
         <button
           onClick={gerarGabarito}
           className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60"
-          disabled={isLoading || !escolaSelecionada || !serieSelecionada || !provaSelecionada}
+          disabled={isLoading || !serieSelecionada || !provaSelecionada}
         >
           {isLoading ? "Gerando gabarito..." : "Gerar Gabarito"}
         </button>

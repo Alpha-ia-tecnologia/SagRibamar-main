@@ -7,6 +7,7 @@ interface User {
   nome: string;
   email: string;
   tipo_usuario: string;
+  municipio?: string;
 }
 
 interface AuthContextProps {
@@ -30,8 +31,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const storedUser = sessionStorage.getItem("currentUser");
     const storedToken = localStorage.getItem("token");
     if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setToken(storedToken);
+      try {
+        setUser(JSON.parse(storedUser));
+        setToken(storedToken);
+      } catch (error) {
+        console.error("Erro ao fazer parse do usuário armazenado:", error);
+        // Limpa dados corrompidos
+        sessionStorage.removeItem("currentUser");
+        localStorage.removeItem("token");
+      }
     }
   }, []);
 

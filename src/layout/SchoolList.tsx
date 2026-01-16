@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { IconButton } from "../components/IconButton";
+import { useApi } from "../utils/api";
+import { ConfirmDialog } from "../components/modals/ConfirmDialog";
 
 interface Regiao {
   id: number;
@@ -41,6 +43,9 @@ export const SchoolList = ({
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [confirmationDelete, setConfirmationDelete] = useState(false);
+  const [escolaIdSelecionada, setEscoldaIdSelecionada] = useState<number | null>(null);
+  const api = useApi();
 
   const fetchEscolas = async () => {
     try {
@@ -52,9 +57,7 @@ export const SchoolList = ({
       if (regiaoId !== null) queryParams.append("regiao_id", String(regiaoId));
 if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
 
-      const res = await fetch(
-        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas?${queryParams.toString()}`
-      );
+      const res = await api.get(`/api/escolas?${queryParams.toString()}`);
 
       const data = await res.json();
       setEscolas(data.data || []);
@@ -69,6 +72,11 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
     fetchEscolas();
   }, [page, searchNome, regiaoId, grupoId]);
 
+  // Reseta a paginação para página 1 quando os filtros mudarem
+  useEffect(() => {
+    setPage(1);
+  }, [searchNome, regiaoId, grupoId]);
+
   useEffect(() => {
     if (reload) {
       fetchEscolas().then(() => onReloadDone?.());
@@ -76,13 +84,8 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
   }, [reload, onReloadDone]);
 
   const handleDelete = async (id: number) => {
-    const confirmDelete = window.confirm("Deseja excluir esta escola?");
-    if (!confirmDelete) return;
-
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas/${id}`, {
-        method: "DELETE",
-      });
+      const res = await api.delete(`/api/escolas/${id}`);
 
       if (!res.ok) throw new Error("Erro ao excluir");
 
@@ -147,7 +150,12 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
           </div>
           <div className="flex gap-3">
             <IconButton type="edit" onClick={() => onEdit?.(escola.id)} />
-            <IconButton type="delete" onClick={() => handleDelete(escola.id)} />
+            <IconButton 
+            type="delete" 
+            onClick={() => {
+              setEscoldaIdSelecionada(escola.id); // <- salva o id);
+              setConfirmationDelete(true)
+            }} />
           </div>
         </div>
       ))}
@@ -197,6 +205,26 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
           >
             &gt;
           </button>
+
+          {confirmationDelete && (
+            <ConfirmDialog
+            isOpen={confirmationDelete}
+            title="Tem certeza que deseja excluir essa escola?"
+            description="Ao excluir uma escola, todas as provas, turmas e alunos vinculados a ela também serão excluídos."
+            warning="Esta ação é irreversível e resultará na perda de todos os dados associados à escola."
+            confirmText="Excluir"
+            cancelText="Cancelar"
+            onConfirm={() => {
+              if ( escolaIdSelecionada != null) handleDelete(escolaIdSelecionada);
+              setConfirmationDelete(false);
+              setEscoldaIdSelecionada(null);
+            }}
+            onCancel={() => {
+              setConfirmationDelete(false)
+              setEscoldaIdSelecionada(null);
+            }}
+            
+            />)}
         </div>
       </div>
     </div>

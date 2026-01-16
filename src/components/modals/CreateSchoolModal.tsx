@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useApi } from "../../utils/api";
 
 interface CreateSchoolModalProps {
   onClose: () => void;
@@ -30,32 +31,31 @@ export const CreateSchoolModal = ({
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const api = useApi();
 
   useEffect(() => {
     const fetchRegioes = async () => {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/regioes`);
+      const res = await api.get(`/api/regioes`);
       const data = await res.json();
       setRegioes(data);
     };
 
     const fetchGrupos = async () => {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/grupos`);
+      const res = await api.get(`/api/grupos`);
       const data = await res.json();
       setGrupos(data);
     };
 
     fetchRegioes();
     fetchGrupos();
-  }, []);
+  }, [api]);
 
   useEffect(() => {
     if (!escolaId) return;
 
     const fetchEscola = async () => {
       try {
-        const res = await fetch(
-          `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas/${escolaId}`
-        );
+        const res = await api.get(`/api/escolas/${escolaId}`);
         if (!res.ok) throw new Error("Erro ao buscar escola");
         const data = await res.json();
         setNome(data.nome);
@@ -81,26 +81,48 @@ export const CreateSchoolModal = ({
     };
 
     try {
-      const res = await fetch(
-        escolaId
-          ? `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas/${escolaId}`
-          : `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/escolas`,
-        {
-          method: escolaId ? "PUT" : "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const res = escolaId 
+        ? await api.put(`/api/escolas/${escolaId}`, payload)
+        : await api.post(`/api/escolas`, payload);
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || "Erro ao salvar escola");
+        let errorMessage = "Erro ao salvar escola";
+        
+        try {
+          const errorText = await res.text();
+          console.error("Erro da API:", errorText);
+          
+          if (errorText && errorText.trim()) {
+            // Tenta parsear como JSON
+            try {
+              const errorData = JSON.parse(errorText);
+              // A API retorna { "error": "mensagem" }
+              errorMessage = errorData.error || errorData.message || errorData.detail || errorText.trim();
+            } catch {
+              // Se não for JSON, usa o texto direto
+              errorMessage = errorText.trim();
+            }
+          }
+        } catch (parseError) {
+          console.error("Erro ao ler resposta de erro:", parseError);
+        }
+        
+        setError(errorMessage);
+        setLoading(false);
+        return;
       }
 
       onSuccess?.();
       onClose();
     } catch (err: any) {
-      setError(err.message);
+      let errorMessage = "Erro ao salvar escola";
+      
+      if (err instanceof Error && err.message !== "Erro ao salvar escola") {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
+      console.error("Erro ao salvar escola:", err);
     } finally {
       setLoading(false);
     }

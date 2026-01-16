@@ -10,8 +10,18 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
+import { useApi } from "../utils/api";
+import NoData from "./NoData";
+import { Loading } from "./Loading";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 interface RegiaoDesempenho {
   regiao_id: number;
@@ -28,6 +38,7 @@ interface EstatisticasGerais {
 
 export const GraficoRankingRegioes = () => {
   const [dadosRegioes, setDadosRegioes] = useState<RegiaoDesempenho[]>([]);
+  const [loading, setLoading] = useState(false);
   const [estatisticas, setEstatisticas] = useState<EstatisticasGerais>({
     total_regioes: 0,
     media_geral: 0,
@@ -35,10 +46,12 @@ export const GraficoRankingRegioes = () => {
   });
 
   const { filtros } = useFiltroDashboard();
+  const api = useApi();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const params = new URLSearchParams();
 
         if (filtros.regiaoId) params.append("regiao_id", filtros.regiaoId);
@@ -48,13 +61,18 @@ export const GraficoRankingRegioes = () => {
         if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
         if (filtros.provaId) params.append("prova_id", filtros.provaId); // ✅ corrigido
 
-        const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/dashboard/regional-performance?${params.toString()}`);
+        const res = await api.get(
+          `/api/dashboard/regional-performance?${params.toString()}`
+        );
         const data = await res.json();
 
         setDadosRegioes(data.dados_grafico || []);
         setEstatisticas(data.estatisticas_gerais || {});
       } catch (error) {
+        setLoading(false);
         console.error("Erro ao buscar dados de desempenho por região", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -96,8 +114,10 @@ export const GraficoRankingRegioes = () => {
     <div className="bg-white rounded-xl shadow p-6 w-full">
       <h2 className="text-lg font-semibold mb-4">Ranking das Regiões</h2>
 
-      {dadosRegioes.length === 0 ? (
-        <p className="text-gray-500 text-sm">Nenhum dado encontrado com os filtros aplicados.</p>
+      {loading ? (
+        <Loading />
+      ) : dadosRegioes.length === 0 ? (
+        <NoData />
       ) : (
         <Bar data={chartData} options={chartOptions} />
       )}
@@ -109,7 +129,9 @@ export const GraficoRankingRegioes = () => {
         </div>
         <div className="bg-gray-50 border rounded-xl p-4 text-center">
           <p className="text-gray-500">Média Geral</p>
-          <p className="text-lg font-semibold">{estatisticas.media_geral?.toFixed(1) || "0.0"}</p>
+          <p className="text-lg font-semibold">
+            {estatisticas.media_geral?.toFixed(1) || "0.0"}
+          </p>
         </div>
         <div className="bg-gray-50 border rounded-xl p-4 text-center">
           <p className="text-gray-500">Melhor Região</p>

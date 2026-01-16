@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { IconButton } from "../components/IconButton";
+import { useApi } from "../utils/api";
+import { ConfirmDialog } from "../components/modals/ConfirmDialog";
 
 interface Escola {
   id: number;
@@ -11,6 +13,9 @@ interface Turma {
   nome: string;
   escola_id: number;
   escola: Escola;
+  turno: string;
+  serie: string;
+  _count: { alunos: number }
 }
 
 interface TurmaListProps {
@@ -19,7 +24,72 @@ interface TurmaListProps {
   onEdit?: (id: number) => void;
   searchNome: string;
   escolaId: number | null;
+  serieId: string | null;
 }
+
+const formatarTextoSelect = (texto: string) => {
+  const mapaSeries: Record<string, string> = {
+    PRIMEIRO_ANO: "1° ano",
+    SEGUNDO_ANO: "2° ano",
+    TERCEIRO_ANO: "3° ano",
+    QUARTO_ANO: "4° ano",
+    QUINTO_ANO: "5° ano",
+    SEXTO_ANO: "6° ano",
+    SETIMO_ANO: "7° ano",
+    OITAVO_ANO: "8° ano",
+    NONO_ANO: "9° ano",
+    PRIMEIRA_SERIE: "1ª série",
+    SEGUNDA_SERIE: "2ª série",
+    TERCEIRA_SERIE: "3ª série",
+    EJA: "EJA",
+    INFANTIL_I: "Infantil I",
+    INFANTIL_II: "Infantil II",
+    INFANTIL_III: "Infantil III",
+    PRE_I: "Pré I",
+    PRE_II: "Pré II",
+    PRE_III: "Pré III",
+    CRECHE: "Creche",
+    TURMA_DE_HABILIDADES: "Turma Habilidades",
+  };
+
+  const mapaTurnos: Record<string, string> = {
+    MATUTINO: "Matutino",
+    VESPERTINO: "Vespertino",
+    NOTURNO: "Noturno"
+  };
+
+  return (
+    mapaSeries[texto] ||
+    mapaTurnos[texto] ||
+    texto.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+  );
+};
+
+const turnos = ["MATUTINO", "VESPERTINO", "NOTURNO"] as const;
+
+const series = [
+  "PRIMEIRO_ANO",
+  "SEGUNDO_ANO",
+  "TERCEIRO_ANO",
+  "QUARTO_ANO",
+  "QUINTO_ANO",
+  "SEXTO_ANO",
+  "SETIMO_ANO",
+  "OITAVO_ANO",
+  "NONO_ANO",
+  "PRIMEIRA_SERIE",
+  "SEGUNDA_SERIE",
+  "TERCEIRA_SERIE",
+  "EJA",
+  "INFANTIL_I",
+  "INFANTIL_II",
+  "INFANTIL_III",
+  "PRE_I",
+  "PRE_II",
+  "PRE_III",
+  "CRECHE",
+  "TURMA_DE_HABILIDADES"
+] as const;
 
 export const TurmaList = ({
   reload,
@@ -27,11 +97,15 @@ export const TurmaList = ({
   onEdit,
   searchNome,
   escolaId,
+  serieId,
 }: TurmaListProps) => {
   const [turmas, setTurmas] = useState<Turma[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [turmaIdSelecionada, setTurmaIdSelecionada] = useState<number | null>(null);
+  const [confirmationDelete, setConfirmationDelete] = useState(false);
+  const api = useApi();
 
   const fetchTurmas = async () => {
     try {
@@ -41,10 +115,9 @@ export const TurmaList = ({
 
       if (searchNome.trim() !== "") queryParams.append("nome", searchNome);
       if (escolaId !== null) queryParams.append("escola_id", String(escolaId));
+      if (serieId !== null) queryParams.append("serie", serieId);
 
-      const res = await fetch(
-        `${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/turmas?${queryParams.toString()}`
-      );
+      const res = await api.get(`/api/turmas?${queryParams.toString()}`);
 
       const data = await res.json();
       setTurmas(data.data || []);
@@ -57,7 +130,12 @@ export const TurmaList = ({
 
   useEffect(() => {
     fetchTurmas();
-  }, [page, searchNome, escolaId]);
+  }, [page, searchNome, escolaId, serieId]);
+
+  // Reseta a paginação para página 1 quando os filtros mudarem
+  useEffect(() => {
+    setPage(1);
+  }, [searchNome, escolaId, serieId]);
 
   useEffect(() => {
     if (reload) {
@@ -66,13 +144,8 @@ export const TurmaList = ({
   }, [reload, onReloadDone]);
 
   const handleDelete = async (id: number) => {
-    const confirmDelete = window.confirm("Deseja excluir esta turma?");
-    if (!confirmDelete) return;
-
     try {
-      const res = await fetch(`${window.__ENV__?.API_URL ?? import.meta.env.VITE_API_URL}/api/turmas/${id}`, {
-        method: "DELETE",
-      });
+      const res = await api.delete(`/api/turmas/${id}`);
 
       if (!res.ok) throw new Error("Erro ao excluir");
 
@@ -131,13 +204,22 @@ export const TurmaList = ({
                 {turma.nome}
               </p>
               <p className="text-sm text-gray-500">
-                ID: {turma.id} | Escola: {turma.escola?.nome || "N/A"}
+                ID: {turma.id} | 
+                Escola: {turma.escola?.nome || "N/A"} | 
+                Série: {series.filter(s => s === turma.serie).map(s => formatarTextoSelect(s))} | 
+                Turno: {turnos.filter(t => t === turma.turno).map(t => formatarTextoSelect(t))} | 
+                Alunos: {turma._count.alunos} 
               </p>
             </div>
           </div>
           <div className="flex gap-3">
             <IconButton type="edit" onClick={() => onEdit?.(turma.id)} />
-            <IconButton type="delete" onClick={() => handleDelete(turma.id)} />
+            <IconButton 
+            type="delete" 
+            onClick={() => {
+              setTurmaIdSelecionada(turma.id)
+              setConfirmationDelete(true)
+            }} />
           </div>
         </div>
       ))}
@@ -187,6 +269,24 @@ export const TurmaList = ({
           >
             &gt;
           </button>
+          {confirmationDelete && (
+            <ConfirmDialog
+            isOpen={confirmationDelete}
+            title="Tem certeza que deseja excluir essa turma?"
+            description="Ao excluir uma turma, todos os alunos vinculados a ela também serão excluídos."
+            warning="Esta ação é irreversível e resultará na perda de todos os dados associados à turma."
+            confirmText="Excluir"
+            cancelText="Cancelar"
+            onConfirm={() => {
+              if (turmaIdSelecionada != null) handleDelete(turmaIdSelecionada);
+              setConfirmationDelete(false);
+              setTurmaIdSelecionada(null);
+            }}
+            onCancel={()=> {
+              setConfirmationDelete(false)
+              setTurmaIdSelecionada(null);
+            }}
+          />)}
         </div>
       </div>
     </div>
