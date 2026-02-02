@@ -8,8 +8,6 @@ interface User {
   email: string;
   tipo_usuario: string;
   municipio?: string;
-  ativo?: boolean;
-  data_expiracao?: string;
 }
 
 interface AuthContextProps {
@@ -56,17 +54,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-
-        // Tratamento de erros especificos da API
-        if (errorData.error === "usuario_inativo") {
-          throw new Error("Usuário desativado. Entre em contato com o administrador.");
-        }
-        if (errorData.error === "usuario_expirado") {
-          throw new Error("Seu acesso expirou. Entre em contato com o administrador.");
-        }
-
-        throw new Error(errorData.message || "Email ou senha inválidos");
+        throw new Error("Email ou senha inválidos");
       }
 
       const data = await res.json();

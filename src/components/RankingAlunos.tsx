@@ -166,28 +166,26 @@ export const RankingAlunos = () => {
         </div>
       </div>
 
-      {/* Conteudo */}
-      <div className="p-6">
-        {loading ? (
-          <Loading />
-        ) : alunos.length === 0 ? (
-          <NoData />
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">#</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Aluno</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Escola</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Turma</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Desempenho</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nota</th>
-                  </tr>
-                </thead>
+    {loading ? (
+      <Loading />
+    ) : alunos.length === 0 ? (
+      <NoData />
+    ) : (
+      <>
+        <div className="overflow-x-auto rounded-lg border border-gray-200">
+          <table className="w-full text-sm text-left text-gray-700">
+            <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
+              <tr>
+                <th className="px-4 py-3">Posição</th>
+                <th className="px-4 py-3">Aluno</th>
+                <th className="px-4 py-3">Escola</th>
+                <th className="px-4 py-3">Turma</th>
+                <th className="px-4 py-3">Desempenho</th>
+                <th className="px-4 py-3">Maior Nota</th>
+              </tr>
+            </thead>
 
-                <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100">
                   {alunos.map((aluno, index) => {
                     const posicao = (page - 1) * 20 + index + 1;
 
@@ -204,7 +202,7 @@ export const RankingAlunos = () => {
                         </td>
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-sm font-medium">
+                            <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-sm font-medium">
                               {aluno.aluno_nome.charAt(0).toUpperCase()}
                             </div>
                             <span className="font-medium text-gray-900">{aluno.aluno_nome}</span>
@@ -265,10 +263,9 @@ export const RankingAlunos = () => {
                   <ChevronRightIcon className="w-4 h-4" />
                 </button>
               </div>
-            </div>
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

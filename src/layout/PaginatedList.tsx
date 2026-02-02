@@ -17,8 +17,6 @@ interface Usuario {
   nome: string;
   email: string;
   tipo_usuario: string;
-  ativo?: boolean;
-  data_expiracao?: string;
 }
 
 interface PaginatedListProps {
@@ -69,28 +67,6 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
   const handleEditSuccess = () => {
     setEditingUserId(null);
     fetchUsuarios();
-  };
-
-  // Funcao para alternar status ativo/inativo do usuario
-  const toggleUserStatus = async (id: number) => {
-    const usuario = usuarios.find((u) => u.id === id);
-    if (!usuario) return;
-
-    const rota = usuario.ativo ? "desativar" : "ativar";
-
-    try {
-      const res = await api.put(`/api/usuarios/${rota}/${id}`, {});
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || `Erro ao ${rota} usuário`);
-      }
-
-      // Atualiza a lista apos sucesso
-      fetchUsuarios();
-    } catch (err: any) {
-      alert(err.message || `Erro ao ${rota} usuário.`);
-    }
   };
 
   const gerarBotoesPaginacao = (): (number | string)[] => {
@@ -166,15 +142,12 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
                 nome={usuario.nome}
                 email={usuario.email}
                 tipo_usuario={usuario.tipo_usuario}
-                ativo={usuario.ativo !== undefined ? usuario.ativo : true}
-                data_expiracao={usuario.data_expiracao}
                 index={index}
                 onEdit={() => setEditingUserId(usuario.id)}
                 onDelete={() => {
                   setIdUser(usuario.id);
                   setConfirmationDelete(true);
                 }}
-                onToggleStatus={() => toggleUserStatus(usuario.id)}
               />
             ))
           )}
@@ -275,7 +248,7 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
           isOpen={confirmationDelete}
           title="Tem certeza que deseja excluir esse usuario?"
           description="Ao excluir um usuario, o mesmo nao podera mais acessar a plataforma com as mesmas informacoes de login."
-          warning="Esta acao e irreversivel."
+          warning="Esta ação é irreversível."
           onConfirm={() => {
             if (idUser !== null) {
               deleteUsuario(idUser);
