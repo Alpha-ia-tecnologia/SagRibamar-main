@@ -291,7 +291,7 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
           isOpen={confirmationDelete}
           title="Tem certeza que deseja excluir esse usuario?"
           description="Ao excluir um usuario, o mesmo nao podera mais acessar a plataforma com as mesmas informacoes de login."
-          warning="Esta acao e irreversivel."
+          warning="Esta ação é irreversível"
           onConfirm={() => {
             if (idUser !== null) {
               deleteUsuario(idUser);

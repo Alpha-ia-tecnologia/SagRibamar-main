@@ -371,7 +371,7 @@ export const TurmaList = ({
           isOpen={confirmationDelete}
           title="Tem certeza que deseja excluir essa turma?"
           description="Ao excluir uma turma, todos os alunos vinculados a ela tambem serao excluidos."
-          warning="Esta acao e irreversivel e resultara na perda de todos os dados associados a turma."
+          warning="Esta ação é irreversível e resultará na perda de todos os dados associados à turma."
           confirmText="Excluir"
           cancelText="Cancelar"
           onConfirm={() => {

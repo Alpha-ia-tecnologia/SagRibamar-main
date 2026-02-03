@@ -301,7 +301,7 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
           isOpen={confirmationDelete}
           title="Tem certeza que deseja excluir essa escola?"
           description="Ao excluir uma escola, todas as provas, turmas e alunos vinculados a ela tambem serao excluidos."
-          warning="Esta acao e irreversivel e resultara na perda de todos os dados associados a escola."
+          warning="Esta ação é irreversível e resultará na perda de todos os dados associados à escola."
           confirmText="Excluir"
           cancelText="Cancelar"
           onConfirm={() => {
