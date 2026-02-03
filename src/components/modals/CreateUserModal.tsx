@@ -23,6 +23,7 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
   const [senha, setSenha] = useState("");
   const [tipoUsuario, setTipoUsuario] = useState("");
   const [ativo, setAtivo] = useState(true);
+  const [ativoOriginal, setAtivoOriginal] = useState(true);
   const [dataExpiracao, setDataExpiracao] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -40,7 +41,9 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
         setNome(data.nome || "");
         setEmail(data.email || "");
         setTipoUsuario(data.tipo_usuario || "");
-        setAtivo(data.ativo !== undefined ? data.ativo : true);
+        const statusAtivo = data.ativo !== undefined ? data.ativo : true;
+        setAtivo(statusAtivo);
+        setAtivoOriginal(statusAtivo);
         // Formata a data ISO para YYYY-MM-DD (formato do input date)
         if (data.data_expiracao) {
           const date = new Date(data.data_expiracao);
@@ -49,8 +52,8 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
         } else {
           setDataExpiracao("");
         }
-      } catch (err: any) {
-        setError(err.message || "Erro ao carregar usuário");
+      } catch (err: unknown) {
+        setError((err as Error).message || "Erro ao carregar usuário");
       }
     };
 
@@ -139,13 +142,27 @@ export const CreateUserModal = ({ onClose, onSuccess, userId }: CreateUserModalP
         return;
       }
 
+      // Se for edição e o status ativo mudou, chama o endpoint específico
+      if (userId && ativo !== ativoOriginal) {
+        const rota = ativo ? "ativar" : "desativar";
+        try {
+          const statusRes = await api.patch(`/api/usuarios/${rota}/${userId}`, {});
+          if (!statusRes.ok) {
+            const text = await statusRes.text();
+            console.error(`Erro ao ${rota} usuário:`, text);
+          }
+        } catch (statusErr) {
+          console.error(`Erro ao ${rota} usuário:`, statusErr);
+        }
+      }
+
       onSuccess?.();
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
       let errorMessage = "Erro ao salvar usuário";
       
       // Tratamento para erros de rede
-      if (err.message && err.message.includes("fetch")) {
+      if (err instanceof Error && err.message.includes("fetch")) {
         errorMessage = "Erro de conexão. Verifique sua internet e tente novamente.";
       }
       // Tratamento para outros erros
