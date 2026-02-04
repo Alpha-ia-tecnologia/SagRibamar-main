@@ -4,6 +4,7 @@ import { useApi } from "../utils/api";
 import NoData from "./NoData";
 import { Loading } from "./Loading";
 import { HabilidadeBNCCModal } from "./modals/HabilidadeBNCCModal";
+import { DocumentCheckIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 interface Habilidade {
   bncc_id: number;
@@ -246,103 +247,135 @@ export const TabelaHabilidadesBNCC = () => {
     return pagesToShow;
   };
 
+  const getSkillColor = (percentual: number) => {
+    if (percentual >= 70) return "bg-emerald-50 border-emerald-200 hover:border-emerald-300";
+    if (percentual >= 50) return "bg-amber-50 border-amber-200 hover:border-amber-300";
+    return "bg-rose-50 border-rose-200 hover:border-rose-300";
+  };
+
+  const getSkillTextColor = (percentual: number) => {
+    if (percentual >= 70) return "text-emerald-700";
+    if (percentual >= 50) return "text-amber-700";
+    return "text-rose-700";
+  };
+
   return (
-    <div className="relative p-6 bg-white rounded-xl shadow-md">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">Habilidades BNCC / SAEB</h2>
-        <div className="flex gap-2">
-          <button
-            onClick={() => {
-              setFiltroOrdem("erros");
-              setPage(1);
-            }}
-            className={`px-3 py-1 text-sm rounded cursor-pointer ${
-              filtroOrdem === "erros"
-                ? "bg-red-500 text-white"
-                : "bg-red-100 text-red-600 hover:bg-red-200"
-            }`}
-          >
-            Mais Críticas
-          </button>
-          <button
-            onClick={() => {
-              setFiltroOrdem("acertos");
-              setPage(1);
-            }}
-            className={`px-3 py-1 text-sm rounded cursor-pointer ${
-              filtroOrdem === "acertos"
-                ? "bg-green-500 text-white"
-                : "bg-green-100 text-green-600 hover:bg-green-200"
-            }`}
-          >
-            Melhores Resultados
-          </button>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* Header */}
+      <div className="px-6 py-5 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-indigo-50 rounded-lg">
+              <DocumentCheckIcon className="w-5 h-5 text-indigo-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Habilidades BNCC / SAEB</h2>
+              <p className="text-sm text-gray-500">Analise de competencias</p>
+            </div>
+          </div>
+
+          {/* Filtros de Ordenacao */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                setFiltroOrdem("erros");
+                setPage(1);
+              }}
+              className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${
+                filtroOrdem === "erros"
+                  ? "bg-rose-500 text-white shadow-sm"
+                  : "bg-rose-50 text-rose-600 hover:bg-rose-100"
+              }`}
+            >
+              Mais Criticas
+            </button>
+            <button
+              onClick={() => {
+                setFiltroOrdem("acertos");
+                setPage(1);
+              }}
+              className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${
+                filtroOrdem === "acertos"
+                  ? "bg-emerald-500 text-white shadow-sm"
+                  : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+              }`}
+            >
+              Melhores Resultados
+            </button>
+          </div>
         </div>
       </div>
 
-      {loading ? (
-        <Loading />
-      ) : habilidades.length === 0 ? (
-        <NoData />
-      ) : (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-            {habilidades.map((h) => {
-              const percentual = parseFloat(h.percentual_acertos as any);
-              const pct = isNaN(percentual)
-                ? "0.00%"
-                : percentual.toFixed(2) + "%";
+      {/* Conteudo */}
+      <div className="p-6">
+        {loading ? (
+          <Loading />
+        ) : habilidades.length === 0 ? (
+          <NoData />
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {habilidades.map((h) => {
+                const percentual = parseFloat(h.percentual_acertos as string);
+                const pct = isNaN(percentual) ? "0.0" : percentual.toFixed(1);
 
-              let bgColor;
-
-              if (percentual >= 70) {
-                bgColor = "bg-green-100 text-green-800";
-              } else if (percentual >= 50) {
-                bgColor = "bg-yellow-100 text-yellow-800";
-              } else {
-                bgColor = "bg-red-100 text-red-800";
-              }
-
-              return (
-                <button
-                  key={h.bncc_id}
-                  onClick={() => setSelecionada(h)}
-                  className={`${bgColor} p-4 rounded-lg text-left shadow hover:shadow-md transition`}
-                >
-                  <p className="font-bold text-sm">{h.bncc_codigo}</p>
-                  <p className="text-2xl font-extrabold">{pct}</p>
-                  <p className="text-xs text-gray-600">
-                    {h.total_questoes}{" "}
-                    {h.total_questoes > 1 ? "questões" : "questão"}
-                  </p>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="flex justify-between items-center mt-6">
-            <p className="text-sm text-gray-500">
-              Mostrando {(page - 1) * 20 + 1} a {Math.min(page * 20, total)} de{" "}
-              {total} resultados
-            </p>
-            <div className="flex gap-1 items-center">
-              <button
-                onClick={() => setPage(1)}
-                className="w-8 h-8 border rounded bg-white hover:bg-gray-100"
-              >
-                ‹
-              </button>
-              {renderPagination()}
-              <button
-                onClick={() => setPage(totalPages)}
-                className="w-8 h-8 border rounded bg-white hover:bg-gray-100"
-              >
-                ›
-              </button>
+                return (
+                  <button
+                    key={h.bncc_id}
+                    onClick={() => setSelecionada(h)}
+                    className={`group p-4 rounded-xl text-left border-2 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${getSkillColor(percentual)}`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="px-2 py-0.5 bg-white/80 text-gray-700 text-xs font-bold rounded-md">
+                        {h.bncc_codigo}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {h.total_questoes} {h.total_questoes > 1 ? "questoes" : "questao"}
+                      </span>
+                    </div>
+                    <p className={`text-3xl font-bold ${getSkillTextColor(percentual)}`}>
+                      {pct}%
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1 truncate">
+                      {h.componente_curricular_nome}
+                    </p>
+                  </button>
+                );
+              })}
             </div>
-          </div>
-        </>
-      )}
+
+            {/* Paginacao */}
+            <div className="flex flex-col sm:flex-row items-center justify-between mt-6 pt-6 border-t border-gray-100 gap-4">
+              <p className="text-sm text-gray-500">
+                Mostrando <span className="font-medium text-gray-900">{(page - 1) * 20 + 1}</span> a{" "}
+                <span className="font-medium text-gray-900">{Math.min(page * 20, total)}</span> de{" "}
+                <span className="font-medium text-gray-900">{total}</span> resultados
+              </p>
+
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setPage(Math.max(1, page - 1))}
+                  disabled={page === 1}
+                  className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronLeftIcon className="w-4 h-4" />
+                </button>
+
+                {renderPagination()}
+
+                <button
+                  onClick={() => setPage(Math.min(totalPages, page + 1))}
+                  disabled={page === totalPages}
+                  className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronRightIcon className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
       <HabilidadeBNCCModal
         habilidade={selecionada}
         onClose={fecharModal}

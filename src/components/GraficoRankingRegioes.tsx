@@ -13,6 +13,7 @@ import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
 import { useApi } from "../utils/api";
 import NoData from "./NoData";
 import { Loading } from "./Loading";
+import { MapPinIcon } from "@heroicons/react/24/outline";
 
 ChartJS.register(
   CategoryScale,
@@ -83,62 +84,90 @@ export const GraficoRankingRegioes = () => {
     labels: dadosRegioes.map((r) => r.regiao_nome),
     datasets: [
       {
-        label: "Desempenho por Região",
+        label: "Desempenho por Regiao",
         data: dadosRegioes.map((r) => r.media_desempenho),
-        backgroundColor: "rgba(255, 205, 86, 0.8)",
-        borderColor: "rgba(255, 205, 86, 1)",
-        borderWidth: 1,
+        backgroundColor: "rgba(251, 191, 36, 0.7)",
+        borderColor: "rgba(251, 191, 36, 1)",
+        borderWidth: 0,
+        borderRadius: 6,
       },
     ],
   };
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
-      legend: { position: "top" as const },
+      legend: { display: false },
       title: { display: false },
+      tooltip: {
+        backgroundColor: "rgba(17, 24, 39, 0.9)",
+        padding: 12,
+        cornerRadius: 8,
+      },
     },
     scales: {
       y: {
         beginAtZero: true,
         max: 10,
-        title: { display: true, text: "Desempenho (%)" },
+        grid: { color: "rgba(0, 0, 0, 0.05)" },
+        title: { display: true, text: "Desempenho", color: "#6b7280" },
       },
       x: {
-        title: { display: true, text: "Regiões" },
+        grid: { display: false },
+        title: { display: false },
       },
     },
   };
 
   return (
-    <div className="bg-white rounded-xl shadow p-6 w-full">
-      <h2 className="text-lg font-semibold mb-4">Ranking das Regiões</h2>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-full">
+      {/* Header */}
+      <div className="px-6 py-5 border-b border-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-amber-50 rounded-lg">
+            <MapPinIcon className="w-5 h-5 text-amber-600" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Ranking das Regioes</h2>
+            <p className="text-sm text-gray-500">Desempenho por localidade</p>
+          </div>
+        </div>
+      </div>
 
-      {loading ? (
-        <Loading />
-      ) : dadosRegioes.length === 0 ? (
-        <NoData />
-      ) : (
-        <Bar data={chartData} options={chartOptions} />
-      )}
+      {/* Conteudo */}
+      <div className="p-6">
+        {loading ? (
+          <Loading />
+        ) : dadosRegioes.length === 0 ? (
+          <NoData />
+        ) : (
+          <>
+            <div className="h-48 mb-6">
+              <Bar data={chartData} options={chartOptions} />
+            </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 text-sm text-gray-700">
-        <div className="bg-gray-50 border rounded-xl p-4 text-center">
-          <p className="text-gray-500">Total de Regiões</p>
-          <p className="text-lg font-semibold">{estatisticas.total_regioes}</p>
-        </div>
-        <div className="bg-gray-50 border rounded-xl p-4 text-center">
-          <p className="text-gray-500">Média Geral</p>
-          <p className="text-lg font-semibold">
-            {estatisticas.media_geral?.toFixed(1) || "0.0"}
-          </p>
-        </div>
-        <div className="bg-gray-50 border rounded-xl p-4 text-center">
-          <p className="text-gray-500">Melhor Região</p>
-          <p className="text-lg font-semibold text-blue-700">
-            {estatisticas.melhor_regiao || "—"}
-          </p>
-        </div>
+            {/* Estatisticas */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-gray-50 rounded-xl p-3 text-center">
+                <p className="text-xs text-gray-500 mb-1">Total</p>
+                <p className="text-lg font-bold text-gray-900">{estatisticas.total_regioes}</p>
+              </div>
+              <div className="bg-blue-50 rounded-xl p-3 text-center">
+                <p className="text-xs text-gray-500 mb-1">Media Geral</p>
+                <p className="text-lg font-bold text-blue-600">
+                  {estatisticas.media_geral?.toFixed(1) || "0.0"}
+                </p>
+              </div>
+              <div className="bg-emerald-50 rounded-xl p-3 text-center">
+                <p className="text-xs text-gray-500 mb-1">Melhor</p>
+                <p className="text-sm font-bold text-emerald-600 truncate">
+                  {estatisticas.melhor_regiao || "-"}
+                </p>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

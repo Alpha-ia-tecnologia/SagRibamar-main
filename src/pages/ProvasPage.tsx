@@ -1,17 +1,21 @@
 import { useState } from "react";
 import { Header } from "../components/Header";
-import { PageHeader } from "../ui/PageHeader";
 import { ProvaList } from "../layout/ProvaList";
 import { VisualizarProvaModal } from "../components/modals/VisualizarProvaModal";
 import Footer from "../components/Footer";
 import SelectTypeTest from "../components/modals/SelectTypeTest";
+import {
+  DocumentTextIcon,
+  PlusIcon,
+  SparklesIcon,
+} from "@heroicons/react/24/outline";
 
 export default function ProvasPage() {
   const [showModal, setShowModal] = useState(false);
   const [, setEditId] = useState<number | null>(null);
   const [reload, setReload] = useState(false);
   const [visualizarId, setVisualizarId] = useState<number | null>(null);
-  const [modoVisualizacao, setModoVisualizacao] = useState<boolean>(false); 
+  const [modoVisualizacao, setModoVisualizacao] = useState<boolean>(false);
 
   const handleEdit = (id: number) => {
     setEditId(id);
@@ -19,30 +23,84 @@ export default function ProvasPage() {
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
       <Header />
 
-      <div className="p-8 bg-gray-100 min-h-screen">
-        <PageHeader
-          title="Avaliações"
-          description="Gerenciamento de avaliações"
-          actionLabel="Nova Prova"
-          onActionClick={() => {
-            setEditId(null);
-            setShowModal(true);
-          }}
-        />
+      <main className="px-4 sm:px-6 lg:px-8 py-8 max-w-[1600px] mx-auto">
+        {/* Header da Pagina */}
+        <div className="mb-8">
+          <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-2xl p-6 sm:p-8 shadow-xl">
+            {/* Elementos decorativos de fundo */}
+            <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
+            <div className="absolute bottom-0 left-1/4 -mb-8 w-32 h-32 bg-blue-400/20 rounded-full blur-3xl"></div>
+            <div className="absolute top-1/2 right-1/3 w-16 h-16 bg-indigo-400/15 rounded-full blur-2xl"></div>
 
-        <ProvaList
-          reload={reload}
-          onReloadDone={() => setReload(false)}
-          onEdit={handleEdit}
-          onVisualizar={(id, modoVisualizacao) => {
-            setVisualizarId(id);
-            setModoVisualizacao(modoVisualizacao ?? false);
-          }}
-        />
-      </div>
+            {/* Padrao de pontos decorativo */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-4 left-8 w-2 h-2 bg-white rounded-full"></div>
+              <div className="absolute top-8 left-16 w-1.5 h-1.5 bg-white rounded-full"></div>
+              <div className="absolute top-12 left-4 w-1 h-1 bg-white rounded-full"></div>
+              <div className="absolute bottom-8 right-20 w-2 h-2 bg-white rounded-full"></div>
+              <div className="absolute bottom-4 right-32 w-1.5 h-1.5 bg-white rounded-full"></div>
+            </div>
+
+            <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+              <div className="flex items-center gap-5">
+                {/* Icone principal com efeito glassmorphism */}
+                <div className="relative">
+                  <div className="absolute inset-0 bg-white/20 rounded-2xl blur-sm"></div>
+                  <div className="relative p-4 bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg">
+                    <DocumentTextIcon className="w-10 h-10 text-white" />
+                  </div>
+                  {/* Badge de destaque */}
+                  <div className="absolute -top-1 -right-1 p-1 bg-amber-400 rounded-full shadow-lg">
+                    <SparklesIcon className="w-3 h-3 text-amber-900" />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center gap-3 mb-1">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                      Avaliacoes
+                    </h1>
+                    <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 bg-white/15 backdrop-blur-sm text-white/90 text-xs font-medium rounded-full border border-white/20">
+                      Gerenciamento
+                    </span>
+                  </div>
+                  <p className="text-blue-100 text-sm sm:text-base">
+                    Gerencie todas as avaliacoes e provas do sistema
+                  </p>
+                </div>
+              </div>
+
+              {/* Botao de nova prova */}
+              <button
+                onClick={() => {
+                  setEditId(null);
+                  setShowModal(true);
+                }}
+                className="inline-flex items-center gap-2.5 px-6 py-3 bg-white text-blue-700 font-semibold rounded-xl hover:bg-blue-50 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-md group"
+              >
+                <PlusIcon className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
+                Nova Prova
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Lista de Provas */}
+        <section>
+          <ProvaList
+            reload={reload}
+            onReloadDone={() => setReload(false)}
+            onEdit={handleEdit}
+            onVisualizar={(id, modoVisualizacao) => {
+              setVisualizarId(id);
+              setModoVisualizacao(modoVisualizacao ?? false);
+            }}
+          />
+        </section>
+      </main>
 
       {showModal && (
         <SelectTypeTest
@@ -62,9 +120,8 @@ export default function ProvasPage() {
           onUpdate={() => setReload(true)}
         />
       )}
-      <div>
-        <Footer />
-      </div>
-    </>
+
+      <Footer />
+    </div>
   );
 }
