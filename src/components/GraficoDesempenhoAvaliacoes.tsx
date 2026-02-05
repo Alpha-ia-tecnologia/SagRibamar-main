@@ -14,6 +14,7 @@ import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
 import { useApi } from "../utils/api";
 import NoData from "./NoData";
 import { Loading } from "./Loading";
+import { ChartBarIcon } from "@heroicons/react/24/outline";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -109,18 +110,32 @@ export const GraficoDesempenhoAvaliacoes = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md ">
-      <h2 className="text-lg font-semibold mb-4 text-gray-800">
-        Notas Médias por Avaliação
-      </h2>
-      {loading ? (        
-        <Loading/>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-full">
+      {/* Header */}
+      <div className="px-6 py-5 border-b border-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-violet-50 rounded-lg">
+            <ChartBarIcon className="w-5 h-5 text-violet-600" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Notas Medias por Avaliacao</h2>
+            <p className="text-sm text-gray-500">Percentual de acertos por prova</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Conteudo */}
+      <div className="p-6">
+        {loading ? (
+          <Loading />
         ) : dados.length === 0 ? (
-          <NoData/>
-        ) : (        
-          <Bar data={chartData} options={options} />
-        )
-      }
+          <NoData />
+        ) : (
+          <div className="h-64">
+            <Bar data={chartData} options={options} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -13,6 +13,7 @@ import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
 import { useApi } from "../utils/api";
 import NoData from "./NoData";
 import { Loading } from "./Loading";
+import { BookOpenIcon } from "@heroicons/react/24/outline";
 
 ChartJS.register(
   CategoryScale,
@@ -78,43 +79,67 @@ export const GraficoComponentesCurriculares = () => {
       {
         label: "Percentual de Acertos (%)",
         data: dados.map((item) => item.percentual_acertos),
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
-        borderColor: "rgba(255, 99, 132, 1)",
-        borderWidth: 1,
+        backgroundColor: "rgba(236, 72, 153, 0.7)",
+        borderColor: "rgba(236, 72, 153, 1)",
+        borderWidth: 0,
+        borderRadius: 6,
       },
     ],
   };
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
-      legend: { position: "top" as const },
+      legend: { display: false },
       title: { display: false },
+      tooltip: {
+        backgroundColor: "rgba(17, 24, 39, 0.9)",
+        padding: 12,
+        cornerRadius: 8,
+      },
     },
     scales: {
       y: {
         beginAtZero: true,
         max: 100,
-        title: { display: true, text: "Percentual de Acertos (%)" },
+        grid: { color: "rgba(0, 0, 0, 0.05)" },
+        title: { display: true, text: "Percentual de Acertos (%)", color: "#6b7280" },
       },
       x: {
-        title: { display: true, text: "Componentes Curriculares" },
+        grid: { display: false },
+        title: { display: false },
       },
     },
   };
 
   return (
-    <div className="bg-white rounded-xl shadow p-6">
-      <h2 className="text-lg font-semibold mb-4 text-gray-800">
-        Análise de Componentes Curriculares
-      </h2>
-      {loading ? (
-        <Loading />
-      ) : dados.length === 0 ? (
-        <NoData />
-      ) : (
-        <Bar data={chartData} options={chartOptions} />
-      )}
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-full">
+      {/* Header */}
+      <div className="px-6 py-5 border-b border-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-pink-50 rounded-lg">
+            <BookOpenIcon className="w-5 h-5 text-pink-600" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Componentes Curriculares</h2>
+            <p className="text-sm text-gray-500">Analise por disciplina</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Conteudo */}
+      <div className="p-6">
+        {loading ? (
+          <Loading />
+        ) : dados.length === 0 ? (
+          <NoData />
+        ) : (
+          <div className="h-64">
+            <Bar data={chartData} options={chartOptions} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

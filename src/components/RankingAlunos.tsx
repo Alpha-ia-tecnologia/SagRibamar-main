@@ -3,6 +3,8 @@ import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
 import { useApi } from "../utils/api";
 import NoData from "./NoData";
 import { Loading } from "./Loading";
+import { TrophyIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { StarIcon } from "@heroicons/react/24/solid";
 
 interface Aluno {
   aluno_id: number;
@@ -135,9 +137,34 @@ export const RankingAlunos = () => {
     return buttons;
   };
 
+  const getPositionStyle = (position: number) => {
+    if (position === 1) return "bg-amber-100 text-amber-700 ring-2 ring-amber-300";
+    if (position === 2) return "bg-gray-100 text-gray-600 ring-2 ring-gray-300";
+    if (position === 3) return "bg-orange-100 text-orange-700 ring-2 ring-orange-300";
+    return "bg-gray-50 text-gray-600";
+  };
+
+  const getMediaColor = (media: number) => {
+    if (media >= 80) return "text-emerald-600 bg-emerald-50";
+    if (media >= 60) return "text-blue-600 bg-blue-50";
+    if (media >= 40) return "text-amber-600 bg-amber-50";
+    return "text-rose-600 bg-rose-50";
+  };
+
   return (
-  <div className="p-6 bg-white rounded-2xl shadow-md">
-    <h2 className="text-xl font-semibold mb-5 text-gray-800">🏅 Ranking de Alunos</h2>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* Header */}
+      <div className="px-6 py-5 border-b border-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-amber-50 rounded-lg">
+            <TrophyIcon className="w-5 h-5 text-amber-600" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Ranking de Alunos</h2>
+            <p className="text-sm text-gray-500">Melhores desempenhos</p>
+          </div>
+        </div>
+      </div>
 
     {loading ? (
       <Loading />
@@ -158,45 +185,87 @@ export const RankingAlunos = () => {
               </tr>
             </thead>
 
-            <tbody>
-              {alunos.map((aluno, index) => {
-                const posicao = (page - 1) * 20 + index + 1;
-                const bg =
-                  posicao === 1
-                    ? "bg-yellow-100"
-                    : posicao <= 3
-                    ? "bg-yellow-50"
-                    : "hover:bg-gray-50";
+            <tbody className="divide-y divide-gray-100">
+                  {alunos.map((aluno, index) => {
+                    const posicao = (page - 1) * 20 + index + 1;
 
-                return (
-                  <tr key={aluno.aluno_id} className={`${bg} border-b transition`}>
-                    <td className="px-4 py-3 font-medium text-gray-800">{posicao}º</td>
-                    <td className="px-4 py-3">{aluno.aluno_nome}</td>
-                    <td className="px-4 py-3">{aluno.escola_nome}</td>
-                    <td className="px-4 py-3">{aluno.turma_nome}</td>
-                    <td className="px-4 py-3 text-blue-700 font-semibold">
-                      {aluno.media_geral.toFixed(1)}%
-                      <span className="text-gray-400 text-xs ml-1">
-                        ({aluno.total_desempenhos} avaliações)
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">
-                      {aluno.maior_nota} / 10
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                    return (
+                      <tr key={aluno.aluno_id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="px-4 py-4">
+                          <div className={`inline-flex items-center justify-center w-8 h-8 rounded-lg text-sm font-bold ${getPositionStyle(posicao)}`}>
+                            {posicao <= 3 ? (
+                              <StarIcon className="w-4 h-4" />
+                            ) : (
+                              posicao
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-sm font-medium">
+                              {aluno.aluno_nome.charAt(0).toUpperCase()}
+                            </div>
+                            <span className="font-medium text-gray-900">{aluno.aluno_nome}</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4">
+                          <span className="text-gray-600">{aluno.escola_nome}</span>
+                        </td>
+                        <td className="px-4 py-4">
+                          <span className="inline-flex px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg">
+                            {aluno.turma_nome}
+                          </span>
+                        </td>
+                        <td className="px-4 py-4">
+                          <div className="flex items-center gap-2">
+                            <span className={`inline-flex px-2.5 py-1 text-sm font-bold rounded-lg ${getMediaColor(aluno.media_geral)}`}>
+                              {aluno.media_geral.toFixed(1)}%
+                            </span>
+                            <span className="text-xs text-gray-400">
+                              ({aluno.total_desempenhos} aval.)
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4">
+                          <span className="text-gray-900 font-medium">{aluno.maior_nota}/10</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
 
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-3">
-          <p className="text-sm text-gray-500">
-            Mostrando {(page - 1) * 20 + 1} a {Math.min(page * 20, total)} de {total} alunos
-          </p>
-          <div className="flex gap-1 items-center">{renderPagination()}</div>
-        </div>
-      </>
-    )}
-  </div>
-);}
+            {/* Paginacao */}
+            <div className="flex flex-col sm:flex-row items-center justify-between mt-6 pt-6 border-t border-gray-100 gap-4">
+              <p className="text-sm text-gray-500">
+                Mostrando <span className="font-medium text-gray-900">{(page - 1) * 20 + 1}</span> a{" "}
+                <span className="font-medium text-gray-900">{Math.min(page * 20, total)}</span> de{" "}
+                <span className="font-medium text-gray-900">{total}</span> alunos
+              </p>
+
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setPage(Math.max(1, page - 1))}
+                  disabled={page === 1}
+                  className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronLeftIcon className="w-4 h-4" />
+                </button>
+
+                {renderPagination()}
+
+                <button
+                  onClick={() => setPage(Math.min(totalPages, page + 1))}
+                  disabled={page === totalPages}
+                  className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronRightIcon className="w-4 h-4" />
+                </button>
+              </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
