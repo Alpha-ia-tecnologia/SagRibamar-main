@@ -8,7 +8,8 @@ services:
     environment:
       - API_URL=https://sag-homologacao-sag-api-git.yzl3d0.easypanel.host/api
       - APP_NAME=SAG (Ribamar)
-      - CORRETOR_URL=https://gerador-gabarito-gerador-gabarito-sao-bento.lh6c5d.easypanel.host/
+      - GABARITOS_URL=https://gerador-gabarito-gerador-gabarito-sao-bento.lh6c5d.easypanel.host/
+      - CORRETOR_URL=https://sag-corretor-sag-corretor-ribamar.gkgtsp.easypanel.host
       - NODE_ENV=production
     networks:
       - sag-front-network

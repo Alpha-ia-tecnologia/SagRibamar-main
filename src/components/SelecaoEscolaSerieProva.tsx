@@ -121,7 +121,7 @@ export const SelecaoEscolaSerieProva = () => {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${window.__ENV__?.CORRETOR_URL ?? import.meta.env.VITE_URL_GABARITOS}`,
+        `${window.__ENV__?.GABARITOS_URL ?? import.meta.env.VITE_URL_GABARITOS}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
