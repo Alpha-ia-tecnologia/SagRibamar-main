@@ -11,6 +11,7 @@ import {
   DocumentTextIcon,
   ClipboardDocumentCheckIcon,
   UsersIcon,
+  PencilSquareIcon,
 } from "@heroicons/react/24/outline";
 
 export const Header = () => {
@@ -48,6 +49,7 @@ export const Header = () => {
     { name: "Alunos", path: "/alunos", allowed: tipo !== "GESTOR", icon: AcademicCapIcon },
     { name: "Provas", path: "/provas", allowed: tipo !== "GESTOR", icon: DocumentTextIcon },
     { name: "Gabaritos", path: "/gabaritos", allowed: tipo !== "GESTOR", icon: ClipboardDocumentCheckIcon },
+    { name: "Corretor", path: "/corretor", allowed: true, icon: PencilSquareIcon },
     { name: "Usuários", path: "/usuarios", allowed: tipo === "ADMINISTRADOR", icon: UsersIcon },
   ];
 
