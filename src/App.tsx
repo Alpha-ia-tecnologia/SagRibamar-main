@@ -8,6 +8,7 @@ import AlunosPage from "./pages/AlunosPage";
 import ProvasPage from "./pages/ProvasPage";
 import { UsuariosPage } from "./pages/UsuariosPage";
 import GabaritoPage from "./pages/GabaritoPage";
+import CorretorPage from "./pages/CorretorPage";
 import { FiltroDashboardProvider } from "./hooks/useFiltroDashboard";
 import { useAuthContext } from "./context/AuthContext";
 
@@ -39,6 +40,7 @@ function App() {
           <Route path="/alunos" element={<AlunosPage />} />
           <Route path="/provas" element={<ProvasPage />} />
           <Route path="/gabaritos" element={<GabaritoPage />} />
+          <Route path="/corretor" element={<CorretorPage />} />
         </>
       )}
 
