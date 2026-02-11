@@ -416,12 +416,11 @@ export const HabilidadeBNCCModal = ({
                                     <span
                                       className={
                                         alt.correta
-                                          ? "bg-green-100 px-2 py-1 rounded"
-                                          : ""
+                                          ? "bg-green-100 px-2 py-1 rounded prose prose-sm max-w-none inline"
+                                          : "prose prose-sm max-w-none inline"
                                       }
-                                    >
-                                      {alt.texto}
-                                    </span>
+                                      dangerouslySetInnerHTML={{ __html: alt.texto || '' }}
+                                    />
                                     {alt.correta && (
                                       <span className="text-green-600">✓</span>
                                     )}
