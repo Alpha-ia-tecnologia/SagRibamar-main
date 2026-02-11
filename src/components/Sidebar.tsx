@@ -1,10 +1,12 @@
-import { NavLink, useNavigate } from "react-router-dom";
-import { LogOut, Menu, X, ChevronRight, User } from "lucide-react";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { LogOut, Menu, X, ChevronRight, ChevronDown, User } from "lucide-react";
 import { useState } from "react";
 import { DynamicLogo } from "./DynamicLogo";
 import { getMunicipalityName } from "../utils/municipalityLogo";
 import {
-  ChartBarIcon,
+  HomeIcon,
+  Squares2X2Icon,
+  ClipboardDocumentListIcon,
   BuildingLibraryIcon,
   UserGroupIcon,
   AcademicCapIcon,
@@ -14,9 +16,28 @@ import {
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
 
+interface NavItem {
+  name: string;
+  path: string;
+  allowed: boolean;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
+interface NavSection {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  items: NavItem[];
+}
+
 export const Sidebar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+
+  const toggleSection = (label: string) => {
+    setExpandedSections((prev) => ({ ...prev, [label]: !prev[label] }));
+  };
 
   const getUser = () => {
     try {
@@ -39,17 +60,116 @@ export const Sidebar = () => {
     navigate("/");
   };
 
-  const navItems = [
-    { name: "Dashboard", path: "/dashboard", allowed: tipo !== "PROFESSOR", icon: ChartBarIcon },
-    { name: "Dashboard", path: "/dashboardprofessor", allowed: tipo === "PROFESSOR", icon: ChartBarIcon },
-    { name: "Escolas", path: "/escolas", allowed: tipo !== "GESTOR", icon: BuildingLibraryIcon },
-    { name: "Turmas", path: "/turmas", allowed: tipo !== "GESTOR", icon: UserGroupIcon },
-    { name: "Alunos", path: "/alunos", allowed: tipo !== "GESTOR", icon: AcademicCapIcon },
-    { name: "Provas", path: "/provas", allowed: tipo !== "GESTOR", icon: DocumentTextIcon },
-    { name: "Gabaritos", path: "/gabaritos", allowed: tipo !== "GESTOR", icon: ClipboardDocumentCheckIcon },
-    { name: "Corretor", path: "/corretor", allowed: true, icon: PencilSquareIcon },
-    { name: "Usuários", path: "/usuarios", allowed: tipo === "ADMINISTRADOR", icon: UsersIcon },
+  // Dashboard como link direto
+  const dashboardItem: NavItem = tipo === "PROFESSOR"
+    ? { name: "Dashboard", path: "/dashboardprofessor", allowed: true, icon: HomeIcon }
+    : { name: "Dashboard", path: "/dashboard", allowed: true, icon: HomeIcon };
+
+  // Seções colapsáveis
+  const navSections: NavSection[] = [
+    {
+      label: "Cadastros",
+      icon: Squares2X2Icon,
+      items: [
+        { name: "Escolas", path: "/escolas", allowed: tipo !== "GESTOR", icon: BuildingLibraryIcon },
+        { name: "Turmas", path: "/turmas", allowed: tipo !== "GESTOR", icon: UserGroupIcon },
+        { name: "Alunos", path: "/alunos", allowed: tipo !== "GESTOR", icon: AcademicCapIcon },
+        { name: "Usuários", path: "/usuarios", allowed: tipo === "ADMINISTRADOR", icon: UsersIcon },
+      ],
+    },
+    {
+      label: "Avaliações",
+      icon: ClipboardDocumentListIcon,
+      items: [
+        { name: "Provas", path: "/provas", allowed: tipo !== "GESTOR", icon: DocumentTextIcon },
+        { name: "Gabaritos", path: "/gabaritos", allowed: tipo !== "GESTOR", icon: ClipboardDocumentCheckIcon },
+        { name: "Corretor", path: "/corretor", allowed: true, icon: PencilSquareIcon },
+      ],
+    },
   ];
+
+  const isSectionActive = (section: NavSection) =>
+    section.items.some((item) => item.allowed && location.pathname === item.path);
+
+  // Estilo compartilhado para item de menu principal (Dashboard e headers de seção)
+  const menuItemBase = "flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200";
+  const menuItemActive = `${menuItemBase} bg-white/15 text-white shadow-lg border border-white/10`;
+  const menuItemInactive = `${menuItemBase} text-blue-100 hover:bg-white/10 hover:text-white`;
+
+  // Renderiza navegação (compartilhado entre desktop e mobile)
+  const renderNav = (onLinkClick?: () => void) => (
+    <>
+      {/* Dashboard - link direto */}
+      <NavLink
+        to={dashboardItem.path}
+        onClick={onLinkClick}
+        className={({ isActive }) => isActive ? menuItemActive : menuItemInactive}
+      >
+        <div className="flex items-center gap-3">
+          <dashboardItem.icon className="w-5 h-5" />
+          <span>{dashboardItem.name}</span>
+        </div>
+        <ChevronRight size={16} className="opacity-60" />
+      </NavLink>
+
+      {/* Seções colapsáveis */}
+      {navSections.map((section) => {
+        const visibleItems = section.items.filter((item) => item.allowed);
+        if (visibleItems.length === 0) return null;
+        const isExpanded = expandedSections[section.label] ?? false;
+        const sectionActive = isSectionActive(section);
+        const SectionIcon = section.icon;
+
+        return (
+          <div key={section.label}>
+            {/* Header da seção - estilizado como item de menu */}
+            <button
+              type="button"
+              onClick={() => toggleSection(section.label)}
+              className={sectionActive && !isExpanded ? menuItemActive : menuItemInactive}
+            >
+              <div className="flex items-center gap-3">
+                <SectionIcon className="w-5 h-5" />
+                <span>{section.label}</span>
+              </div>
+              {isExpanded ? (
+                <ChevronDown size={16} className="opacity-60" />
+              ) : (
+                <ChevronRight size={16} className="opacity-60" />
+              )}
+            </button>
+
+            {/* Sub-itens com borda esquerda */}
+            <div
+              className={`overflow-hidden transition-all duration-200 ${
+                isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+              }`}
+            >
+              <div className="ml-4 pl-3 border-l-2 border-white/10 mt-1 mb-1 flex flex-col gap-0.5">
+                {visibleItems.map(({ name, path, icon: Icon }) => (
+                  <NavLink
+                    key={path}
+                    to={path}
+                    onClick={onLinkClick}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
+                        isActive
+                          ? "bg-white/10 text-white font-medium"
+                          : "text-blue-200 hover:bg-white/5 hover:text-white"
+                      }`
+                    }
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{name}</span>
+                  </NavLink>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </>
+  );
 
   return (
     <>
@@ -59,42 +179,21 @@ export const Sidebar = () => {
         <div className="absolute top-0 right-0 w-1 h-full bg-gradient-to-b from-amber-400 via-orange-400 to-amber-500"></div>
 
         {/* Logo */}
-        <div className="flex items-center gap-3 px-5 py-5 border-b border-white/10">
+        <div className="flex items-center justify-center px-5 py-6 border-b border-white/10">
           <div className="relative">
-            <div className="absolute inset-0 bg-white/20 rounded-lg blur-sm"></div>
-            <div className="relative bg-white/10 backdrop-blur-sm p-1.5 rounded-lg border border-white/20">
+            <div className="absolute inset-0 bg-white/20 rounded-xl blur-sm"></div>
+            <div className="relative bg-white/10 backdrop-blur-sm p-3 rounded-xl border border-white/20">
               <DynamicLogo
                 alt={`Logo de ${municipalityName}`}
-                width={40}
+                width={120}
               />
             </div>
-          </div>
-          <div>
-            <span className="font-bold text-xl tracking-tight">SAG</span>
           </div>
         </div>
 
         {/* Navegação */}
-        <nav className="flex-1 flex flex-col px-3 py-4 gap-1 overflow-y-auto">
-          <span className="text-xs text-blue-300 uppercase tracking-wider font-medium px-3 mb-2">Menu</span>
-          {navItems
-            .filter((item) => item.allowed)
-            .map(({ name, path, icon: Icon }) => (
-              <NavLink
-                key={path}
-                to={path}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? "bg-white/15 text-white shadow-lg border border-white/10"
-                      : "text-blue-100 hover:bg-white/10 hover:text-white"
-                  }`
-                }
-              >
-                <Icon className="w-5 h-5" />
-                <span>{name}</span>
-              </NavLink>
-            ))}
+        <nav className="sidebar-scroll flex-1 flex flex-col px-3 py-4 gap-1 overflow-y-auto">
+          {renderNav()}
         </nav>
 
         {/* Área do usuário */}
@@ -114,7 +213,7 @@ export const Sidebar = () => {
             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-400/20 hover:bg-red-500 text-white rounded-xl border border-blue-400/30 hover:border-red-400 transition-all duration-200 text-sm font-medium"
           >
             <LogOut size={16} />
-            <span>Sair do Sistema</span>
+            <span>Sair</span>
           </button>
         </div>
       </aside>
@@ -179,30 +278,8 @@ export const Sidebar = () => {
         </div>
 
         {/* Navegação Mobile */}
-        <nav className="flex flex-col p-4 gap-1.5">
-          <span className="text-xs text-blue-300 uppercase tracking-wider font-medium px-3 mb-2">Menu</span>
-          {navItems
-            .filter((item) => item.allowed)
-            .map(({ name, path, icon: Icon }) => (
-              <NavLink
-                key={path}
-                to={path}
-                onClick={() => setIsOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 ${
-                    isActive
-                      ? "bg-white/15 text-white font-semibold shadow-lg border border-white/10"
-                      : "hover:bg-white/10 text-blue-100"
-                  }`
-                }
-              >
-                <div className="flex items-center gap-3">
-                  <Icon className="w-5 h-5" />
-                  <span>{name}</span>
-                </div>
-                <ChevronRight size={16} className="opacity-50" />
-              </NavLink>
-            ))}
+        <nav className="sidebar-scroll flex flex-col p-4 gap-1.5 overflow-y-auto">
+          {renderNav(() => setIsOpen(false))}
         </nav>
 
         {/* Botão Logout Mobile */}
