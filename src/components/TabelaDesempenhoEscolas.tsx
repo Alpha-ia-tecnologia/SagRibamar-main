@@ -120,7 +120,7 @@ export const TabelaDesempenhoEscolas = () => {
         </div>
       </div>
 
-      {/* Conteudo */}
+      {/* Conteúdo */}
       <div className="p-6">
         {loading ? (
           <Loading />
@@ -134,9 +134,9 @@ export const TabelaDesempenhoEscolas = () => {
                   <tr className="border-b border-gray-200">
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">#</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Escola</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Regiao</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Região</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Grupo</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Media</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Média</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Avaliados</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Turmas</th>
@@ -167,7 +167,7 @@ export const TabelaDesempenhoEscolas = () => {
                         </td>
                         <td className="px-4 py-4">
                           <span className="inline-flex px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg">
-                            {escola.grupo_nome || "Nao Definido"}
+                            {escola.grupo_nome || "Não Definido"}
                           </span>
                         </td>
                         <td className="px-4 py-4">
@@ -193,7 +193,7 @@ export const TabelaDesempenhoEscolas = () => {
               </table>
             </div>
 
-            {/* Paginacao */}
+            {/* Paginação */}
             <div className="flex flex-col sm:flex-row items-center justify-between mt-6 pt-6 border-t border-gray-100 gap-4">
               <p className="text-sm text-gray-500">
                 Mostrando <span className="font-medium text-gray-900">{(pagina - 1) * 10 + 1}</span> a{" "}

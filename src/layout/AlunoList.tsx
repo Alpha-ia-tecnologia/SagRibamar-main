@@ -157,7 +157,7 @@ export const AlunoList = ({
             <div>
               <h3 className="font-semibold text-gray-900">Lista de Alunos</h3>
               <p className="text-sm text-gray-500">
-                Pagina <span className="font-medium text-blue-600">{page}</span> de <span className="font-medium">{totalPages}</span> - Total: <span className="font-medium text-blue-600">{totalItems}</span> alunos
+                Página <span className="font-medium text-blue-600">{page}</span> de <span className="font-medium">{totalPages}</span> - Total: <span className="font-medium text-blue-600">{totalItems}</span> alunos
               </p>
             </div>
           </div>
@@ -211,7 +211,7 @@ export const AlunoList = ({
                   </div>
                 </div>
 
-                {/* Acoes */}
+                {/* Ações */}
                 <div className="flex items-center gap-2">
                   <IconButton type="edit" onClick={() => onEdit?.(aluno.id)} />
                   <IconButton
@@ -228,7 +228,7 @@ export const AlunoList = ({
         )}
       </div>
 
-      {/* Paginacao */}
+      {/* Paginação */}
       {alunos.length > 0 && (
         <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-100">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -237,27 +237,27 @@ export const AlunoList = ({
             </p>
 
             <div className="flex items-center gap-1">
-              {/* Primeira pagina */}
+              {/* Primeira página */}
               <button
                 onClick={() => setPage(1)}
                 disabled={page === 1}
                 className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white hover:border-gray-300 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
-                title="Primeira pagina"
+                title="Primeira página"
               >
                 <ChevronDoubleLeftIcon className="w-4 h-4" />
               </button>
 
-              {/* Pagina anterior */}
+              {/* Página anterior */}
               <button
                 onClick={() => setPage(page - 1)}
                 disabled={page === 1}
                 className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white hover:border-gray-300 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
-                title="Pagina anterior"
+                title="Página anterior"
               >
                 <ChevronLeftIcon className="w-4 h-4" />
               </button>
 
-              {/* Numeros de pagina */}
+              {/* Números de página */}
               <div className="flex items-center gap-1 mx-2">
                 {gerarBotoesPaginacao().map((num, i) =>
                   num === "..." ? (
@@ -283,22 +283,22 @@ export const AlunoList = ({
                 )}
               </div>
 
-              {/* Proxima pagina */}
+              {/* Próxima página */}
               <button
                 onClick={() => setPage(page + 1)}
                 disabled={page === totalPages}
                 className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white hover:border-gray-300 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
-                title="Proxima pagina"
+                title="Próxima página"
               >
                 <ChevronRightIcon className="w-4 h-4" />
               </button>
 
-              {/* Ultima pagina */}
+              {/* Última página */}
               <button
                 onClick={() => setPage(totalPages)}
                 disabled={page === totalPages}
                 className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white hover:border-gray-300 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
-                title="Ultima pagina"
+                title="Última página"
               >
                 <ChevronDoubleRightIcon className="w-4 h-4" />
               </button>
@@ -307,13 +307,13 @@ export const AlunoList = ({
         </div>
       )}
 
-      {/* Dialog de Confirmacao */}
+      {/* Dialog de Confirmação */}
       {confirmationDelete && (
         <ConfirmDialog
           isOpen={confirmationDelete}
           title="Tem certeza que deseja excluir esse aluno?"
-          description="Ao excluir o aluno, todas as informacoes relacionadas a ele serao perdidas."
-          warning="Essa acao nao podera ser desfeita."
+          description="Ao excluir o aluno, todas as informações relacionadas a ele serão perdidas."
+          warning="Essa ação não poderá ser desfeita."
           confirmText="Excluir"
           cancelText="Cancelar"
           onConfirm={() => {

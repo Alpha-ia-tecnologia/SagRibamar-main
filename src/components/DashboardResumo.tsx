@@ -45,7 +45,7 @@ export const DashboardResumo = () => {
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Erro ao buscar estatisticas:", err);
+        console.error("Erro ao buscar estatísticas:", err);
         setLoading(false);
       });
   }, [filtros]);
@@ -105,7 +105,7 @@ export const DashboardResumo = () => {
       trend: null
     },
     {
-      label: "Participacao",
+      label: "Participação",
       valor: typeof stats.participacao === "number" ? stats.participacao.toFixed(1) : "0",
       suffix: "%",
       icon: ChartPieIcon,
@@ -115,7 +115,7 @@ export const DashboardResumo = () => {
       trend: stats.participacao >= 70 ? "up" : "down"
     },
     {
-      label: "Media Geral",
+      label: "Média Geral",
       valor: typeof stats.media_geral === "number" ? stats.media_geral.toFixed(1) : "0.0",
       icon: CalculatorIcon,
       gradient: "from-indigo-500 to-indigo-600",

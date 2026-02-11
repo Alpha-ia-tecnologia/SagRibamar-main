@@ -270,11 +270,11 @@ export const TabelaHabilidadesBNCC = () => {
             </div>
             <div>
               <h2 className="text-lg font-semibold text-gray-900">Habilidades BNCC / SAEB</h2>
-              <p className="text-sm text-gray-500">Analise de competencias</p>
+              <p className="text-sm text-gray-500">Análise de competências</p>
             </div>
           </div>
 
-          {/* Filtros de Ordenacao */}
+          {/* Filtros de Ordenação */}
           <div className="flex gap-2">
             <button
               onClick={() => {
@@ -287,7 +287,7 @@ export const TabelaHabilidadesBNCC = () => {
                   : "bg-rose-50 text-rose-600 hover:bg-rose-100"
               }`}
             >
-              Mais Criticas
+              Mais Críticas
             </button>
             <button
               onClick={() => {
@@ -306,7 +306,7 @@ export const TabelaHabilidadesBNCC = () => {
         </div>
       </div>
 
-      {/* Conteudo */}
+      {/* Conteúdo */}
       <div className="p-6">
         {loading ? (
           <Loading />
@@ -330,7 +330,7 @@ export const TabelaHabilidadesBNCC = () => {
                         {h.bncc_codigo}
                       </span>
                       <span className="text-xs text-gray-500">
-                        {h.total_questoes} {h.total_questoes > 1 ? "questoes" : "questao"}
+                        {h.total_questoes} {h.total_questoes > 1 ? "questões" : "questão"}
                       </span>
                     </div>
                     <p className={`text-3xl font-bold ${getSkillTextColor(percentual)}`}>
@@ -344,7 +344,7 @@ export const TabelaHabilidadesBNCC = () => {
               })}
             </div>
 
-            {/* Paginacao */}
+            {/* Paginação */}
             <div className="flex flex-col sm:flex-row items-center justify-between mt-6 pt-6 border-t border-gray-100 gap-4">
               <p className="text-sm text-gray-500">
                 Mostrando <span className="font-medium text-gray-900">{(page - 1) * 20 + 1}</span> a{" "}

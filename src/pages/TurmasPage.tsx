@@ -103,7 +103,7 @@ export default function TurmasPage() {
       <Header />
 
       <main className="px-4 sm:px-6 lg:px-8 py-8 max-w-[1600px] mx-auto">
-        {/* Header da Pagina */}
+        {/* Header da Página */}
         <div className="mb-8">
           <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-2xl p-6 sm:p-8 shadow-xl">
             {/* Elementos decorativos de fundo */}
@@ -111,7 +111,7 @@ export default function TurmasPage() {
             <div className="absolute bottom-0 left-1/4 -mb-8 w-32 h-32 bg-blue-400/20 rounded-full blur-3xl"></div>
             <div className="absolute top-1/2 right-1/3 w-16 h-16 bg-indigo-400/15 rounded-full blur-2xl"></div>
 
-            {/* Padrao de pontos decorativo */}
+            {/* Padrão de pontos decorativo */}
             <div className="absolute inset-0 opacity-10">
               <div className="absolute top-4 left-8 w-2 h-2 bg-white rounded-full"></div>
               <div className="absolute top-8 left-16 w-1.5 h-1.5 bg-white rounded-full"></div>
@@ -122,7 +122,7 @@ export default function TurmasPage() {
 
             <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <div className="flex items-center gap-5">
-                {/* Icone principal com efeito glassmorphism */}
+                {/* Ícone principal com efeito glassmorphism */}
                 <div className="relative">
                   <div className="absolute inset-0 bg-white/20 rounded-2xl blur-sm"></div>
                   <div className="relative p-4 bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg">
@@ -149,7 +149,7 @@ export default function TurmasPage() {
                 </div>
               </div>
 
-              {/* Botao de nova turma */}
+              {/* Botão de nova turma */}
               <button
                 onClick={() => {
                   setEditId(null);
@@ -193,7 +193,7 @@ export default function TurmasPage() {
               </div>
             </button>
 
-            {/* Conteudo dos Filtros */}
+            {/* Conteúdo dos Filtros */}
             {isFilterExpanded && (
               <div className="px-6 pb-6 pt-2">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -243,10 +243,10 @@ export default function TurmasPage() {
                     </div>
                   </div>
 
-                  {/* Select de Serie */}
+                  {/* Select de Série */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Serie
+                      Série
                     </label>
                     <div className="relative">
                       <AcademicCapIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
@@ -257,7 +257,7 @@ export default function TurmasPage() {
                           setSerieId(e.target.value === "" ? null : e.target.value)
                         }
                       >
-                        <option value="">Todas as series</option>
+                        <option value="">Todas as séries</option>
                         {todasSeries.map((serie) => (
                           <option key={serie} value={serie}>
                             {serieNomes[serie]}
@@ -270,7 +270,7 @@ export default function TurmasPage() {
                     </div>
                   </div>
 
-                  {/* Botoes */}
+                  {/* Botões */}
                   <div className="flex items-end gap-2">
                     <button
                       onClick={handleFilter}

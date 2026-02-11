@@ -147,7 +147,7 @@ const handleDownloadTest = async (id: number) => {
               <DocumentTextSolid className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Lista de Avaliacoes</h3>
+              <h3 className="font-semibold text-gray-900">Lista de Avaliações</h3>
               <p className="text-sm text-gray-500">
                 Total: <span className="font-medium text-blue-600">{provas.length}</span> provas cadastradas
               </p>
@@ -162,7 +162,7 @@ const handleDownloadTest = async (id: number) => {
           <div className="px-6 py-12 text-center">
             <DocumentTextIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-1">Nenhuma prova encontrada</h3>
-            <p className="text-gray-500">Crie uma nova prova para comecar</p>
+            <p className="text-gray-500">Crie uma nova prova para começar</p>
           </div>
         ) : (
           provas.map((prova, index) => (
@@ -199,13 +199,13 @@ const handleDownloadTest = async (id: number) => {
                       </span>
                       <span className="inline-flex items-center gap-1.5 text-sm text-gray-500">
                         <QuestionMarkCircleIcon className="w-4 h-4 text-gray-400" />
-                        {prova._count.questoes} questoes
+                        {prova._count.questoes} questões
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Acoes */}
+                {/* Ações */}
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleDownloadTest(prova.id)}
@@ -235,13 +235,13 @@ const handleDownloadTest = async (id: number) => {
         )}
       </div>
 
-      {/* Dialog de Confirmacao */}
+      {/* Dialog de Confirmação */}
       {confirmationDelete && (
         <ConfirmDialog
           isOpen={confirmationDelete}
           title="Tem certeza que deseja excluir a prova?"
-          description="Esta acao nao podera ser desfeita."
-          warning="Todas as notas dos alunos associadas a esta prova tambem serao excluidas."
+          description="Esta ação não poderá ser desfeita."
+          warning="Todas as notas dos alunos associadas a esta prova também serão excluídas."
           confirmText="Excluir"
           cancelText="Cancelar"
           onConfirm={() => {

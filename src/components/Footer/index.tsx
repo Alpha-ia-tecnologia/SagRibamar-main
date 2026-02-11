@@ -16,7 +16,7 @@ export default function Footer() {
       {/* Linha decorativa superior */}
       <div className="h-1 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500"></div>
 
-      {/* Conteudo principal */}
+      {/* Conteúdo principal */}
       <div className="relative max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
           {/* Logo e nome */}
@@ -29,7 +29,7 @@ export default function Footer() {
             </div>
             <div>
               <span className="font-bold text-xl tracking-tight">SAG</span>
-              <p className="text-blue-200 text-xs">Sistema de Avaliacao e Gerenciamento</p>
+              <p className="text-blue-200 text-xs">Sistema de Avaliação e Gerenciamento</p>
             </div>
           </div>
 
@@ -39,26 +39,26 @@ export default function Footer() {
               <div className="p-2 bg-white/10 rounded-lg">
                 <AcademicCapIcon className="w-5 h-5 text-amber-400" />
               </div>
-              <span className="text-xs text-blue-200">Educacao</span>
+              <span className="text-xs text-blue-200">Educação</span>
             </div>
             <div className="flex flex-col items-center gap-1 text-center">
               <div className="p-2 bg-white/10 rounded-lg">
                 <ChartBarIcon className="w-5 h-5 text-emerald-400" />
               </div>
-              <span className="text-xs text-blue-200">Analise</span>
+              <span className="text-xs text-blue-200">Análise</span>
             </div>
             <div className="flex flex-col items-center gap-1 text-center">
               <div className="p-2 bg-white/10 rounded-lg">
                 <ShieldCheckIcon className="w-5 h-5 text-sky-400" />
               </div>
-              <span className="text-xs text-blue-200">Seguranca</span>
+              <span className="text-xs text-blue-200">Segurança</span>
             </div>
           </div>
 
-          {/* Info do municipio */}
+          {/* Info do município */}
           <div className="text-center md:text-right">
             <p className="text-sm font-medium text-white">{municipalityName}</p>
-            <p className="text-xs text-blue-200">Gestao Educacional</p>
+            <p className="text-xs text-blue-200">Gestão Educacional</p>
           </div>
         </div>
 
@@ -71,7 +71,7 @@ export default function Footer() {
             © {currentYear} SAG - {municipalityName}. Todos os direitos reservados.
           </p>
           <p className="text-blue-300 flex items-center gap-1.5 text-xs">
-            Feito com <HeartIcon className="w-4 h-4 text-red-400 animate-pulse" /> para a educacao
+            Feito com <HeartIcon className="w-4 h-4 text-red-400 animate-pulse" /> para a educação
           </p>
         </div>
       </div>

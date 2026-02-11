@@ -23,7 +23,7 @@ function ErrorFallback() {
       <div className="text-center text-red-400">
         <PencilSquareIcon className="w-16 h-16 mx-auto mb-4 opacity-50" />
         <p className="text-lg font-medium">Erro ao carregar o Corretor</p>
-        <p className="text-sm mt-1">Verifique se o servico esta disponivel.</p>
+        <p className="text-sm mt-1">Verifique se o serviço está disponível.</p>
       </div>
     </div>
   );

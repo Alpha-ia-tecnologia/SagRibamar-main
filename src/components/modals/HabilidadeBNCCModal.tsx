@@ -377,7 +377,7 @@ export const HabilidadeBNCCModal = ({
                                 <span className="bg-gray-200 text-gray-900 px-2 py-1 rounded">
                                   {questao.proficiencia_saeb
                                     ? `${questao.proficiencia_saeb.nivel} - ${questao.proficiencia_saeb.descricao}`
-                                    : "Sem nivel vinculado"}
+                                    : "Sem nível vinculado"}
                                 </span>
                               </div>
                             </div>
