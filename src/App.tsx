@@ -11,6 +11,7 @@ import GabaritoPage from "./pages/GabaritoPage";
 import CorretorPage from "./pages/CorretorPage";
 import { FiltroDashboardProvider } from "./hooks/useFiltroDashboard";
 import { useAuthContext } from "./context/AuthContext";
+import { AppLayout } from "./components/AppLayout";
 
 function App() {
   const { user } = useAuthContext();
@@ -31,24 +32,26 @@ function App() {
   <FiltroDashboardProvider>
     <Routes>
       <Route path="/" element={<LoginPage />} />
-      <Route path="/dashboard" element={<DashboardPage />} />
+      <Route element={<AppLayout />}>
+        <Route path="/dashboard" element={<DashboardPage />} />
 
-      {(isAdmin || !isGestor) && (
-        <>
-          <Route path="/escolas" element={<EscolasPage />} />
-          <Route path="/turmas" element={<TurmasPage />} />
-          <Route path="/alunos" element={<AlunosPage />} />
-          <Route path="/provas" element={<ProvasPage />} />
-          <Route path="/gabaritos" element={<GabaritoPage />} />
-          <Route path="/corretor" element={<CorretorPage />} />
-        </>
-      )}
+        {(isAdmin || !isGestor) && (
+          <>
+            <Route path="/escolas" element={<EscolasPage />} />
+            <Route path="/turmas" element={<TurmasPage />} />
+            <Route path="/alunos" element={<AlunosPage />} />
+            <Route path="/provas" element={<ProvasPage />} />
+            <Route path="/gabaritos" element={<GabaritoPage />} />
+            <Route path="/corretor" element={<CorretorPage />} />
+          </>
+        )}
 
-      {isProfessor && (
-        <Route path="/dashboardprofessor" element={<DashboardProfessor />} />
-      )}
+        {isProfessor && (
+          <Route path="/dashboardprofessor" element={<DashboardProfessor />} />
+        )}
 
-      {isAdmin && <Route path="/usuarios" element={<UsuariosPage />} />}
+        {isAdmin && <Route path="/usuarios" element={<UsuariosPage />} />}
+      </Route>
     </Routes>
   </FiltroDashboardProvider>
 );

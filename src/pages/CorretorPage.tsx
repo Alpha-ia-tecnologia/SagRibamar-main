@@ -1,6 +1,4 @@
 import React, { Suspense } from "react";
-import { Header } from "../components/Header";
-import Footer from "../components/Footer";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { useAuthContext } from "../context/AuthContext";
 
@@ -54,19 +52,15 @@ export default function CorretorPage() {
   const { user, token } = useAuthContext();
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-1 bg-gradient-to-br from-gray-50 to-blue-50">
-        <ErrorBoundary fallback={<ErrorFallback />}>
-          <Suspense fallback={<LoadingFallback />}>
-            <RemoteCorretorApp
-              token={token || ""}
-              user={user}
-            />
-          </Suspense>
-        </ErrorBoundary>
-      </main>
-      <Footer />
-    </div>
+    <main className="flex-1">
+      <ErrorBoundary fallback={<ErrorFallback />}>
+        <Suspense fallback={<LoadingFallback />}>
+          <RemoteCorretorApp
+            token={token || ""}
+            user={user}
+          />
+        </Suspense>
+      </ErrorBoundary>
+    </main>
   );
 }

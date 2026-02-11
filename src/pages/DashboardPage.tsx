@@ -1,4 +1,3 @@
-import { Header } from "../components/Header";
 import { FiltroAvaliacoes } from "../components/FiltroAvaliacoes";
 import { DashboardResumo } from "../components/DashboardResumo";
 import { TabelaDesempenhoEscolas } from "../components/TabelaDesempenhoEscolas";
@@ -9,7 +8,6 @@ import { TabelaHabilidadesBNCC } from "../components/TabelaHabilidadesBNCC";
 import { RankingAlunos } from "../components/RankingAlunos";
 import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
 import { useApi } from "../utils/api";
-import Footer from "../components/Footer";
 import GraficoArea from "../components/GraficoArea";
 import { ArrowDownTrayIcon, ChartBarIcon, SparklesIcon, CalendarDaysIcon, DocumentArrowDownIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
@@ -56,7 +54,7 @@ export const DashboardPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
+    <>
       {/* Modal de Loading para Exportação */}
       {isExporting && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
@@ -108,8 +106,6 @@ export const DashboardPage = () => {
           </div>
         </div>
       )}
-
-      <Header />
 
       <main className="px-4 sm:px-6 lg:px-8 py-8 max-w-[1600px] mx-auto">
         {/* Header do Dashboard */}
@@ -225,8 +221,6 @@ export const DashboardPage = () => {
           <RankingAlunos />
         </section>
       </main>
-
-      <Footer />
-    </div>
+    </>
   );
 };

@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { Header } from "../components/Header";
 import { AlunoList } from "../layout/AlunoList";
 import { CreateAlunoModal } from "../components/modals/CreateAlunoModal";
 import { AlunoFilter } from "../components/AlunoFilter";
 import { ImportAlunosModal } from "../components/modals/ImportAlunosModal ";
 import { Loading } from "../components/Loading";
 import { useApi } from "../utils/api";
-import Footer from "../components/Footer";
 import {
   AcademicCapIcon,
   PlusIcon,
@@ -120,9 +118,7 @@ export default function AlunosPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
-      <Header />
-
+    <>
       <main className="px-4 sm:px-6 lg:px-8 py-8 max-w-[1600px] mx-auto">
         {/* Header da Página */}
         <div className="mb-8">
@@ -240,7 +236,6 @@ export default function AlunosPage() {
 
       {isLoading && <Loading />}
 
-      <Footer />
-    </div>
+    </>
   );
 }

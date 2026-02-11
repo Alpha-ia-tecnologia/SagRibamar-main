@@ -14,11 +14,10 @@ import {
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
 
-export const Header = () => {
+export const Sidebar = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Função segura para obter usuário do sessionStorage
   const getUser = () => {
     try {
       const storedUser = sessionStorage.getItem("currentUser");
@@ -32,7 +31,6 @@ export const Header = () => {
 
   const user = getUser();
   const municipalityName = getMunicipalityName();
-
   const tipo = user?.tipo_usuario;
 
   const handleLogout = () => {
@@ -55,83 +53,80 @@ export const Header = () => {
 
   return (
     <>
-      <header className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white sticky z-50 top-0 shadow-lg shadow-blue-900/20">
-        {/* Linha decorativa superior */}
-        <div className="h-1 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500"></div>
+      {/* Sidebar Desktop */}
+      <aside className="hidden lg:flex fixed top-0 left-0 h-screen w-64 z-40 flex-col bg-gradient-to-b from-blue-600 via-blue-700 to-indigo-800 text-white shadow-xl shadow-blue-900/30">
+        {/* Linha decorativa lateral */}
+        <div className="absolute top-0 right-0 w-1 h-full bg-gradient-to-b from-amber-400 via-orange-400 to-amber-500"></div>
 
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-3 flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="absolute inset-0 bg-white/20 rounded-lg blur-sm"></div>
-                <div className="relative bg-white/10 backdrop-blur-sm p-1.5 rounded-lg border border-white/20">
-                  <DynamicLogo
-                    alt={`Logo de ${municipalityName}`}
-                    width={70}
-                  />
-                </div>
-              </div>
-              <div className="hidden sm:block">
-                <span className="font-bold text-xl tracking-tight">SAG</span>
-                <p className="text-blue-200 text-xs -mt-0.5">Sistema de Avaliação</p>
-              </div>
+        {/* Logo */}
+        <div className="flex items-center gap-3 px-5 py-5 border-b border-white/10">
+          <div className="relative">
+            <div className="absolute inset-0 bg-white/20 rounded-lg blur-sm"></div>
+            <div className="relative bg-white/10 backdrop-blur-sm p-1.5 rounded-lg border border-white/20">
+              <DynamicLogo
+                alt={`Logo de ${municipalityName}`}
+                width={40}
+              />
             </div>
-
-            {/* Menu Desktop */}
-            <nav className="hidden lg:flex items-center gap-1 bg-white/10 backdrop-blur-sm rounded-xl p-1.5 border border-white/10">
-              {navItems
-                .filter((item) => item.allowed)
-                .map(({ name, path, icon: Icon }) => (
-                  <NavLink
-                    key={path}
-                    to={path}
-                    className={({ isActive }) =>
-                      `flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                        isActive
-                          ? "bg-white text-blue-700 shadow-md"
-                          : "text-white/90 hover:bg-white/15 hover:text-white"
-                      }`
-                    }
-                  >
-                    <Icon className="w-4 h-4" />
-                    {name}
-                  </NavLink>
-                ))}
-            </nav>
-
-            {/* Área do usuário */}
-            <div className="hidden md:flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-lg border border-white/10">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-sm font-bold text-white shadow-md">
-                  {user?.nome?.charAt(0)?.toUpperCase() || <User size={16} />}
-                </div>
-                <div className="text-left">
-                  <span className="text-sm font-medium block leading-tight">{user?.nome || "Usuário"}</span>
-                  <span className="text-xs text-blue-200 leading-tight">{tipo || "Convidado"}</span>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-red-500 backdrop-blur-sm rounded-lg border border-white/10 hover:border-red-400 transition-all duration-200 group"
-              >
-                <LogOut size={18} className="group-hover:animate-pulse" />
-                <span className="text-sm font-medium">Sair</span>
-              </button>
-            </div>
-
-            {/* Botão Mobile */}
-            <button
-              type="button"
-              onClick={() => setIsOpen(!isOpen)}
-              className="lg:hidden p-2 bg-white/10 hover:bg-white/20 rounded-lg border border-white/10 transition-all duration-200"
-            >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+          </div>
+          <div>
+            <span className="font-bold text-xl tracking-tight">SAG</span>
           </div>
         </div>
-      </header>
+
+        {/* Navegação */}
+        <nav className="flex-1 flex flex-col px-3 py-4 gap-1 overflow-y-auto">
+          <span className="text-xs text-blue-300 uppercase tracking-wider font-medium px-3 mb-2">Menu</span>
+          {navItems
+            .filter((item) => item.allowed)
+            .map(({ name, path, icon: Icon }) => (
+              <NavLink
+                key={path}
+                to={path}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? "bg-white/15 text-white shadow-lg border border-white/10"
+                      : "text-blue-100 hover:bg-white/10 hover:text-white"
+                  }`
+                }
+              >
+                <Icon className="w-5 h-5" />
+                <span>{name}</span>
+              </NavLink>
+            ))}
+        </nav>
+
+        {/* Área do usuário */}
+        <div className="border-t border-white/10 bg-white/5 p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-sm font-bold text-white shadow-md">
+              {user?.nome?.charAt(0)?.toUpperCase() || <User size={16} />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <span className="text-sm font-medium block leading-tight truncate">{user?.nome || "Usuário"}</span>
+              <span className="text-xs text-blue-200 leading-tight">{tipo || "Convidado"}</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-400/20 hover:bg-red-500 text-white rounded-xl border border-blue-400/30 hover:border-red-400 transition-all duration-200 text-sm font-medium"
+          >
+            <LogOut size={16} />
+            <span>Sair do Sistema</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Botão Mobile */}
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl shadow-lg shadow-blue-900/30 border border-white/10 transition-all duration-200 hover:scale-105"
+      >
+        {isOpen ? <X size={22} /> : <Menu size={22} />}
+      </button>
 
       {/* Overlay Mobile */}
       {isOpen && (
@@ -146,7 +141,7 @@ export const Header = () => {
         className={`fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-blue-700 via-blue-800 to-indigo-900 text-white transform transition-transform duration-300 ease-out z-50 shadow-2xl
         ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:hidden`}
       >
-        {/* Header da Sidebar */}
+        {/* Header da Sidebar Mobile */}
         <div className="flex justify-between items-center p-5 border-b border-white/10 bg-white/5">
           <div className="flex items-center gap-3">
             <div className="bg-white/10 p-2 rounded-lg border border-white/20">
