@@ -8,16 +8,16 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 text-white overflow-hidden">
+    <footer className="relative bg-linear-to-r from-blue-700 via-blue-800 to-indigo-800 text-white overflow-hidden">
       {/* Elementos decorativos de fundo */}
       <div className="absolute top-0 left-1/4 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>
 
       {/* Linha decorativa superior */}
-      <div className="h-1 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500"></div>
+      <div className="h-1 bg-linear-to-r from-amber-400 via-orange-400 to-amber-500"></div>
 
       {/* Conteúdo principal */}
-      <div className="relative max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="relative max-w-400 mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
           {/* Logo e nome */}
           <div className="flex items-center gap-4 justify-center md:justify-start">
@@ -25,6 +25,14 @@ export default function Footer() {
               <DynamicLogo
                 alt={`Logo de ${municipalityName}`}
                 width={50}
+              />
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm p-2 rounded-xl border border-white/20">
+              <img
+                src="/logos/maximiza.png"
+                alt="Logo Maximiza"
+                width={50}
+                className="object-contain"
               />
             </div>
             <div>

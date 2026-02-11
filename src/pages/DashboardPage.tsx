@@ -1,4 +1,3 @@
-import { Header } from "../components/Header";
 import { FiltroAvaliacoes } from "../components/FiltroAvaliacoes";
 import { DashboardResumo } from "../components/DashboardResumo";
 import { TabelaDesempenhoEscolas } from "../components/TabelaDesempenhoEscolas";
@@ -9,7 +8,6 @@ import { TabelaHabilidadesBNCC } from "../components/TabelaHabilidadesBNCC";
 import { RankingAlunos } from "../components/RankingAlunos";
 import { useFiltroDashboard } from "../hooks/useFiltroDashboard";
 import { useApi } from "../utils/api";
-import Footer from "../components/Footer";
 import GraficoArea from "../components/GraficoArea";
 import { ArrowDownTrayIcon, ChartBarIcon, SparklesIcon, CalendarDaysIcon, DocumentArrowDownIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
@@ -56,14 +54,14 @@ export const DashboardPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
+    <>
       {/* Modal de Loading para Exportação */}
       {isExporting && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
           <div className="bg-white rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-5 max-w-sm mx-4 animate-in fade-in zoom-in duration-200">
             {/* Ícone animado */}
             <div className="relative">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+              <div className="w-20 h-20 rounded-full bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
                 <DocumentArrowDownIcon className="w-10 h-10 text-white animate-bounce" />
               </div>
               {/* Spinner ao redor */}
@@ -103,18 +101,16 @@ export const DashboardPage = () => {
 
             {/* Barra de progresso animada */}
             <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full animate-pulse w-3/4"></div>
+              <div className="h-full bg-linear-to-r from-blue-500 to-indigo-600 rounded-full animate-pulse w-3/4"></div>
             </div>
           </div>
         </div>
       )}
 
-      <Header />
-
-      <main className="px-4 sm:px-6 lg:px-8 py-8 max-w-[1600px] mx-auto">
+      <main className="px-4 sm:px-6 lg:px-8 py-8 max-w-400 mx-auto">
         {/* Header do Dashboard */}
         <div className="mb-8">
-          <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-2xl p-6 sm:p-8 shadow-xl">
+          <div className="relative overflow-hidden bg-linear-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-2xl p-6 sm:p-8 shadow-xl">
             {/* Elementos decorativos de fundo */}
             <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
             <div className="absolute bottom-0 left-1/4 -mb-8 w-32 h-32 bg-blue-400/20 rounded-full blur-3xl"></div>
@@ -225,8 +221,6 @@ export const DashboardPage = () => {
           <RankingAlunos />
         </section>
       </main>
-
-      <Footer />
-    </div>
+    </>
   );
 };

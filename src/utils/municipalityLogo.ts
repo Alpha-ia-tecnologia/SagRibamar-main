@@ -41,8 +41,12 @@ export const getMunicipalityConfig = (): MunicipalityConfig => {
     }
   };
 
-  // Retorna a configuração do município ou a de Ribamar como fallback
-  return municipalityConfigs[municipality] || municipalityConfigs["Ribamar"];
+  // Retorna a configuração do município ou o logo padrão SAG como fallback
+  return municipalityConfigs[municipality] || {
+    name: municipality,
+    logo: "/sag.svg",
+    fallbackLogo: "/sag.svg"
+  };
 };
 
 export const getMunicipalityLogo = (): string => {

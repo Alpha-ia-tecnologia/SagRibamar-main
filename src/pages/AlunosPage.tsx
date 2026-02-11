@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { Header } from "../components/Header";
 import { AlunoList } from "../layout/AlunoList";
 import { CreateAlunoModal } from "../components/modals/CreateAlunoModal";
 import { AlunoFilter } from "../components/AlunoFilter";
 import { ImportAlunosModal } from "../components/modals/ImportAlunosModal ";
 import { Loading } from "../components/Loading";
 import { useApi } from "../utils/api";
-import Footer from "../components/Footer";
 import {
   AcademicCapIcon,
   PlusIcon,
@@ -120,13 +118,11 @@ export default function AlunosPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
-      <Header />
-
-      <main className="px-4 sm:px-6 lg:px-8 py-8 max-w-[1600px] mx-auto">
+    <>
+      <main className="px-4 sm:px-6 lg:px-8 py-8 max-w-400 mx-auto">
         {/* Header da Página */}
         <div className="mb-8">
-          <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-2xl p-6 sm:p-8 shadow-xl">
+          <div className="relative overflow-hidden bg-linear-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-2xl p-6 sm:p-8 shadow-xl">
             {/* Elementos decorativos de fundo */}
             <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
             <div className="absolute bottom-0 left-1/4 -mb-8 w-32 h-32 bg-blue-400/20 rounded-full blur-3xl"></div>
@@ -240,7 +236,6 @@ export default function AlunosPage() {
 
       {isLoading && <Loading />}
 
-      <Footer />
-    </div>
+    </>
   );
 }
