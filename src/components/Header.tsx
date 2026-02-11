@@ -74,7 +74,7 @@ export const Header = () => {
               </div>
               <div className="hidden sm:block">
                 <span className="font-bold text-xl tracking-tight">SAG</span>
-                <p className="text-blue-200 text-xs -mt-0.5">Sistema de Avaliacao</p>
+                <p className="text-blue-200 text-xs -mt-0.5">Sistema de Avaliação</p>
               </div>
             </div>
 
@@ -159,7 +159,7 @@ export const Header = () => {
             </div>
             <div>
               <span className="font-bold text-lg">SAG</span>
-              <p className="text-blue-300 text-xs">Sistema de Avaliacao</p>
+              <p className="text-blue-300 text-xs">Sistema de Avaliação</p>
             </div>
           </div>
           <button
@@ -183,7 +183,7 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* Navegacao Mobile */}
+        {/* Navegação Mobile */}
         <nav className="flex flex-col p-4 gap-1.5">
           <span className="text-xs text-blue-300 uppercase tracking-wider font-medium px-3 mb-2">Menu</span>
           {navItems
@@ -210,7 +210,7 @@ export const Header = () => {
             ))}
         </nav>
 
-        {/* Botao Logout Mobile */}
+        {/* Botão Logout Mobile */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10 bg-white/5">
           <button
             type="button"

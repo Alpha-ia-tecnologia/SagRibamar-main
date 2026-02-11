@@ -57,11 +57,11 @@ export const DashboardPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
-      {/* Modal de Loading para Exportacao */}
+      {/* Modal de Loading para Exportação */}
       {isExporting && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
           <div className="bg-white rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-5 max-w-sm mx-4 animate-in fade-in zoom-in duration-200">
-            {/* Icone animado */}
+            {/* Ícone animado */}
             <div className="relative">
               <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
                 <DocumentArrowDownIcon className="w-10 h-10 text-white animate-bounce" />
@@ -120,7 +120,7 @@ export const DashboardPage = () => {
             <div className="absolute bottom-0 left-1/4 -mb-8 w-32 h-32 bg-blue-400/20 rounded-full blur-3xl"></div>
             <div className="absolute top-1/2 right-1/3 w-16 h-16 bg-indigo-400/15 rounded-full blur-2xl"></div>
 
-            {/* Padrao de pontos decorativo */}
+            {/* Padrão de pontos decorativo */}
             <div className="absolute inset-0 opacity-10">
               <div className="absolute top-4 left-8 w-2 h-2 bg-white rounded-full"></div>
               <div className="absolute top-8 left-16 w-1.5 h-1.5 bg-white rounded-full"></div>
@@ -131,7 +131,7 @@ export const DashboardPage = () => {
 
             <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <div className="flex items-center gap-5">
-                {/* Icone principal com efeito glassmorphism */}
+                {/* Ícone principal com efeito glassmorphism */}
                 <div className="relative">
                   <div className="absolute inset-0 bg-white/20 rounded-2xl blur-sm"></div>
                   <div className="relative p-4 bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg">
@@ -153,7 +153,7 @@ export const DashboardPage = () => {
                     </span>
                   </div>
                   <p className="text-blue-100 text-sm sm:text-base">
-                    Sistema de Avaliacao e Gerenciamento Educacional
+                    Sistema de Avaliação e Gerenciamento Educacional
                   </p>
                   {/* Data atual */}
                   <div className="flex items-center gap-1.5 mt-2 text-blue-200 text-sm">
@@ -163,7 +163,7 @@ export const DashboardPage = () => {
                 </div>
               </div>
 
-              {/* Botao de exportar com design melhorado */}
+              {/* Botão de exportar com design melhorado */}
               <button
                 onClick={handleExport}
                 disabled={isExporting}
@@ -203,13 +203,13 @@ export const DashboardPage = () => {
           <TabelaDesempenhoEscolas />
         </section>
 
-        {/* Graficos - Linha 1 */}
+        {/* Gráficos - Linha 1 */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <GraficoArea />
           <GraficoDesempenhoAvaliacoes />
         </section>
 
-        {/* Graficos - Linha 2 */}
+        {/* Gráficos - Linha 2 */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <GraficoComponentesCurriculares />
           <GraficoRankingRegioes />

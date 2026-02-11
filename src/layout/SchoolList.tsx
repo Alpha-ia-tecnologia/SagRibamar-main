@@ -146,7 +146,7 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
             <div>
               <h3 className="font-semibold text-gray-900">Lista de Escolas</h3>
               <p className="text-sm text-gray-500">
-                Pagina <span className="font-medium text-blue-600">{page}</span> de <span className="font-medium">{totalPages}</span> - Total: <span className="font-medium text-blue-600">{totalItems}</span> escolas
+                Página <span className="font-medium text-blue-600">{page}</span> de <span className="font-medium">{totalPages}</span> - Total: <span className="font-medium text-blue-600">{totalItems}</span> escolas
               </p>
             </div>
           </div>
@@ -189,7 +189,7 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
                       </span>
                       <span className="inline-flex items-center gap-1.5 text-sm text-gray-500">
                         <MapPinIcon className="w-4 h-4 text-gray-400" />
-                        {escola.regiao?.nome || `Regiao ${escola.regiao_id}`}
+                        {escola.regiao?.nome || `Região ${escola.regiao_id}`}
                       </span>
                       <span className="inline-flex items-center gap-1.5 text-sm text-gray-500">
                         <TagIcon className="w-4 h-4 text-gray-400" />
@@ -199,7 +199,7 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
                   </div>
                 </div>
 
-                {/* Acoes */}
+                {/* Ações */}
                 <div className="flex items-center gap-2">
                   <IconButton type="edit" onClick={() => onEdit?.(escola.id)} />
                   <IconButton
@@ -216,7 +216,7 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
         )}
       </div>
 
-      {/* Paginacao */}
+      {/* Paginação */}
       {escolas.length > 0 && (
         <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-100">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -225,27 +225,27 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
             </p>
 
             <div className="flex items-center gap-1">
-              {/* Primeira pagina */}
+              {/* Primeira página */}
               <button
                 onClick={() => setPage(1)}
                 disabled={page === 1}
                 className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white hover:border-gray-300 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
-                title="Primeira pagina"
+                title="Primeira página"
               >
                 <ChevronDoubleLeftIcon className="w-4 h-4" />
               </button>
 
-              {/* Pagina anterior */}
+              {/* Página anterior */}
               <button
                 onClick={() => setPage(page - 1)}
                 disabled={page === 1}
                 className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white hover:border-gray-300 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
-                title="Pagina anterior"
+                title="Página anterior"
               >
                 <ChevronLeftIcon className="w-4 h-4" />
               </button>
 
-              {/* Numeros de pagina */}
+              {/* Números de página */}
               <div className="flex items-center gap-1 mx-2">
                 {gerarBotoesPaginacao().map((num, i) =>
                   num === "..." ? (
@@ -271,22 +271,22 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
                 )}
               </div>
 
-              {/* Proxima pagina */}
+              {/* Próxima página */}
               <button
                 onClick={() => setPage(page + 1)}
                 disabled={page === totalPages}
                 className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white hover:border-gray-300 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
-                title="Proxima pagina"
+                title="Próxima página"
               >
                 <ChevronRightIcon className="w-4 h-4" />
               </button>
 
-              {/* Ultima pagina */}
+              {/* Última página */}
               <button
                 onClick={() => setPage(totalPages)}
                 disabled={page === totalPages}
                 className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white hover:border-gray-300 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
-                title="Ultima pagina"
+                title="Última página"
               >
                 <ChevronDoubleRightIcon className="w-4 h-4" />
               </button>
@@ -295,13 +295,13 @@ if (grupoId !== null) queryParams.append("grupo_id", String(grupoId));
         </div>
       )}
 
-      {/* Dialog de Confirmacao */}
+      {/* Dialog de Confirmação */}
       {confirmationDelete && (
         <ConfirmDialog
           isOpen={confirmationDelete}
           title="Tem certeza que deseja excluir essa escola?"
-          description="Ao excluir uma escola, todas as provas, turmas e alunos vinculados a ela tambem serao excluidos."
-          warning="Esta acao e irreversivel e resultara na perda de todos os dados associados a escola."
+          description="Ao excluir uma escola, todas as provas, turmas e alunos vinculados a ela também serão excluídos."
+          warning="Esta ação é irreversível e resultará na perda de todos os dados associados à escola."
           confirmText="Excluir"
           cancelText="Cancelar"
           onConfirm={() => {

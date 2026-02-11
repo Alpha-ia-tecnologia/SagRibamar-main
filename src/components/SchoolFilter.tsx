@@ -93,7 +93,7 @@ export const SchoolFilter = ({ onFilter }: SchoolFilterProps) => {
         </div>
       </button>
 
-      {/* Conteudo dos Filtros */}
+      {/* Conteúdo dos Filtros */}
       {isExpanded && (
         <div className="px-6 pb-6 pt-2">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -115,10 +115,10 @@ export const SchoolFilter = ({ onFilter }: SchoolFilterProps) => {
               </div>
             </div>
 
-            {/* Select de Regiao */}
+            {/* Select de Região */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Regiao
+                Região
               </label>
               <div className="relative">
                 <MapPinIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
@@ -129,7 +129,7 @@ export const SchoolFilter = ({ onFilter }: SchoolFilterProps) => {
                     setRegiaoId(e.target.value === "" ? "" : parseInt(e.target.value))
                   }
                 >
-                  <option value="">Todas as regioes</option>
+                  <option value="">Todas as regiões</option>
                   {regioes.map((r) => (
                     <option key={r.id} value={r.id}>
                       {r.nome}
@@ -169,7 +169,7 @@ export const SchoolFilter = ({ onFilter }: SchoolFilterProps) => {
               </div>
             </div>
 
-            {/* Botoes */}
+            {/* Botões */}
             <div className="flex items-end gap-2">
               <button
                 onClick={handleFilter}

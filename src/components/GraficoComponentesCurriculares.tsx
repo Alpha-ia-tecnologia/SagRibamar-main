@@ -123,12 +123,12 @@ export const GraficoComponentesCurriculares = () => {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Componentes Curriculares</h2>
-            <p className="text-sm text-gray-500">Analise por disciplina</p>
+            <p className="text-sm text-gray-500">Análise por disciplina</p>
           </div>
         </div>
       </div>
 
-      {/* Conteudo */}
+      {/* Conteúdo */}
       <div className="p-6">
         {loading ? (
           <Loading />

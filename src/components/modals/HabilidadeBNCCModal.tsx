@@ -377,7 +377,7 @@ export const HabilidadeBNCCModal = ({
                                 <span className="bg-gray-200 text-gray-900 px-2 py-1 rounded">
                                   {questao.proficiencia_saeb
                                     ? `${questao.proficiencia_saeb.nivel} - ${questao.proficiencia_saeb.descricao}`
-                                    : "Sem nivel vinculado"}
+                                    : "Sem nível vinculado"}
                                 </span>
                               </div>
                             </div>
@@ -416,12 +416,11 @@ export const HabilidadeBNCCModal = ({
                                     <span
                                       className={
                                         alt.correta
-                                          ? "bg-green-100 px-2 py-1 rounded"
-                                          : ""
+                                          ? "bg-green-100 px-2 py-1 rounded prose prose-sm max-w-none inline"
+                                          : "prose prose-sm max-w-none inline"
                                       }
-                                    >
-                                      {alt.texto}
-                                    </span>
+                                      dangerouslySetInnerHTML={{ __html: alt.texto || '' }}
+                                    />
                                     {alt.correta && (
                                       <span className="text-green-600">✓</span>
                                     )}

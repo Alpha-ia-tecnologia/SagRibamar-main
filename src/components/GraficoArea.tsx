@@ -97,13 +97,13 @@ export default function GraficoArea() {
             <AcademicCapIcon className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Desempenho por Area</h2>
-            <p className="text-sm text-gray-500">Areas de conhecimento</p>
+            <h2 className="text-lg font-semibold text-gray-900">Desempenho por Área</h2>
+            <p className="text-sm text-gray-500">Áreas de conhecimento</p>
           </div>
         </div>
       </div>
 
-      {/* Conteudo */}
+      {/* Conteúdo */}
       <div className="p-6">
         {semdados.areas2.length === 0 ? (
           <NoData />

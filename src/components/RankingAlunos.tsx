@@ -236,7 +236,7 @@ export const RankingAlunos = () => {
               </table>
             </div>
 
-            {/* Paginacao */}
+            {/* Paginação */}
             <div className="flex flex-col sm:flex-row items-center justify-between mt-6 pt-6 border-t border-gray-100 gap-4">
               <p className="text-sm text-gray-500">
                 Mostrando <span className="font-medium text-gray-900">{(page - 1) * 20 + 1}</span> a{" "}

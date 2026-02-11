@@ -118,22 +118,22 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
                 <UsersSolid className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">Lista de Usuarios</h3>
+                <h3 className="font-semibold text-gray-900">Lista de Usuários</h3>
                 <p className="text-sm text-gray-500">
-                  Pagina <span className="font-medium text-blue-600">{currentPage}</span> de <span className="font-medium">{totalPages}</span> - Total: <span className="font-medium text-blue-600">{usuarios.length}</span> usuarios
+                  Página <span className="font-medium text-blue-600">{currentPage}</span> de <span className="font-medium">{totalPages}</span> - Total: <span className="font-medium text-blue-600">{usuarios.length}</span> usuários
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Lista de Usuarios */}
+        {/* Lista de Usuários */}
         <div className="divide-y divide-gray-100">
           {paginated.length === 0 ? (
             <div className="px-6 py-12 text-center">
               <UsersIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-1">Nenhum usuario encontrado</h3>
-              <p className="text-gray-500">Adicione um novo usuario para comecar</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-1">Nenhum usuário encontrado</h3>
+              <p className="text-gray-500">Adicione um novo usuário para começar</p>
             </div>
           ) : (
             paginated.map((usuario, index) => (
@@ -153,7 +153,7 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
           )}
         </div>
 
-        {/* Paginacao */}
+        {/* Paginação */}
         {paginated.length > 0 && (
           <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-100">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -162,27 +162,27 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
               </p>
 
               <div className="flex items-center gap-1">
-                {/* Primeira pagina */}
+                {/* Primeira página */}
                 <button
                   onClick={() => setCurrentPage(1)}
                   disabled={currentPage === 1}
                   className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white hover:border-gray-300 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
-                  title="Primeira pagina"
+                  title="Primeira página"
                 >
                   <ChevronDoubleLeftIcon className="w-4 h-4" />
                 </button>
 
-                {/* Pagina anterior */}
+                {/* Página anterior */}
                 <button
                   onClick={() => setCurrentPage(currentPage - 1)}
                   disabled={currentPage === 1}
                   className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white hover:border-gray-300 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
-                  title="Pagina anterior"
+                  title="Página anterior"
                 >
                   <ChevronLeftIcon className="w-4 h-4" />
                 </button>
 
-                {/* Numeros de pagina */}
+                {/* Números de página */}
                 <div className="flex items-center gap-1 mx-2">
                   {gerarBotoesPaginacao().map((num, i) =>
                     num === "..." ? (
@@ -208,22 +208,22 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
                   )}
                 </div>
 
-                {/* Proxima pagina */}
+                {/* Próxima página */}
                 <button
                   onClick={() => setCurrentPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white hover:border-gray-300 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
-                  title="Proxima pagina"
+                  title="Próxima página"
                 >
                   <ChevronRightIcon className="w-4 h-4" />
                 </button>
 
-                {/* Ultima pagina */}
+                {/* Última página */}
                 <button
                   onClick={() => setCurrentPage(totalPages)}
                   disabled={currentPage === totalPages}
                   className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white hover:border-gray-300 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
-                  title="Ultima pagina"
+                  title="Última página"
                 >
                   <ChevronDoubleRightIcon className="w-4 h-4" />
                 </button>
@@ -242,12 +242,12 @@ export const PaginatedList = ({ reload, onReloadDone }: PaginatedListProps) => {
         />
       )}
 
-      {/* Dialog de Confirmacao */}
+      {/* Dialog de Confirmação */}
       {confirmationDelete && (
         <ConfirmDialog
           isOpen={confirmationDelete}
-          title="Tem certeza que deseja excluir esse usuario?"
-          description="Ao excluir um usuario, o mesmo nao podera mais acessar a plataforma com as mesmas informacoes de login."
+          title="Tem certeza que deseja excluir esse usuário?"
+          description="Ao excluir um usuário, o mesmo não poderá mais acessar a plataforma com as mesmas informações de login."
           warning="Esta ação é irreversível."
           onConfirm={() => {
             if (idUser !== null) {

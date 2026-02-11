@@ -84,7 +84,7 @@ export const GraficoRankingRegioes = () => {
     labels: dadosRegioes.map((r) => r.regiao_nome),
     datasets: [
       {
-        label: "Desempenho por Regiao",
+        label: "Desempenho por Região",
         data: dadosRegioes.map((r) => r.media_desempenho),
         backgroundColor: "rgba(251, 191, 36, 0.7)",
         borderColor: "rgba(251, 191, 36, 1)",
@@ -135,7 +135,7 @@ export const GraficoRankingRegioes = () => {
         </div>
       </div>
 
-      {/* Conteudo */}
+      {/* Conteúdo */}
       <div className="p-6">
         {loading ? (
           <Loading />
@@ -147,14 +147,14 @@ export const GraficoRankingRegioes = () => {
               <Bar data={chartData} options={chartOptions} />
             </div>
 
-            {/* Estatisticas */}
+            {/* Estatísticas */}
             <div className="grid grid-cols-3 gap-3">
               <div className="bg-gray-50 rounded-xl p-3 text-center">
                 <p className="text-xs text-gray-500 mb-1">Total</p>
                 <p className="text-lg font-bold text-gray-900">{estatisticas.total_regioes}</p>
               </div>
               <div className="bg-blue-50 rounded-xl p-3 text-center">
-                <p className="text-xs text-gray-500 mb-1">Media Geral</p>
+                <p className="text-xs text-gray-500 mb-1">Média Geral</p>
                 <p className="text-lg font-bold text-blue-600">
                   {estatisticas.media_geral?.toFixed(1) || "0.0"}
                 </p>

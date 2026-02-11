@@ -102,7 +102,7 @@ export const GraficoDesempenhoAvaliacoes = () => {
         },
         ticks: {
           font: {
-            size: 0 //tamnho do titulo da prova
+            size: 0 //tamanho do título da prova
           },
         },
       },
@@ -118,13 +118,13 @@ export const GraficoDesempenhoAvaliacoes = () => {
             <ChartBarIcon className="w-5 h-5 text-violet-600" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Notas Medias por Avaliacao</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Notas Médias por Avaliação</h2>
             <p className="text-sm text-gray-500">Percentual de acertos por prova</p>
           </div>
         </div>
       </div>
 
-      {/* Conteudo */}
+      {/* Conteúdo */}
       <div className="p-6">
         {loading ? (
           <Loading />
