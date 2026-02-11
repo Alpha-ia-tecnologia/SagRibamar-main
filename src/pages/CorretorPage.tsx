@@ -8,7 +8,7 @@ function LoadingFallback() {
   return (
     <div className="flex items-center justify-center h-96">
       <div className="text-center text-gray-400">
-        <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+        <div className="w-12 h-12 border-4 border-accent-200 border-t-accent-500 rounded-full animate-spin mx-auto mb-4"></div>
         <p className="text-lg font-medium">Carregando Corretor...</p>
       </div>
     </div>

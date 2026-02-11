@@ -175,7 +175,7 @@ export const AlunoFilter = ({ onFilter }: AlunoFilterProps) => {
 
         <button
           onClick={handleFilter}
-          className="bg-blue-600 text-white px-5 py-2 rounded-xl hover:bg-blue-700 transition-all duration-200 shrink-0 whitespace-nowrap"
+          className="bg-accent-500 text-white px-5 py-2 rounded-xl hover:bg-accent-600 transition-all duration-200 shrink-0 whitespace-nowrap"
         >
           Filtrar
         </button>

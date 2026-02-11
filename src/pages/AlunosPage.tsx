@@ -122,11 +122,11 @@ export default function AlunosPage() {
       <main className="px-4 sm:px-6 lg:px-8 py-8 max-w-400 mx-auto">
         {/* Header da Página */}
         <div className="mb-8">
-          <div className="relative overflow-hidden bg-linear-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-2xl p-6 sm:p-8 shadow-xl">
+          <div className="relative overflow-hidden bg-linear-to-r from-brand-700 via-brand-500 to-accent-500 rounded-2xl p-6 sm:p-8 shadow-xl">
             {/* Elementos decorativos de fundo */}
             <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
-            <div className="absolute bottom-0 left-1/4 -mb-8 w-32 h-32 bg-blue-400/20 rounded-full blur-3xl"></div>
-            <div className="absolute top-1/2 right-1/3 w-16 h-16 bg-indigo-400/15 rounded-full blur-2xl"></div>
+            <div className="absolute bottom-0 left-1/4 -mb-8 w-32 h-32 bg-accent-500/20 rounded-full blur-3xl"></div>
+            <div className="absolute top-1/2 right-1/3 w-16 h-16 bg-accent-400/15 rounded-full blur-2xl"></div>
 
             {/* Padrão de pontos decorativo */}
             <div className="absolute inset-0 opacity-10">
@@ -146,8 +146,8 @@ export default function AlunosPage() {
                     <AcademicCapIcon className="w-10 h-10 text-white" />
                   </div>
                   {/* Badge de destaque */}
-                  <div className="absolute -top-1 -right-1 p-1 bg-amber-400 rounded-full shadow-lg">
-                    <SparklesIcon className="w-3 h-3 text-amber-900" />
+                  <div className="absolute -top-1 -right-1 p-1 bg-accent-400 rounded-full shadow-lg">
+                    <SparklesIcon className="w-3 h-3 text-accent-700" />
                   </div>
                 </div>
 
@@ -160,7 +160,7 @@ export default function AlunosPage() {
                       Gerenciamento
                     </span>
                   </div>
-                  <p className="text-blue-100 text-sm sm:text-base">
+                  <p className="text-accent-100 text-sm sm:text-base">
                     Gerencie todos os alunos do sistema
                   </p>
                 </div>

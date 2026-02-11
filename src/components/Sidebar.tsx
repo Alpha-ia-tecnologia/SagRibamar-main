@@ -94,7 +94,7 @@ export const Sidebar = () => {
   // Estilo compartilhado para item de menu principal (Dashboard e headers de seção)
   const menuItemBase = "flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200";
   const menuItemActive = `${menuItemBase} bg-white/15 text-white shadow-lg border border-white/10`;
-  const menuItemInactive = `${menuItemBase} text-blue-100 hover:bg-white/10 hover:text-white`;
+  const menuItemInactive = `${menuItemBase} text-white hover:bg-white/10 hover:text-white`;
 
   // Renderiza navegação (compartilhado entre desktop e mobile)
   const renderNav = (onLinkClick?: () => void) => (
@@ -155,7 +155,7 @@ export const Sidebar = () => {
                       `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
                         isActive
                           ? "bg-white/10 text-white font-medium"
-                          : "text-blue-200 hover:bg-white/5 hover:text-white"
+                          : "text-white hover:bg-white/5 hover:text-white"
                       }`
                     }
                   >
@@ -174,37 +174,31 @@ export const Sidebar = () => {
   return (
     <>
       {/* Sidebar Desktop */}
-      <aside className="hidden lg:flex fixed top-0 left-0 h-screen w-64 z-40 flex-col bg-linear-to-b from-blue-600 via-blue-700 to-indigo-800 text-white shadow-xl shadow-blue-900/30">
+      <aside className="hidden lg:flex fixed top-0 left-0 h-screen w-64 z-40 flex-col bg-linear-to-b from-brand-700 via-brand-500 to-accent-500 text-white shadow-xl shadow-brand-950/30">
         {/* Linha decorativa lateral */}
-        <div className="absolute top-0 right-0 w-1 h-full bg-linear-to-b from-amber-400 via-orange-400 to-amber-500"></div>
+        <div className="absolute top-0 right-0 w-1 h-full bg-linear-to-b from-accent-500 via-accent-400 to-accent-500"></div>
 
         {/* Logo */}
         <div className="flex flex-col items-center gap-3 px-5 py-6 border-b border-white/10">
           <div className="flex items-center justify-center gap-3">
-            <div className="relative">
-              <div className="absolute inset-0 bg-blue-200/70 rounded-xl blur-sm"></div>
-              <div className="relative backdrop-blur-sm p-3 rounded-xl">
-                <DynamicLogo
-                  alt={`Logo de ${municipalityName}`}
-                  width={80}
-                />
-              </div>
+            <div className="bg-white/10 backdrop-blur-sm p-2 rounded-xl border border-white/20">
+              <DynamicLogo
+                alt={`Logo de ${municipalityName}`}
+                width={80}
+              />
             </div>
-            <div className="relative">
-              <div className="absolute inset-0 bg-blue-200/70 rounded-xl blur-sm"></div>
-              <div className="relative backdrop-blur-sm p-3 rounded-xl ">
-                <img
-                  src="/logos/maximiza.png"
-                  alt="Logo Maximiza"
-                  width={100}
-                  className="object-contain"
-                />
-              </div>
+            <div className="bg-white/10 backdrop-blur-sm p-2 rounded-xl border border-white/20">
+              <img
+                src="/logos/maximiza.png"
+                alt="Logo Maximiza"
+                width={100}
+                className="object-contain"
+              />
             </div>
           </div>
           <div className="text-center">
             <span className="font-bold text-lg tracking-tight">SAG</span>
-            <p className="text-blue-200 text-xs">Sistema de Avaliação e Gerenciamento Educacional</p>
+            <p className="text-brand-100 text-xs">Sistema de Avaliação e Gerenciamento Educacional</p>
           </div>
         </div>
 
@@ -216,19 +210,18 @@ export const Sidebar = () => {
         {/* Área do usuário */}
         <div className="border-t border-white/10 bg-white/5 p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-linear-to-br from-amber-400 to-orange-500 flex items-center justify-center text-sm font-bold text-white shadow-md">
+            <div className="w-10 h-10 rounded-full bg-linear-to-br from-accent-400 to-accent-600 flex items-center justify-center text-sm font-bold text-white shadow-md">
               {user?.nome?.charAt(0)?.toUpperCase() || <User size={16} />}
             </div>
             <div className="flex-1 min-w-0">
               <span className="text-sm font-medium block leading-tight truncate">{user?.nome || "Usuário"}</span>
-              <span className="text-xs text-blue-200 leading-tight">{tipo || "Convidado"}</span>
+              <span className="text-xs text-brand-100 leading-tight">{tipo || "Convidado"}</span>
             </div>
           </div>
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-400/20 hover:bg-red-500 text-white rounded-xl border border-blue-400/30 hover:border-red-400 transition-all duration-200 text-sm font-medium"
-          >
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-accent-500/20 hover:bg-red-500 text-white rounded-xl border border-accent-500/30 hover:border-red-400 transition-all duration-200 text-sm font-medium shadow-2xl"          >
             <LogOut size={16} />
             <span>Sair</span>
           </button>
@@ -239,7 +232,7 @@ export const Sidebar = () => {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2.5 bg-linear-to-r from-blue-600 to-indigo-700 text-white rounded-xl shadow-lg shadow-blue-900/30 border border-white/10 transition-all duration-200 hover:scale-105"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2.5 bg-linear-to-r from-brand-700 to-accent-500 text-white rounded-xl shadow-lg shadow-brand-950/30 border border-white/10 transition-all duration-200 hover:scale-105"
       >
         {isOpen ? <X size={22} /> : <Menu size={22} />}
       </button>
@@ -254,7 +247,7 @@ export const Sidebar = () => {
 
       {/* Sidebar Mobile */}
       <div
-        className={`fixed top-0 left-0 h-full w-72 bg-linear-to-b from-blue-700 via-blue-800 to-indigo-900 text-white transform transition-transform duration-300 ease-out z-50 shadow-2xl
+        className={`fixed top-0 left-0 h-full w-72 bg-linear-to-b from-brand-700 via-brand-500 to-accent-500 text-white transform transition-transform duration-300 ease-out z-50 shadow-2xl
         ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:hidden`}
       >
         {/* Header da Sidebar Mobile */}
@@ -279,7 +272,7 @@ export const Sidebar = () => {
             </div>
             <div>
               <span className="font-bold text-lg">SAG</span>
-              <p className="text-blue-300 text-xs">Sistema de Avaliação</p>
+              <p className="text-brand-200 text-xs">Sistema de Avaliação</p>
             </div>
           </div>
           <button
@@ -293,12 +286,12 @@ export const Sidebar = () => {
         {/* Info do Usuario Mobile */}
         <div className="p-5 border-b border-white/10 bg-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-linear-to-br from-amber-400 to-orange-500 flex items-center justify-center text-lg font-bold text-white shadow-lg">
+            <div className="w-12 h-12 rounded-full bg-linear-to-br from-accent-400 to-accent-600 flex items-center justify-center text-lg font-bold text-white shadow-lg">
               {user?.nome?.charAt(0)?.toUpperCase() || <User size={20} />}
             </div>
             <div>
               <span className="font-medium block">{user?.nome || "Usuário"}</span>
-              <span className="text-sm text-blue-300">{tipo || "Convidado"}</span>
+              <span className="text-sm text-brand-200">{tipo || "Convidado"}</span>
             </div>
           </div>
         </div>

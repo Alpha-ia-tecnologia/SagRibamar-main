@@ -8,13 +8,13 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative bg-linear-to-r from-blue-700 via-blue-800 to-indigo-800 text-white overflow-hidden">
+    <footer className="relative bg-linear-to-r from-brand-700 via-brand-800 to-brand-900 text-white overflow-hidden">
       {/* Elementos decorativos de fundo */}
-      <div className="absolute top-0 left-1/4 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>
+      <div className="absolute top-0 left-1/4 w-32 h-32 bg-brand-500/10 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-accent-500/10 rounded-full blur-3xl"></div>
 
       {/* Linha decorativa superior */}
-      <div className="h-1 bg-linear-to-r from-amber-400 via-orange-400 to-amber-500"></div>
+      <div className="h-1 bg-linear-to-r from-accent-500 via-accent-400 to-accent-500"></div>
 
       {/* Conteúdo principal */}
       <div className="relative max-w-400 mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -37,7 +37,7 @@ export default function Footer() {
             </div>
             <div>
               <span className="font-bold text-xl tracking-tight">SAG</span>
-              <p className="text-blue-200 text-xs">Sistema de Avaliação e Gerenciamento</p>
+              <p className="text-brand-100 text-xs">Sistema de Avaliação e Gerenciamento</p>
             </div>
           </div>
 
@@ -45,28 +45,28 @@ export default function Footer() {
           <div className="flex items-center justify-center gap-6">
             <div className="flex flex-col items-center gap-1 text-center">
               <div className="p-2 bg-white/10 rounded-lg">
-                <AcademicCapIcon className="w-5 h-5 text-amber-400" />
+                <AcademicCapIcon className="w-5 h-5 text-accent-400" />
               </div>
-              <span className="text-xs text-blue-200">Educação</span>
+              <span className="text-xs text-brand-100">Educação</span>
             </div>
             <div className="flex flex-col items-center gap-1 text-center">
               <div className="p-2 bg-white/10 rounded-lg">
                 <ChartBarIcon className="w-5 h-5 text-emerald-400" />
               </div>
-              <span className="text-xs text-blue-200">Análise</span>
+              <span className="text-xs text-brand-100">Análise</span>
             </div>
             <div className="flex flex-col items-center gap-1 text-center">
               <div className="p-2 bg-white/10 rounded-lg">
                 <ShieldCheckIcon className="w-5 h-5 text-sky-400" />
               </div>
-              <span className="text-xs text-blue-200">Segurança</span>
+              <span className="text-xs text-brand-100">Segurança</span>
             </div>
           </div>
 
           {/* Info do município */}
           <div className="text-center md:text-right">
             <p className="text-sm font-medium text-white">{municipalityName}</p>
-            <p className="text-xs text-blue-200">Gestão Educacional</p>
+            <p className="text-xs text-brand-100">Gestão Educacional</p>
           </div>
         </div>
 
@@ -75,10 +75,10 @@ export default function Footer() {
 
         {/* Copyright */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
-          <p className="text-blue-200 flex items-center gap-1.5">
+          <p className="text-brand-100 flex items-center gap-1.5">
             © {currentYear} SAG - {municipalityName}. Todos os direitos reservados.
           </p>
-          <p className="text-blue-300 flex items-center gap-1.5 text-xs">
+          <p className="text-brand-200 flex items-center gap-1.5 text-xs">
             Feito com <HeartIcon className="w-4 h-4 text-red-400 animate-pulse" /> para a educação
           </p>
         </div>
