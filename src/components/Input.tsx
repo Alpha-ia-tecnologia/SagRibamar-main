@@ -11,6 +11,6 @@ export const Input = ({ type, placeholder, value, onChange }: InputProps) => (
     placeholder={placeholder}
     value={value}
     onChange={onChange}
-    className="w-full px-4 py-2 rounded-md bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-600"
+    className="w-full px-4 py-2 rounded-md bg-accent-50 focus:outline-none focus:ring-2 focus:ring-accent-500"
   />
 );

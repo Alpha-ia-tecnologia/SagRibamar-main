@@ -35,7 +35,7 @@ export const LoginForm = () => {
           width={120}
           height={120}
         />
-        <h1 className="text-2xl font-bold text-center text-blue-600 mb-1">{appName}</h1>
+        <h1 className="text-2xl font-bold text-center text-brand-700 mb-1">{appName}</h1>
         <p className="text-center text-sm text-gray-600">
           Sistema de Avaliação e Gerenciamento
         </p>

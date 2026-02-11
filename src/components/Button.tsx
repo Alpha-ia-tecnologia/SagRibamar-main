@@ -12,7 +12,7 @@ export const Button = ({ label, onClick, disabled }: ButtonProps) => (
     className={`w-full py-2 rounded-md font-semibold transition cursor-pointer ${
       disabled
         ? "bg-gray-400 text-gray-600 cursor-not-allowed" 
-        : "bg-blue-600 text-white hover:bg-blue-700" 
+        : "bg-accent-500 text-white hover:bg-accent-600" 
     }`}
   >
     {label}

@@ -61,14 +61,14 @@ export const DashboardPage = () => {
           <div className="bg-white rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-5 max-w-sm mx-4 animate-in fade-in zoom-in duration-200">
             {/* Ícone animado */}
             <div className="relative">
-              <div className="w-20 h-20 rounded-full bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+              <div className="w-20 h-20 rounded-full bg-linear-to-br from-brand-500 to-accent-500 flex items-center justify-center shadow-lg shadow-brand-500/30">
                 <DocumentArrowDownIcon className="w-10 h-10 text-white animate-bounce" />
               </div>
               {/* Spinner ao redor */}
               <div className="absolute inset-0 w-20 h-20">
                 <svg className="w-full h-full animate-spin" viewBox="0 0 100 100">
                   <circle
-                    className="stroke-blue-200"
+                    className="stroke-accent-200"
                     cx="50"
                     cy="50"
                     r="45"
@@ -76,7 +76,7 @@ export const DashboardPage = () => {
                     strokeWidth="6"
                   />
                   <circle
-                    className="stroke-blue-600"
+                    className="stroke-accent-500"
                     cx="50"
                     cy="50"
                     r="45"
@@ -101,7 +101,7 @@ export const DashboardPage = () => {
 
             {/* Barra de progresso animada */}
             <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div className="h-full bg-linear-to-r from-blue-500 to-indigo-600 rounded-full animate-pulse w-3/4"></div>
+              <div className="h-full bg-linear-to-r from-brand-500 to-accent-500 rounded-full animate-pulse w-3/4"></div>
             </div>
           </div>
         </div>
@@ -110,11 +110,11 @@ export const DashboardPage = () => {
       <main className="px-4 sm:px-6 lg:px-8 py-8 max-w-400 mx-auto">
         {/* Header do Dashboard */}
         <div className="mb-8">
-          <div className="relative overflow-hidden bg-linear-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-2xl p-6 sm:p-8 shadow-xl">
+          <div className="relative overflow-hidden bg-linear-to-r from-brand-700 via-brand-500 to-accent-500 rounded-2xl p-6 sm:p-8 shadow-xl">
             {/* Elementos decorativos de fundo */}
             <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
-            <div className="absolute bottom-0 left-1/4 -mb-8 w-32 h-32 bg-blue-400/20 rounded-full blur-3xl"></div>
-            <div className="absolute top-1/2 right-1/3 w-16 h-16 bg-indigo-400/15 rounded-full blur-2xl"></div>
+            <div className="absolute bottom-0 left-1/4 -mb-8 w-32 h-32 bg-accent-500/20 rounded-full blur-3xl"></div>
+            <div className="absolute top-1/2 right-1/3 w-16 h-16 bg-accent-400/15 rounded-full blur-2xl"></div>
 
             {/* Padrão de pontos decorativo */}
             <div className="absolute inset-0 opacity-10">
@@ -134,8 +134,8 @@ export const DashboardPage = () => {
                     <ChartBarIcon className="w-10 h-10 text-white" />
                   </div>
                   {/* Badge de destaque */}
-                  <div className="absolute -top-1 -right-1 p-1 bg-amber-400 rounded-full shadow-lg">
-                    <SparklesIcon className="w-3 h-3 text-amber-900" />
+                  <div className="absolute -top-1 -right-1 p-1 bg-accent-400 rounded-full shadow-lg">
+                    <SparklesIcon className="w-3 h-3 text-accent-700" />
                   </div>
                 </div>
 
@@ -148,11 +148,11 @@ export const DashboardPage = () => {
                       SAG
                     </span>
                   </div>
-                  <p className="text-blue-100 text-sm sm:text-base">
+                  <p className="text-accent-100 text-sm sm:text-base">
                     Sistema de Avaliação e Gerenciamento Educacional
                   </p>
                   {/* Data atual */}
-                  <div className="flex items-center gap-1.5 mt-2 text-blue-200 text-sm">
+                  <div className="flex items-center gap-1.5 mt-2 text-accent-200 text-sm">
                     <CalendarDaysIcon className="w-4 h-4" />
                     <span>{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
                   </div>
@@ -163,7 +163,7 @@ export const DashboardPage = () => {
               <button
                 onClick={handleExport}
                 disabled={isExporting}
-                className="inline-flex items-center gap-2.5 px-6 py-3 bg-white text-blue-700 font-semibold rounded-xl hover:bg-blue-50 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-md group disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="inline-flex items-center gap-2.5 px-6 py-3 bg-white text-brand-700 font-semibold rounded-xl hover:bg-brand-50 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-md group disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isExporting ? (
                   <>

@@ -54,8 +54,8 @@ export const FiltroAvaliacoes = () => {
         className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors rounded-t-2xl"
       >
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-50 rounded-lg">
-            <FunnelIcon className="w-5 h-5 text-blue-600" />
+          <div className="p-2 bg-accent-50 rounded-lg">
+            <FunnelIcon className="w-5 h-5 text-accent-500" />
           </div>
           <div className="text-left">
             <h3 className="text-base font-semibold text-gray-900">Filtros de Busca</h3>
@@ -64,7 +64,7 @@ export const FiltroAvaliacoes = () => {
             </p>
           </div>
           {hasActiveFilters && (
-            <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+            <span className="ml-2 px-2 py-0.5 bg-accent-100 text-accent-700 text-xs font-medium rounded-full">
               Ativo
             </span>
           )}
@@ -95,7 +95,7 @@ export const FiltroAvaliacoes = () => {
             <div className="flex items-end gap-3">
               <button
                 onClick={handleAplicarFiltros}
-                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
+                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-accent-500 text-white text-sm font-medium rounded-xl hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <MagnifyingGlassIcon className="w-4 h-4" />
                 Aplicar
