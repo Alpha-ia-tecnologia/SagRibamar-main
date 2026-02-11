@@ -174,9 +174,9 @@ export const Sidebar = () => {
   return (
     <>
       {/* Sidebar Desktop */}
-      <aside className="hidden lg:flex fixed top-0 left-0 h-screen w-64 z-40 flex-col bg-gradient-to-b from-blue-600 via-blue-700 to-indigo-800 text-white shadow-xl shadow-blue-900/30">
+      <aside className="hidden lg:flex fixed top-0 left-0 h-screen w-64 z-40 flex-col bg-linear-to-b from-blue-600 via-blue-700 to-indigo-800 text-white shadow-xl shadow-blue-900/30">
         {/* Linha decorativa lateral */}
-        <div className="absolute top-0 right-0 w-1 h-full bg-gradient-to-b from-amber-400 via-orange-400 to-amber-500"></div>
+        <div className="absolute top-0 right-0 w-1 h-full bg-linear-to-b from-amber-400 via-orange-400 to-amber-500"></div>
 
         {/* Logo */}
         <div className="flex flex-col items-center gap-3 px-5 py-6 border-b border-white/10">
@@ -216,7 +216,7 @@ export const Sidebar = () => {
         {/* Área do usuário */}
         <div className="border-t border-white/10 bg-white/5 p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-sm font-bold text-white shadow-md">
+            <div className="w-10 h-10 rounded-full bg-linear-to-br from-amber-400 to-orange-500 flex items-center justify-center text-sm font-bold text-white shadow-md">
               {user?.nome?.charAt(0)?.toUpperCase() || <User size={16} />}
             </div>
             <div className="flex-1 min-w-0">
@@ -239,7 +239,7 @@ export const Sidebar = () => {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl shadow-lg shadow-blue-900/30 border border-white/10 transition-all duration-200 hover:scale-105"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2.5 bg-linear-to-r from-blue-600 to-indigo-700 text-white rounded-xl shadow-lg shadow-blue-900/30 border border-white/10 transition-all duration-200 hover:scale-105"
       >
         {isOpen ? <X size={22} /> : <Menu size={22} />}
       </button>
@@ -254,7 +254,7 @@ export const Sidebar = () => {
 
       {/* Sidebar Mobile */}
       <div
-        className={`fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-blue-700 via-blue-800 to-indigo-900 text-white transform transition-transform duration-300 ease-out z-50 shadow-2xl
+        className={`fixed top-0 left-0 h-full w-72 bg-linear-to-b from-blue-700 via-blue-800 to-indigo-900 text-white transform transition-transform duration-300 ease-out z-50 shadow-2xl
         ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:hidden`}
       >
         {/* Header da Sidebar Mobile */}
@@ -293,7 +293,7 @@ export const Sidebar = () => {
         {/* Info do Usuario Mobile */}
         <div className="p-5 border-b border-white/10 bg-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-lg font-bold text-white shadow-lg">
+            <div className="w-12 h-12 rounded-full bg-linear-to-br from-amber-400 to-orange-500 flex items-center justify-center text-lg font-bold text-white shadow-lg">
               {user?.nome?.charAt(0)?.toUpperCase() || <User size={20} />}
             </div>
             <div>
