@@ -121,7 +121,7 @@ export const DashboardResumo = () => {
       gradient: "from-indigo-500 to-indigo-600",
       bgLight: "bg-indigo-50",
       textColor: "text-indigo-600",
-      trend: stats.media_geral >= 60 ? "up" : "down"
+      trend: Math.round(stats.media_geral * 10) / 10 >= 7 ? "up" : "down"
     }
   ];
 
