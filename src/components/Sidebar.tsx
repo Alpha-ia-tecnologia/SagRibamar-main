@@ -179,15 +179,32 @@ export const Sidebar = () => {
         <div className="absolute top-0 right-0 w-1 h-full bg-gradient-to-b from-amber-400 via-orange-400 to-amber-500"></div>
 
         {/* Logo */}
-        <div className="flex items-center justify-center px-5 py-6 border-b border-white/10">
-          <div className="relative">
-            <div className="absolute inset-0 bg-white/20 rounded-xl blur-sm"></div>
-            <div className="relative bg-white/10 backdrop-blur-sm p-3 rounded-xl border border-white/20">
-              <DynamicLogo
-                alt={`Logo de ${municipalityName}`}
-                width={120}
-              />
+        <div className="flex flex-col items-center gap-3 px-5 py-6 border-b border-white/10">
+          <div className="flex items-center justify-center gap-3">
+            <div className="relative">
+              <div className="absolute inset-0 bg-blue-200/70 rounded-xl blur-sm"></div>
+              <div className="relative backdrop-blur-sm p-3 rounded-xl">
+                <DynamicLogo
+                  alt={`Logo de ${municipalityName}`}
+                  width={80}
+                />
+              </div>
             </div>
+            <div className="relative">
+              <div className="absolute inset-0 bg-blue-200/70 rounded-xl blur-sm"></div>
+              <div className="relative backdrop-blur-sm p-3 rounded-xl ">
+                <img
+                  src="/logos/maximiza.png"
+                  alt="Logo Maximiza"
+                  width={100}
+                  className="object-contain"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="text-center">
+            <span className="font-bold text-lg tracking-tight">SAG</span>
+            <p className="text-blue-200 text-xs">Sistema de Avaliação e Gerenciamento Educacional</p>
           </div>
         </div>
 
@@ -249,6 +266,15 @@ export const Sidebar = () => {
                 alt={`Logo de ${municipalityName}`}
                 width={32}
                 height={32}
+              />
+            </div>
+            <div className="bg-white/10 p-2 rounded-lg border border-white/20">
+              <img
+                src="/logos/maximiza.png"
+                alt="Logo Maximiza"
+                width={32}
+                height={32}
+                className="rounded-sm object-contain"
               />
             </div>
             <div>

@@ -27,6 +27,14 @@ export default function Footer() {
                 width={50}
               />
             </div>
+            <div className="bg-white/10 backdrop-blur-sm p-2 rounded-xl border border-white/20">
+              <img
+                src="/logos/maximiza.png"
+                alt="Logo Maximiza"
+                width={50}
+                className="object-contain"
+              />
+            </div>
             <div>
               <span className="font-bold text-xl tracking-tight">SAG</span>
               <p className="text-blue-200 text-xs">Sistema de Avaliação e Gerenciamento</p>
