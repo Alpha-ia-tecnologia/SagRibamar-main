@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useApi } from "../../utils/api";
 import { ConfirmDialog } from "./ConfirmDialog";
 
@@ -20,6 +21,13 @@ interface Questao {
       descricao: string;
     };
   }>;
+}
+
+interface Alternativa {
+  id: number;
+  texto: string;
+  correta: boolean;
+  imagem_url?: string;
 }
 
 interface ComponenteCurricular {
@@ -92,6 +100,9 @@ export const BancoQuestoesModal = ({
   const [salvando, setSalvando] = useState(false);
   const [questaoParaDesvincular, setQuestaoParaDesvincular] = useState<number | null>(null);
   const [filtroVinculadas, setFiltroVinculadas] = useState(false);
+  const [questoesExpandidas, setQuestoesExpandidas] = useState<number[]>([]);
+  const [alternativasCache, setAlternativasCache] = useState<Record<number, Alternativa[]>>({});
+  const [carregandoAlternativas, setCarregandoAlternativas] = useState<number | null>(null);
   
   // Filtros
   const [componenteFiltro, setComponenteFiltro] = useState<number | "">("");
@@ -334,6 +345,35 @@ export const BancoQuestoesModal = ({
     aplicarFiltros(questoes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pesquisa, questoes, filtroVinculadas, questoesVinculadas]);
+
+  const toggleExpandirQuestao = async (questaoId: number) => {
+    const jaExpandida = questoesExpandidas.includes(questaoId);
+    if (jaExpandida) {
+      setQuestoesExpandidas((prev) => prev.filter((id) => id !== questaoId));
+      return;
+    }
+
+    // Buscar alternativas se ainda não estão no cache
+    if (!alternativasCache[questaoId]) {
+      try {
+        setCarregandoAlternativas(questaoId);
+        const res = await api.get(`/api/questoes/${questaoId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setAlternativasCache((prev) => ({
+            ...prev,
+            [questaoId]: data.alternativas || [],
+          }));
+        }
+      } catch (error) {
+        console.error("Erro ao buscar alternativas:", error);
+      } finally {
+        setCarregandoAlternativas(null);
+      }
+    }
+
+    setQuestoesExpandidas((prev) => [...prev, questaoId]);
+  };
 
   const toggleSelecionarQuestao = (questaoId: number) => {
     setQuestoesSelecionadas((prev) => {
@@ -698,6 +738,60 @@ export const BancoQuestoesModal = ({
                                 {codigo.bncc?.codigo}
                               </span>
                             ))}
+                          </div>
+                        )}
+
+                        {/* Botão Ver Alternativas */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleExpandirQuestao(questao.id);
+                          }}
+                          className="flex items-center gap-1 mt-3 text-xs text-blue-600 hover:text-blue-800 transition"
+                        >
+                          {carregandoAlternativas === questao.id ? (
+                            "Carregando..."
+                          ) : questoesExpandidas.includes(questao.id) ? (
+                            <>
+                              <ChevronUp className="h-3.5 w-3.5" />
+                              Ocultar alternativas
+                            </>
+                          ) : (
+                            <>
+                              <ChevronDown className="h-3.5 w-3.5" />
+                              Ver alternativas
+                            </>
+                          )}
+                        </button>
+
+                        {/* Alternativas expandidas */}
+                        {questoesExpandidas.includes(questao.id) && alternativasCache[questao.id] && (
+                          <div className="mt-3 space-y-2 border-t border-gray-200 pt-3">
+                            {alternativasCache[questao.id].length === 0 ? (
+                              <p className="text-xs text-gray-400">Nenhuma alternativa cadastrada.</p>
+                            ) : (
+                              alternativasCache[questao.id].map((alt, idx) => (
+                                <div
+                                  key={alt.id}
+                                  className={`flex items-start gap-2 p-2 rounded-lg text-sm ${
+                                    alt.correta ? "bg-green-50 border border-green-200" : "bg-gray-50"
+                                  }`}
+                                >
+                                  <span className={`font-semibold text-xs mt-0.5 ${alt.correta ? "text-green-700" : "text-gray-500"}`}>
+                                    {String.fromCharCode(65 + idx)})
+                                  </span>
+                                  <div
+                                    className="flex-1 text-sm prose prose-sm max-w-none"
+                                    dangerouslySetInnerHTML={{ __html: alt.texto || "" }}
+                                  />
+                                  {alt.correta && (
+                                    <span className="text-xs bg-green-200 text-green-800 px-1.5 py-0.5 rounded whitespace-nowrap">
+                                      Correta
+                                    </span>
+                                  )}
+                                </div>
+                              ))
+                            )}
                           </div>
                         )}
                       </div>
