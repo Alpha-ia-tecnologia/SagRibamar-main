@@ -91,6 +91,7 @@ export const BancoQuestoesModal = ({
   const [loading, setLoading] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const [questaoParaDesvincular, setQuestaoParaDesvincular] = useState<number | null>(null);
+  const [filtroVinculadas, setFiltroVinculadas] = useState(false);
   
   // Filtros
   const [componenteFiltro, setComponenteFiltro] = useState<number | "">("");
@@ -257,6 +258,11 @@ export const BancoQuestoesModal = ({
       );
     }
 
+    // Filtro por questões vinculadas à prova
+    if (filtroVinculadas) {
+      filtradas = filtradas.filter((q) => questoesVinculadas.includes(q.id));
+    }
+
     setQuestoesFiltradas(filtradas);
   };
 
@@ -323,11 +329,11 @@ export const BancoQuestoesModal = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [componenteFiltro, serieFiltro, nivelEnsinoFiltro, habilidadeFiltro]);
 
-  // Aplica filtros locais quando pesquisa ou questões mudarem
+  // Aplica filtros locais quando pesquisa, questões ou filtro de vinculadas mudarem
   useEffect(() => {
     aplicarFiltros(questoes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pesquisa, questoes]);
+  }, [pesquisa, questoes, filtroVinculadas, questoesVinculadas]);
 
   const toggleSelecionarQuestao = (questaoId: number) => {
     setQuestoesSelecionadas((prev) => {
@@ -444,7 +450,7 @@ export const BancoQuestoesModal = ({
               <h3 className="text-lg font-semibold text-gray-800">
                 Filtrar Questões
               </h3>
-              {(componenteFiltro !== "" || serieFiltro || nivelEnsinoFiltro || tipoHabilidadeFiltro || habilidadeFiltro !== "") && (
+              {(componenteFiltro !== "" || serieFiltro || nivelEnsinoFiltro || tipoHabilidadeFiltro || habilidadeFiltro !== "" || filtroVinculadas) && (
                 <button
                   onClick={() => {
                     setComponenteFiltro("");
@@ -452,6 +458,7 @@ export const BancoQuestoesModal = ({
                     setNivelEnsinoFiltro("");
                     setTipoHabilidadeFiltro("");
                     setHabilidadeFiltro("");
+                    setFiltroVinculadas(false);
                   }}
                   className="text-xs text-blue-600 hover:text-blue-800 underline"
                   title="Limpar todos os filtros"
@@ -463,6 +470,21 @@ export const BancoQuestoesModal = ({
 
             {/* Filtros */}
             <div className="space-y-4">
+              {provaId && questoesVinculadas.length > 0 && (
+                <button
+                  onClick={() => setFiltroVinculadas((prev) => !prev)}
+                  className={`w-full p-3 rounded-lg text-sm font-medium transition ${
+                    filtroVinculadas
+                      ? "bg-green-600 text-white hover:bg-green-700"
+                      : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  {filtroVinculadas
+                    ? `Vinculadas (${questoesVinculadas.length})`
+                    : `Questões vinculadas (${questoesVinculadas.length})`}
+                </button>
+              )}
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Componente Curricular
