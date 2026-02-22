@@ -85,6 +85,7 @@ export const BancoQuestoesModal = ({
   const [questoes, setQuestoes] = useState<Questao[]>([]);
   const [questoesFiltradas, setQuestoesFiltradas] = useState<Questao[]>([]);
   const [questoesSelecionadas, setQuestoesSelecionadas] = useState<number[]>([]);
+  const [questoesVinculadas, setQuestoesVinculadas] = useState<number[]>([]);
   const [pesquisa, setPesquisa] = useState("");
   const [loading, setLoading] = useState(false);
   const [salvando, setSalvando] = useState(false);
@@ -257,10 +258,49 @@ export const BancoQuestoesModal = ({
     setQuestoesFiltradas(filtradas);
   };
 
+  // Buscar questões já vinculadas à prova
+  const fetchQuestoesVinculadas = async () => {
+    if (!provaId) return;
+    try {
+      const res = await api.get(`/api/provas/${provaId}/questoes-detalhadas`);
+      if (res.ok) {
+        const data = await res.json();
+        const ids = (data.questoes || []).map((q: Questao) => q.id);
+        setQuestoesVinculadas(ids);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar questões vinculadas:", error);
+    }
+  };
+
+  // Desvincular questão da prova
+  const handleDesvincularQuestao = async (questaoId: number) => {
+    if (!provaId) return;
+    if (!confirm("Deseja desvincular esta questão da prova? A questão continuará no banco de questões.")) return;
+
+    try {
+      setSalvando(true);
+      const res = await api.delete(`/api/provas/${provaId}/questoes/${questaoId}`);
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Erro ao desvincular questão:", res.status, errorText);
+        alert("Erro ao desvincular questão.");
+      } else {
+        setQuestoesVinculadas((prev) => prev.filter((id) => id !== questaoId));
+      }
+    } catch (error) {
+      console.error("Erro ao desvincular questão:", error);
+      alert("Erro ao desvincular questão.");
+    } finally {
+      setSalvando(false);
+    }
+  };
+
   useEffect(() => {
     fetchComponentes();
     fetchSeries();
     buscarQuestoes();
+    fetchQuestoesVinculadas();
   }, []);
 
   // Busca habilidades quando o tipo de habilidade mudar
@@ -338,36 +378,32 @@ export const BancoQuestoesModal = ({
     // Adicionar questões selecionadas à prova
     try {
       setSalvando(true);
-      
-      // TODO: A implementação exata depende da API do backend
-      // Possíveis formatos de endpoint:
-      // 1. POST /api/provas/{provaId}/questoes com { questao_id: number }
-      // 2. PUT /api/questoes/{questaoId} com { prova_id: number }
-      // 3. POST /api/provas/{provaId}/questoes com array de IDs
-      
-      // Tentativa 1: Adicionar questões uma por uma
-      const erros: number[] = [];
-      for (const questaoId of questoesSelecionadas) {
-        try {
-          const res = await api.post(`/api/provas/${provaIdAtual}/questoes`, {
-            questao_id: questaoId,
-          });
 
-          if (!res.ok) {
-            erros.push(questaoId);
-            console.error(`Erro ao adicionar questão ${questaoId} à prova`);
-          }
-        } catch (err) {
-          erros.push(questaoId);
-          console.error(`Erro ao adicionar questão ${questaoId}:`, err);
+      // Buscar questões existentes para definir a ordem das novas
+      let ordemInicial = 1;
+      try {
+        const provaRes = await api.get(`/api/provas/${provaIdAtual}/questoes-detalhadas`);
+        if (provaRes.ok) {
+          const provaData = await provaRes.json();
+          ordemInicial = (provaData.questoes?.length || 0) + 1;
         }
+      } catch {
+        console.warn("Não foi possível buscar ordem atual, iniciando em 1.");
       }
 
-      if (erros.length > 0) {
-        alert(
-          `${questoesSelecionadas.length - erros.length} questão(ões) adicionada(s). ` +
-          `${erros.length} questão(ões) falharam. Verifique o console para mais detalhes.`
-        );
+      const questoesPayload = questoesSelecionadas.map((questaoId, index) => ({
+        questao_id: questaoId,
+        ordem: ordemInicial + index,
+      }));
+
+      const res = await api.post(`/api/provas/${provaIdAtual}/questoes`, {
+        questoes: questoesPayload,
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Erro ao vincular questões:", res.status, errorText);
+        alert("Erro ao vincular questões à prova.");
       } else {
         alert(`${questoesSelecionadas.length} questão(ões) adicionada(s) com sucesso!`);
       }
@@ -567,27 +603,50 @@ export const BancoQuestoesModal = ({
                 <div className="space-y-3">
                   {questoesFiltradas.map((questao) => {
                 const isSelecionada = questoesSelecionadas.includes(questao.id);
+                const isVinculada = questoesVinculadas.includes(questao.id);
                 return (
                   <div
                     key={questao.id}
-                    className={`p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition cursor-pointer ${
-                      isSelecionada ? "bg-blue-50 border-blue-500 border-2" : ""
+                    className={`p-4 border rounded-lg transition ${
+                      isVinculada
+                        ? "bg-green-50 border-green-400 border-2"
+                        : isSelecionada
+                          ? "bg-blue-50 border-blue-500 border-2 cursor-pointer hover:bg-gray-50"
+                          : "border-gray-200 cursor-pointer hover:bg-gray-50"
                     }`}
-                    onClick={() => toggleSelecionarQuestao(questao.id)}
+                    onClick={() => !isVinculada && toggleSelecionarQuestao(questao.id)}
                   >
                     <div className="flex items-start gap-3">
-                      <input
-                        type="checkbox"
-                        checked={isSelecionada}
-                        onChange={() => toggleSelecionarQuestao(questao.id)}
-                        onClick={(e) => e.stopPropagation()}
-                        className="mt-1 accent-blue-600"
-                      />
+                      {isVinculada ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDesvincularQuestao(questao.id);
+                          }}
+                          disabled={salvando}
+                          className="mt-1 px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition whitespace-nowrap disabled:opacity-50"
+                        >
+                          Desvincular
+                        </button>
+                      ) : (
+                        <input
+                          type="checkbox"
+                          checked={isSelecionada}
+                          onChange={() => toggleSelecionarQuestao(questao.id)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="mt-1 accent-blue-600"
+                        />
+                      )}
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <span className="text-xs font-medium text-gray-500">
                             Questão #{questao.id}
                           </span>
+                          {isVinculada && (
+                            <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-medium">
+                              Vinculada à prova
+                            </span>
+                          )}
                           {questao.componente_curricular && (
                             <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
                               {questao.componente_curricular.nome}
