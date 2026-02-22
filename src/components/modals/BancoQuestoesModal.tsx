@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useApi } from "../../utils/api";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 interface Questao {
   id: number;
@@ -89,6 +90,7 @@ export const BancoQuestoesModal = ({
   const [pesquisa, setPesquisa] = useState("");
   const [loading, setLoading] = useState(false);
   const [salvando, setSalvando] = useState(false);
+  const [questaoParaDesvincular, setQuestaoParaDesvincular] = useState<number | null>(null);
   
   // Filtros
   const [componenteFiltro, setComponenteFiltro] = useState<number | "">("");
@@ -274,25 +276,25 @@ export const BancoQuestoesModal = ({
   };
 
   // Desvincular questão da prova
-  const handleDesvincularQuestao = async (questaoId: number) => {
-    if (!provaId) return;
-    if (!confirm("Deseja desvincular esta questão da prova? A questão continuará no banco de questões.")) return;
+  const confirmarDesvinculacao = async () => {
+    if (!provaId || questaoParaDesvincular === null) return;
 
     try {
       setSalvando(true);
-      const res = await api.delete(`/api/provas/${provaId}/questoes/${questaoId}`);
+      const res = await api.delete(`/api/provas/${provaId}/questoes/${questaoParaDesvincular}`);
       if (!res.ok) {
         const errorText = await res.text();
         console.error("Erro ao desvincular questão:", res.status, errorText);
         alert("Erro ao desvincular questão.");
       } else {
-        setQuestoesVinculadas((prev) => prev.filter((id) => id !== questaoId));
+        setQuestoesVinculadas((prev) => prev.filter((id) => id !== questaoParaDesvincular));
       }
     } catch (error) {
       console.error("Erro ao desvincular questão:", error);
       alert("Erro ao desvincular questão.");
     } finally {
       setSalvando(false);
+      setQuestaoParaDesvincular(null);
     }
   };
 
@@ -621,7 +623,7 @@ export const BancoQuestoesModal = ({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDesvincularQuestao(questao.id);
+                            setQuestaoParaDesvincular(questao.id);
                           }}
                           disabled={salvando}
                           className="mt-1 px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition whitespace-nowrap disabled:opacity-50"
@@ -713,6 +715,17 @@ export const BancoQuestoesModal = ({
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={questaoParaDesvincular !== null}
+        title="Desvincular questão"
+        description="Deseja desvincular esta questão da prova? A questão continuará disponível no banco de questões."
+        confirmText="Desvincular"
+        cancelText="Cancelar"
+        danger
+        onConfirm={confirmarDesvinculacao}
+        onCancel={() => setQuestaoParaDesvincular(null)}
+      />
     </div>
   );
 };
