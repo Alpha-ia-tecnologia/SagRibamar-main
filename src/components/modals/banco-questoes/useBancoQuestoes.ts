@@ -23,6 +23,7 @@ export function useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess, onR
   const [questoesExpandidas, setQuestoesExpandidas] = useState<number[]>([]);
   const [alternativasCache, setAlternativasCache] = useState<Record<number, Alternativa[]>>({});
   const [carregandoAlternativas, setCarregandoAlternativas] = useState<number | null>(null);
+  const [mensagemSucesso, setMensagemSucesso] = useState<string | null>(null);
 
   // Filtros
   const [componenteFiltro, setComponenteFiltro] = useState<number | "">("");
@@ -282,18 +283,22 @@ export function useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess, onR
         const errorText = await res.text();
         console.error("Erro ao vincular questões:", res.status, errorText);
         alert("Erro ao vincular questões à prova.");
-      } else {
-        alert(`${questoesSelecionadas.length} questão(ões) adicionada(s) com sucesso!`);
+        return;
       }
 
-      onSuccess();
-      onClose();
+      setMensagemSucesso(`${questoesSelecionadas.length} questão(ões) adicionada(s) com sucesso!`);
     } catch (error) {
       console.error("Erro ao adicionar questões à prova:", error);
       alert("Erro ao adicionar questões à prova. Verifique o console para mais detalhes.");
     } finally {
       setSalvando(false);
     }
+  };
+
+  const fecharMensagemSucesso = () => {
+    setMensagemSucesso(null);
+    onSuccess();
+    onClose();
   };
 
   const limparFiltros = () => {
@@ -366,6 +371,10 @@ export function useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess, onR
     // Estado do dialog de desvinculação
     questaoParaDesvincular,
     setQuestaoParaDesvincular,
+
+    // Estado do dialog de sucesso
+    mensagemSucesso,
+    fecharMensagemSucesso,
 
     // Ações
     setPesquisa,

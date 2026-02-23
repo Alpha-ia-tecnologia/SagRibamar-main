@@ -1,4 +1,5 @@
 import { ConfirmDialog } from "./ConfirmDialog";
+import { SuccessDialog } from "./SuccessDialog";
 import { useBancoQuestoes } from "./banco-questoes/useBancoQuestoes";
 import { QuestaoCard } from "./banco-questoes/QuestaoCard";
 import { FiltrosSidebar } from "./banco-questoes/FiltrosSidebar";
@@ -164,6 +165,13 @@ export const BancoQuestoesModal = ({
         danger
         onConfirm={banco.confirmarDesvinculacao}
         onCancel={() => banco.setQuestaoParaDesvincular(null)}
+      />
+
+      <SuccessDialog
+        isOpen={banco.mensagemSucesso !== null}
+        title="Questões adicionadas!"
+        description={banco.mensagemSucesso ?? ""}
+        onClose={banco.fecharMensagemSucesso}
       />
     </div>
   );
