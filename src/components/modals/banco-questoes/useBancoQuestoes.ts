@@ -7,9 +7,10 @@ interface UseBancoQuestoesParams {
   tituloProva: string;
   onClose: () => void;
   onSuccess: () => void;
+  onRefresh?: () => void;
 }
 
-export function useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess }: UseBancoQuestoesParams) {
+export function useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess, onRefresh }: UseBancoQuestoesParams) {
   const [questoes, setQuestoes] = useState<Questao[]>([]);
   const [questoesFiltradas, setQuestoesFiltradas] = useState<Questao[]>([]);
   const [questoesSelecionadas, setQuestoesSelecionadas] = useState<number[]>([]);
@@ -178,6 +179,7 @@ export function useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess }: U
         alert("Erro ao desvincular questão.");
       } else {
         setQuestoesVinculadas((prev) => prev.filter((id) => id !== questaoParaDesvincular));
+        onRefresh?.();
       }
     } catch (error) {
       console.error("Erro ao desvincular questão:", error);

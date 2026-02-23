@@ -8,6 +8,7 @@ interface BancoQuestoesModalProps {
   tituloProva: string;
   onClose: () => void;
   onSuccess: () => void;
+  onRefresh?: () => void;
 }
 
 export const BancoQuestoesModal = ({
@@ -15,8 +16,9 @@ export const BancoQuestoesModal = ({
   tituloProva,
   onClose,
   onSuccess,
+  onRefresh,
 }: BancoQuestoesModalProps) => {
-  const banco = useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess });
+  const banco = useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess, onRefresh });
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">

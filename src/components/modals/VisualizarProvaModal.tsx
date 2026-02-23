@@ -306,6 +306,7 @@ export const VisualizarProvaModal = ({
             setShowCreateModal(false);
             carregarQuestoes();
           }}
+          onRefresh={carregarQuestoes}
         />
       )}
     </>
