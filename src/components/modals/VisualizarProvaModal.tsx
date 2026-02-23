@@ -135,6 +135,7 @@ export const VisualizarProvaModal = ({
         alert("Erro ao desvincular questão.");
       } else {
         carregarQuestoes();
+        onUpdate?.();
       }
     } catch (error) {
       console.error("Erro ao desvincular questão:", error);
@@ -350,8 +351,12 @@ export const VisualizarProvaModal = ({
           onSuccess={() => {
             setShowCreateModal(false);
             carregarQuestoes();
+            onUpdate?.();
           }}
-          onRefresh={carregarQuestoes}
+          onRefresh={() => {
+            carregarQuestoes();
+            onUpdate?.();
+          }}
         />
       )}
     </>
