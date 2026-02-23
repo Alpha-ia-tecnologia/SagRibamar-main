@@ -7,13 +7,15 @@ interface SelectTypeAddQuestaoProps {
   tituloProva: string;
   onClose: () => void;
   onSuccess?: () => void;
+  onRefresh?: () => void;
 }
 
-export default function SelectTypeAddQuestao({ 
-  provaId, 
-  tituloProva, 
-  onClose, 
-  onSuccess 
+export default function SelectTypeAddQuestao({
+  provaId,
+  tituloProva,
+  onClose,
+  onSuccess,
+  onRefresh,
 }: SelectTypeAddQuestaoProps) {
   const [showModalManual, setShowModalManual] = useState(false);
   const [showModalBanco, setShowModalBanco] = useState(false);
@@ -74,6 +76,7 @@ export default function SelectTypeAddQuestao({
             setShowModalBanco(false);
             onSuccess?.();
           }}
+          onRefresh={onRefresh}
         />
       )}
     </>

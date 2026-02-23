@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { EditarQuestaoModal } from "./EditQuestaoModal";
 import SelectTypeAddQuestao from "./SelectTypeAddQuestao";
+import { ConfirmDialog } from "./ConfirmDialog";
 import { useApi } from "../../utils/api";
-import { SquarePen } from "lucide-react";
+import { SquarePen, Unlink } from "lucide-react";
 
 interface VisualizarProvaModalProps {
   provaId: number;
@@ -48,6 +49,8 @@ export const VisualizarProvaModal = ({
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editandoNome, setEditandoNome] = useState(false);
   const [novoNome, setNovoNome] = useState("");
+  const [questaoParaDesvincular, setQuestaoParaDesvincular] = useState<number | null>(null);
+  const [desvinculando, setDesvinculando] = useState(false);
   const api = useApi();
 
   const carregarQuestoes = () => {
@@ -119,6 +122,28 @@ export const VisualizarProvaModal = ({
   const handleCancelarEdicaoNome = () => {
     setEditandoNome(false);
     setNovoNome("");
+  };
+
+  const handleDesvincularQuestao = async () => {
+    if (questaoParaDesvincular === null) return;
+    try {
+      setDesvinculando(true);
+      const res = await api.delete(`/api/provas/${provaId}/questoes/${questaoParaDesvincular}`);
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Erro ao desvincular questão:", res.status, errorText);
+        alert("Erro ao desvincular questão.");
+      } else {
+        carregarQuestoes();
+        onUpdate?.();
+      }
+    } catch (error) {
+      console.error("Erro ao desvincular questão:", error);
+      alert("Erro ao desvincular questão.");
+    } finally {
+      setDesvinculando(false);
+      setQuestaoParaDesvincular(null);
+    }
   };
 
   return (
@@ -216,14 +241,24 @@ export const VisualizarProvaModal = ({
                       />
                     </div>
                     {!modoVisualizacao && (
-                      <button
-                        onClick={() => setQuestaoIdEmEdicao(questao.id)
-                        }
-                        className="text-blue-600 hover:text-blue-800 transition text-sm ml-2"
-                        title="Editar questão"
-                      >
-                        Editar
-                      </button>
+                      <div className="flex items-center gap-2 ml-2">
+                        <button
+                          onClick={() => setQuestaoIdEmEdicao(questao.id)}
+                          className="text-blue-600 hover:text-blue-800 transition text-sm"
+                          title="Editar questão"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => setQuestaoParaDesvincular(questao.id)}
+                          disabled={desvinculando}
+                          className="flex items-center gap-1 text-red-600 hover:text-red-800 transition text-sm disabled:opacity-50"
+                          title="Desvincular questão da prova"
+                        >
+                          <Unlink className="h-3.5 w-3.5" />
+                          Desvincular
+                        </button>
+                      </div>
                     )}
                   </div>
 
@@ -297,6 +332,17 @@ export const VisualizarProvaModal = ({
         />
       )}
 
+      <ConfirmDialog
+        isOpen={questaoParaDesvincular !== null}
+        title="Desvincular questão"
+        description="Deseja desvincular esta questão da prova? A questão continuará disponível no banco de questões."
+        confirmText="Desvincular"
+        cancelText="Cancelar"
+        danger
+        onConfirm={handleDesvincularQuestao}
+        onCancel={() => setQuestaoParaDesvincular(null)}
+      />
+
       {showCreateModal && prova && (
         <SelectTypeAddQuestao
           provaId={provaId}
@@ -305,6 +351,11 @@ export const VisualizarProvaModal = ({
           onSuccess={() => {
             setShowCreateModal(false);
             carregarQuestoes();
+            onUpdate?.();
+          }}
+          onRefresh={() => {
+            carregarQuestoes();
+            onUpdate?.();
           }}
         />
       )}

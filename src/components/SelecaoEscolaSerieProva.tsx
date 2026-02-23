@@ -109,6 +109,7 @@ export const SelecaoEscolaSerieProva = () => {
     const prova = provas.find(p => p.id === provaSelecionada);
     const payload: any = {
       exam_id: provaSelecionada,
+      exam_name: prova?.nome || "",
       classroom_name: serieSelecionada,
       question: prova?._count?.questoes || 0
     };
