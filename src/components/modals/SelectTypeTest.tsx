@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CreateProvaModal } from "./CreateProvaModal";
+import { CreateQuestoesModal } from "./CreateQuestoesModal";
 import { BancoQuestoesModal } from "./BancoQuestoesModal";
 
 interface SelectTypeTestProps {
@@ -91,15 +92,27 @@ export default function SelectTypeTest({ onClose, onSuccess }: SelectTypeTestPro
       </div>
 
       {showModalManual && (
-        <CreateProvaModal
-          provaId={provaId}
-          tituloProva={tituloProva}
-          onClose={() => setShowModalManual(false)}
-          onSuccess={() => {
-            setShowModalManual(false);
-            onSuccess?.();
-          }}
-        />
+        provaId ? (
+          <CreateQuestoesModal
+            provaId={provaId}
+            tituloProva={tituloProva}
+            onClose={() => setShowModalManual(false)}
+            onSuccess={() => {
+              setShowModalManual(false);
+              onSuccess?.();
+            }}
+          />
+        ) : (
+          <CreateProvaModal
+            provaId={provaId}
+            tituloProva={tituloProva}
+            onClose={() => setShowModalManual(false)}
+            onSuccess={() => {
+              setShowModalManual(false);
+              onSuccess?.();
+            }}
+          />
+        )
       )}
 
       {showModalBanco && (
@@ -111,6 +124,11 @@ export default function SelectTypeTest({ onClose, onSuccess }: SelectTypeTestPro
             setShowModalBanco(false);
             onSuccess?.();
           }}
+          onCriarManualmente={() => {
+            setShowModalBanco(false);
+            setShowModalManual(true);
+          }}
+          onProvaCreated={(id) => setProvaId(id)}
         />
       )}
     </>

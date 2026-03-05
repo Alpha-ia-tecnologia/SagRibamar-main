@@ -8,9 +8,11 @@ interface UseBancoQuestoesParams {
   onClose: () => void;
   onSuccess: () => void;
   onRefresh?: () => void;
+  onCriarManualmente?: () => void;
+  onProvaCreated?: (provaId: number) => void;
 }
 
-export function useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess, onRefresh }: UseBancoQuestoesParams) {
+export function useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess, onRefresh, onCriarManualmente, onProvaCreated }: UseBancoQuestoesParams) {
   const [questoes, setQuestoes] = useState<Questao[]>([]);
   const [questoesFiltradas, setQuestoesFiltradas] = useState<Questao[]>([]);
   const [questoesSelecionadas, setQuestoesSelecionadas] = useState<number[]>([]);
@@ -242,6 +244,7 @@ export function useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess, onR
         }
         const provaSalva = await provaRes.json();
         provaIdAtual = provaSalva.id;
+        onProvaCreated?.(provaIdAtual as number);
       } catch (err) {
         alert("Erro ao criar prova. Veja o console para mais informações.");
         console.error(err);
@@ -295,7 +298,18 @@ export function useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess, onR
     }
   };
 
-  const fecharMensagemSucesso = () => {
+  const continuarNoBanco = () => {
+    setMensagemSucesso(null);
+    setQuestoesSelecionadas([]);
+    fetchQuestoesVinculadas();
+  };
+
+  const irParaCriarManualmente = () => {
+    setMensagemSucesso(null);
+    onCriarManualmente?.();
+  };
+
+  const finalizarEFechar = () => {
     setMensagemSucesso(null);
     onSuccess();
     onClose();
@@ -374,7 +388,9 @@ export function useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess, onR
 
     // Estado do dialog de sucesso
     mensagemSucesso,
-    fecharMensagemSucesso,
+    continuarNoBanco,
+    irParaCriarManualmente,
+    finalizarEFechar,
 
     // Ações
     setPesquisa,
