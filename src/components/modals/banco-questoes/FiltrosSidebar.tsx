@@ -8,7 +8,7 @@ interface FiltrosSidebarProps {
   componenteFiltro: number | "";
   serieFiltro: string;
   nivelEnsinoFiltro: string;
-  tipoHabilidadeFiltro: "BNCC" | "SAEB" | "SEAMA" | "";
+  tipoHabilidadeFiltro: "BNCC" | "SAEB" | "";
   habilidadeFiltro: number | "";
   componentes: ComponenteCurricular[];
   series: Serie[];
@@ -17,7 +17,7 @@ interface FiltrosSidebarProps {
   onComponenteChange: (value: number | "") => void;
   onSerieChange: (value: string) => void;
   onNivelEnsinoChange: (value: string) => void;
-  onTipoHabilidadeChange: (value: "BNCC" | "SAEB" | "SEAMA" | "") => void;
+  onTipoHabilidadeChange: (value: "BNCC" | "SAEB" | "") => void;
   onHabilidadeChange: (value: number | "") => void;
   onFiltroVinculadasChange: (value: boolean) => void;
   onLimparFiltros: () => void;
@@ -131,13 +131,12 @@ export function FiltrosSidebar({
           </label>
           <select
             value={tipoHabilidadeFiltro}
-            onChange={(e) => onTipoHabilidadeChange(e.target.value as "BNCC" | "SAEB" | "SEAMA" | "")}
+            onChange={(e) => onTipoHabilidadeChange(e.target.value as "BNCC" | "SAEB" | "")}
             className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Selecione o Tipo</option>
             <option value="BNCC">BNCC</option>
             <option value="SAEB">SAEB</option>
-            <option value="SEAMA">SEAMA</option>
           </select>
         </div>
 

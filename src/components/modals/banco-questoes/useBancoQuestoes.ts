@@ -31,7 +31,7 @@ export function useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess, onR
   const [componenteFiltro, setComponenteFiltro] = useState<number | "">("");
   const [serieFiltro, setSerieFiltro] = useState("");
   const [nivelEnsinoFiltro, setNivelEnsinoFiltro] = useState("");
-  const [tipoHabilidadeFiltro, setTipoHabilidadeFiltro] = useState<"BNCC" | "SAEB" | "SEAMA" | "">("");
+  const [tipoHabilidadeFiltro, setTipoHabilidadeFiltro] = useState<"BNCC" | "SAEB" | "">("");
   const [habilidadeFiltro, setHabilidadeFiltro] = useState<number | "">("");
 
   // Dados para filtros
@@ -80,8 +80,6 @@ export function useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess, onR
       } else if (tipoHabilidadeFiltro === "SAEB") {
         params.append("saeb", "true");
         params.append("bncc", "false");
-      } else if (tipoHabilidadeFiltro === "SEAMA") {
-        params.append("seama", "true");
       }
 
       const url = params.toString() ? `/api/bncc?${params.toString()}` : `/api/bncc`;
@@ -148,6 +146,11 @@ export function useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess, onR
     if (habilidadeFiltro !== "") {
       filtradas = filtradas.filter((q) =>
         q.codigos_bncc?.some((c) => c.bncc_id === habilidadeFiltro || c.bncc?.id === habilidadeFiltro)
+      );
+    } else if (tipoHabilidadeFiltro && habilidades.length > 0) {
+      const idsDoTipo = new Set(habilidades.map((h) => h.id));
+      filtradas = filtradas.filter((q) =>
+        q.codigos_bncc?.some((c) => idsDoTipo.has(c.bncc_id ?? 0) || idsDoTipo.has(c.bncc?.id ?? 0))
       );
     }
     if (filtroVinculadas) {
@@ -355,7 +358,7 @@ export function useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess, onR
   useEffect(() => {
     aplicarFiltros(questoes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pesquisa, questoes, filtroVinculadas, questoesVinculadas]);
+  }, [pesquisa, questoes, filtroVinculadas, questoesVinculadas, tipoHabilidadeFiltro, habilidades]);
 
   return {
     // Estado da lista
