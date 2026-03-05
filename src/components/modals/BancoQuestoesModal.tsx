@@ -1,5 +1,6 @@
+import { createPortal } from "react-dom";
+import { CircleCheck } from "lucide-react";
 import { ConfirmDialog } from "./ConfirmDialog";
-import { SuccessDialog } from "./SuccessDialog";
 import { useBancoQuestoes } from "./banco-questoes/useBancoQuestoes";
 import { QuestaoCard } from "./banco-questoes/QuestaoCard";
 import { FiltrosSidebar } from "./banco-questoes/FiltrosSidebar";
@@ -10,6 +11,8 @@ interface BancoQuestoesModalProps {
   onClose: () => void;
   onSuccess: () => void;
   onRefresh?: () => void;
+  onCriarManualmente?: () => void;
+  onProvaCreated?: (provaId: number) => void;
 }
 
 export const BancoQuestoesModal = ({
@@ -18,8 +21,10 @@ export const BancoQuestoesModal = ({
   onClose,
   onSuccess,
   onRefresh,
+  onCriarManualmente,
+  onProvaCreated,
 }: BancoQuestoesModalProps) => {
-  const banco = useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess, onRefresh });
+  const banco = useBancoQuestoes({ provaId, tituloProva, onClose, onSuccess, onRefresh, onCriarManualmente, onProvaCreated });
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -167,12 +172,49 @@ export const BancoQuestoesModal = ({
         onCancel={() => banco.setQuestaoParaDesvincular(null)}
       />
 
-      <SuccessDialog
-        isOpen={banco.mensagemSucesso !== null}
-        title="Questões adicionadas!"
-        description={banco.mensagemSucesso ?? ""}
-        onClose={banco.fecharMensagemSucesso}
-      />
+      {banco.mensagemSucesso !== null && createPortal(
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="bg-white rounded-xl p-10 shadow-xl max-w-lg w-[92%] text-center">
+            <div className="mx-auto text-green-600 mb-2 flex justify-center">
+              <CircleCheck className="h-20 w-20" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Questões adicionadas!
+            </h2>
+            <p className="mt-2 text-gray-700">{banco.mensagemSucesso}</p>
+            <p className="mt-4 text-sm text-gray-600">
+              Deseja adicionar mais questões?
+            </p>
+            <div className="flex flex-col gap-3 mt-6">
+              <button
+                className="w-full px-6 py-2.5 rounded-lg font-medium text-white transition bg-green-600 hover:bg-green-700"
+                onClick={banco.continuarNoBanco}
+              >
+                Adicionar mais do Banco de Questões
+              </button>
+              {onCriarManualmente && (
+                <button
+                  className="w-full px-6 py-2.5 rounded-lg font-medium text-white transition bg-blue-600 hover:bg-blue-700"
+                  onClick={banco.irParaCriarManualmente}
+                >
+                  Criar Questão Manualmente
+                </button>
+              )}
+              <button
+                className="w-full px-6 py-2.5 rounded-lg font-medium text-gray-700 transition bg-gray-100 hover:bg-gray-200"
+                onClick={banco.finalizarEFechar}
+              >
+                Finalizar
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

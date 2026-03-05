@@ -91,7 +91,12 @@ export function QuestaoCard({
                   key={idx}
                   className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded"
                 >
-                  {codigo.bncc?.codigo}
+                  <strong>{codigo.bncc?.codigo}</strong>
+                  {codigo.bncc?.descricao && (
+                    <span className="ml-1 font-normal">
+                      - {codigo.bncc.descricao}
+                    </span>
+                  )}
                 </span>
               ))}
             </div>
