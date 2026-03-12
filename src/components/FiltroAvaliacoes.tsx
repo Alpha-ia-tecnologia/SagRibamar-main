@@ -10,41 +10,41 @@ import { SelectProvas } from "./selects/SelectProvas";
 import { FunnelIcon, ArrowPathIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 export const FiltroAvaliacoes = () => {
-  const [regiaoId, setRegiaoId] = useState("");
-  const [grupoId, setGrupoId] = useState("");
-  const [escolaId, setEscolaId] = useState("");
+  const [regiaoIds, setRegiaoIds] = useState<string[]>([]);
+  const [grupoIds, setGrupoIds] = useState<string[]>([]);
+  const [escolaIds, setEscolaIds] = useState<string[]>([]);
   const [series, setSeries] = useState<string[]>([]);
-  const [turmaId, setTurmaId] = useState("");
+  const [turmaIds, setTurmaIds] = useState<string[]>([]);
   const [provaIds, setProvaIds] = useState<string[]>([]);
-  const [filtro, setFiltro] = useState("acertos");
+  const [filtro, setFiltro] = useState<string[]>([]);
   const [isExpanded, setIsExpanded] = useState(true);
 
   const { setFiltros } = useFiltroDashboard();
 
   const handleAplicarFiltros = () => {
     setFiltros({
-      regiaoId,
-      grupoId,
-      escolaId,
+      regiaoId: regiaoIds.join(","),
+      grupoId: grupoIds.join(","),
+      escolaId: escolaIds.join(","),
       serie: series.join(","),
-      turmaId,
+      turmaId: turmaIds.join(","),
       provaId: provaIds.join(","),
-      filtro,
+      filtro: filtro.join(","),
     });
   };
 
   const handleResetarFiltros = () => {
-    setRegiaoId("");
-    setGrupoId("");
-    setEscolaId("");
+    setRegiaoIds([]);
+    setGrupoIds([]);
+    setEscolaIds([]);
     setSeries([]);
-    setTurmaId("");
+    setTurmaIds([]);
     setProvaIds([]);
-    setFiltro("acertos");
+    setFiltro([]);
     setFiltros({});
   };
 
-  const hasActiveFilters = regiaoId || grupoId || escolaId || series.length > 0 || turmaId || provaIds.length > 0;
+  const hasActiveFilters = regiaoIds.length > 0 || grupoIds.length > 0 || escolaIds.length > 0 || series.length > 0 || turmaIds.length > 0 || provaIds.length > 0 || filtro.length > 0;
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 transition-all duration-300">
@@ -83,11 +83,11 @@ export const FiltroAvaliacoes = () => {
       {isExpanded && (
         <div className="px-6 pb-6 pt-2">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <SelectRegiao value={regiaoId} onChange={setRegiaoId} />
-            <SelectGrupo regiaoId={regiaoId} value={grupoId} onChange={setGrupoId} />
-            <SelectEscola regiaoId={regiaoId} grupoId={grupoId} value={escolaId} onChange={setEscolaId} />
-            <SelectSerie escolaId={escolaId} value={series} onChange={setSeries} />
-            <SelectTurma escolaId={escolaId} serie={series.join(",")} value={turmaId} onChange={setTurmaId} />
+            <SelectRegiao value={regiaoIds} onChange={setRegiaoIds} />
+            <SelectGrupo regiaoId={regiaoIds.join(",")} value={grupoIds} onChange={setGrupoIds} />
+            <SelectEscola regiaoId={regiaoIds.join(",")} grupoId={grupoIds.join(",")} value={escolaIds} onChange={setEscolaIds} />
+            <SelectSerie escolaId={escolaIds.join(",")} value={series} onChange={setSeries} />
+            <SelectTurma escolaId={escolaIds.join(",")} serie={series.join(",")} value={turmaIds} onChange={setTurmaIds} />
             <SelectProvas value={provaIds} onChange={setProvaIds} />
             <SelectResultado value={filtro} onChange={setFiltro} />
 
