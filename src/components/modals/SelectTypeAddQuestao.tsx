@@ -77,6 +77,10 @@ export default function SelectTypeAddQuestao({
             onSuccess?.();
           }}
           onRefresh={onRefresh}
+          onCriarManualmente={() => {
+            setShowModalBanco(false);
+            setShowModalManual(true);
+          }}
         />
       )}
     </>
