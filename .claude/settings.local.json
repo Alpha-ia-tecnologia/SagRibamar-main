@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep -r \"DashboardPage\\\\|DashboardProfessor\" '/c/Users/CJ/Desktop/Alpha IA/SagRibamar-main/src' --include=*.tsx --include=*.ts)"
+      "Bash(grep -r \"DashboardPage\\\\|DashboardProfessor\" '/c/Users/CJ/Desktop/Alpha IA/SagRibamar-main/src' --include=*.tsx --include=*.ts)",
+      "Bash(grep -r \"area\\\\|conhecimento\\\\|Area\\\\|Conhecimento\" '/c/Users/CJ/Desktop/Alpha IA/SagRibamar-main/src' --include=*.tsx --include=*.ts)",
+      "Bash(grep -r areas '/c/Users/CJ/Desktop/Alpha IA/SagRibamar-main/src' --include=*.tsx --include=*.ts)",
+      "Bash(grep -l \"api/dashboard\" \"/c/Users/CJ/Desktop/Alpha IA/SagRibamar-main/src/components\"/*.tsx)",
+      "Bash(grep -r \"Humanas\\\\|Exatas\\\\|Natureza\\\\|Linguagens\" '/c/Users/CJ\\\\Desktop/Alpha IA/SagRibamar-main/src' --include=*.tsx --include=*.ts)",
+      "Bash(xargs grep:*)",
+      "Bash(ls -1 Grafico*.tsx)",
+      "Bash(npm install:*)",
+      "WebFetch(domain:sao-bento-sag-api.gkgtsp.easypanel.host)"
     ]
   }
 }

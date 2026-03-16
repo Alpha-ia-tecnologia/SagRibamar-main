@@ -58,9 +58,9 @@ export const RankingAlunos = () => {
         const res = await api.get(`/api/dashboard/student-ranking?${params.toString()}`);
         const json: ApiResponse = await res.json();
 
-        setAlunos(json.data);
-        setTotalPages(json.totalPages);
-        setTotal(json.total);
+        setAlunos(json.data || []);
+        setTotalPages(json.totalPages || 1);
+        setTotal(json.total || 0);
       } catch (err) {
         setLoading(false);
         console.error("Erro ao buscar ranking de alunos:", err);

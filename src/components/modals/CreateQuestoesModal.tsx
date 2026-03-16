@@ -96,11 +96,24 @@ export const CreateQuestoesModal = ({ provaId, tituloProva, onClose, onSuccess }
 
   const areas = ["Ciências Humanas", "Ciências Exatas", "Ciências da Natureza", "Linguagens"]
 
+  const areaParaEnum: Record<string, string> = {
+    "Ciências Humanas": "CIENCIAS_HUMANAS",
+    "Ciências Exatas": "CIENCIAS_EXATAS",
+    "Ciências da Natureza": "CIENCIAS_DA_NATUREZA",
+    "Linguagens": "LINGUAGENS",
+  };
+
   useEffect(() => {
-    api.get(`/api/componentes-curriculares`)
+    if (!area) return;
+    const areaEnum = areaParaEnum[area] || area;
+    api.get(`/api/componentes-curriculares?area_conhecimento=${encodeURIComponent(areaEnum)}`)
       .then(res => res.json())
-      .then(data => setComponentes(data || []));
-  }, [api]);
+      .then(data => {
+        setComponentes(data || []);
+        setComponenteId(data?.[0]?.id ?? 0);
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [area]);
 
   // Função para buscar o próximo número da questão
   const buscarProximoNumero = async (provaIdAtual: number) => {

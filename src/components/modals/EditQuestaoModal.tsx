@@ -112,6 +112,13 @@ export const EditarQuestaoModal = ({
     "Linguagens",
   ];
 
+  const areaParaEnum: Record<string, string> = {
+    "Ciências Humanas": "CIENCIAS_HUMANAS",
+    "Ciências Exatas": "CIENCIAS_EXATAS",
+    "Ciências da Natureza": "CIENCIAS_DA_NATUREZA",
+    "Linguagens": "LINGUAGENS",
+  };
+
   useEffect(() => {
     let questaoData: any = null;
 
@@ -169,11 +176,6 @@ export const EditarQuestaoModal = ({
         setProficienciaSaebId(data.proficiencia_saeb_id || null);
       });
 
-    api
-      .get(`/api/componentes-curriculares`)
-      .then((res) => res.json())
-      .then((data) => setComponentes(data || []));
-
     // Carrega habilidades BNCC já vinculadas para exibição/remoção
     api
       .get(`/api/bncc?questao_id=${questaoId}`)
@@ -216,6 +218,17 @@ export const EditarQuestaoModal = ({
       })
       .catch(() => {});
   }, [questaoId]);
+
+  useEffect(() => {
+    if (!area) return;
+    api
+      .get(`/api/componentes-curriculares?area_conhecimento=${encodeURIComponent(areaParaEnum[area] || area)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setComponentes(data || []);
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [area]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

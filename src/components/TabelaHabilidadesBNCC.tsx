@@ -188,9 +188,9 @@ export const TabelaHabilidadesBNCC = () => {
         );
         const json: ApiResponse = await res.json();
 
-        setHabilidades(json.data);
-        setTotalPages(json.totalPages);
-        setTotal(json.total);
+        setHabilidades(json.data || []);
+        setTotalPages(json.totalPages || 1);
+        setTotal(json.total || 0);
       } catch (err) {
         setLoading(false);
         console.error("Erro ao buscar habilidades BNCC:", err);
