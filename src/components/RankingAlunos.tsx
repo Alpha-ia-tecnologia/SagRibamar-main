@@ -53,7 +53,8 @@ export const RankingAlunos = () => {
         if (filtros.escolaId) params.append("escola_id", filtros.escolaId);
         if (filtros.serie) params.append("serie", filtros.serie);
         if (filtros.turmaId) params.append("turma_id", filtros.turmaId); 
-        if (filtros.provaId) params.append("prova_id", filtros.provaId); 
+        if (filtros.provaId) params.append("prova_id", filtros.provaId);
+        if (filtros.alunoId) params.append("aluno_id", filtros.alunoId);
 
         const res = await api.get(`/api/dashboard/student-ranking?${params.toString()}`);
         const json: ApiResponse = await res.json();
@@ -145,10 +146,9 @@ export const RankingAlunos = () => {
   };
 
   const getMediaColor = (media: number) => {
-    if (media >= 80) return "text-emerald-600 bg-emerald-50";
-    if (media >= 60) return "text-blue-600 bg-blue-50";
-    if (media >= 40) return "text-amber-600 bg-amber-50";
-    return "text-rose-600 bg-rose-50";
+    if (media >= 80) return "text-emerald-600 bg-emerald-50"; // bom
+    if (media >= 60) return "text-amber-600 bg-amber-50";     // razoável
+    return "text-rose-600 bg-rose-50";                         // crítico
   };
 
   return (

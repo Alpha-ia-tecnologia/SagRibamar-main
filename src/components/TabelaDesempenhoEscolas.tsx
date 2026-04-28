@@ -39,8 +39,9 @@ export const TabelaDesempenhoEscolas = () => {
     if (filtros.escolaId) params.append("escola_id", filtros.escolaId);
     if (filtros.serie) params.append("serie", filtros.serie);
     if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
-    if (filtros.provaId) params.append("prova_id", filtros.provaId); 
-    
+    if (filtros.provaId) params.append("prova_id", filtros.provaId);
+    if (filtros.alunoId) params.append("aluno_id", filtros.alunoId);
+
     try {
       setLoading(true)
       const res = await api.get(`/api/dashboard/school-performance?${params.toString()}`);
@@ -100,9 +101,9 @@ export const TabelaDesempenhoEscolas = () => {
 
   const getMediaColor = (media: number | null) => {
     if (media === null) return "text-gray-400";
-    if (media >= 70) return "text-emerald-600";
-    if (media >= 50) return "text-amber-600";
-    return "text-rose-600";
+    if (media >= 80) return "text-emerald-600"; // bom
+    if (media >= 60) return "text-amber-600";   // razoável
+    return "text-rose-600";                      // crítico
   };
 
   return (

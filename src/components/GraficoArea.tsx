@@ -29,9 +29,10 @@ interface DesempenhoArea {
   percentual_erros: number;
 }
 
-const BAR_COLOR = {
-  bg: "rgba(59, 130, 246, 0.8)",
-  border: "rgba(59, 130, 246, 1)",
+const getBarColor = (value: number) => {
+  if (value >= 80) return { bg: "rgba(16, 185, 129, 0.8)", border: "rgba(16, 185, 129, 1)" }; // verde (bom)
+  if (value >= 60) return { bg: "rgba(245, 158, 11, 0.8)", border: "rgba(245, 158, 11, 1)" }; // amarelo (razoável)
+  return { bg: "rgba(239, 68, 68, 0.8)", border: "rgba(239, 68, 68, 1)" }; // vermelho (crítico)
 };
 
 export default function GraficoArea() {
@@ -50,6 +51,7 @@ export default function GraficoArea() {
     if (filtros.serie) params.append("serie", filtros.serie);
     if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
     if (filtros.provaId) params.append("prova_id", filtros.provaId);
+    if (filtros.alunoId) params.append("aluno_id", filtros.alunoId);
 
     api
       .get(`/api/dashboard/area-conhecimento-desempenho?${params.toString()}`)
@@ -76,14 +78,14 @@ export default function GraficoArea() {
         {
           label: "Percentual de Acertos (%)",
           data: dados.map((area) => area.percentual_acertos),
-          backgroundColor: BAR_COLOR.bg,
-          borderColor: BAR_COLOR.border,
+          backgroundColor: dados.map((area) => getBarColor(area.percentual_acertos).bg),
+          borderColor: dados.map((area) => getBarColor(area.percentual_acertos).border),
           borderWidth: 0,
           borderRadius: { topRight: 8, bottomRight: 8, topLeft: 0, bottomLeft: 0 },
           borderSkipped: false as const,
           barPercentage: 0.7,
           categoryPercentage: 0.85,
-          hoverBackgroundColor: BAR_COLOR.border,
+          hoverBackgroundColor: dados.map((area) => getBarColor(area.percentual_acertos).border),
         },
       ],
     };

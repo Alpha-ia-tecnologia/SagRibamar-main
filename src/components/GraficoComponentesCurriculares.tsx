@@ -49,6 +49,7 @@ export const GraficoComponentesCurriculares = () => {
     if (filtros.serie) params.append("serie", filtros.serie);
     if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
     if (filtros.provaId) params.append("prova_id", filtros.provaId);
+    if (filtros.alunoId) params.append("aluno_id", filtros.alunoId);
 
     api
       .get(
@@ -79,8 +80,16 @@ export const GraficoComponentesCurriculares = () => {
       {
         label: "Percentual de Acertos (%)",
         data: dados.map((item) => item.percentual_acertos),
-        backgroundColor: "rgba(236, 72, 153, 0.7)",
-        borderColor: "rgba(236, 72, 153, 1)",
+        backgroundColor: dados.map((item) => {
+          if (item.percentual_acertos >= 80) return "rgba(16, 185, 129, 0.7)"; // verde (bom)
+          if (item.percentual_acertos >= 60) return "rgba(245, 158, 11, 0.7)"; // amarelo (razoável)
+          return "rgba(239, 68, 68, 0.7)"; // vermelho (crítico)
+        }),
+        borderColor: dados.map((item) => {
+          if (item.percentual_acertos >= 80) return "rgba(16, 185, 129, 1)";
+          if (item.percentual_acertos >= 60) return "rgba(245, 158, 11, 1)";
+          return "rgba(239, 68, 68, 1)";
+        }),
         borderWidth: 0,
         borderRadius: 6,
       },

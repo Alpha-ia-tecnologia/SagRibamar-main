@@ -9,7 +9,10 @@
       "Bash(xargs grep:*)",
       "Bash(ls -1 Grafico*.tsx)",
       "Bash(npm install:*)",
-      "WebFetch(domain:sao-bento-sag-api.gkgtsp.easypanel.host)"
+      "WebFetch(domain:sao-bento-sag-api.gkgtsp.easypanel.host)",
+      "Bash(grep -r \"emerald\\\\|rose\\\\|amber\\\\|blue\\\\|violet\\\\|purple\\\\|pink\" --include=\"*.tsx\" components/Grafico* components/RankingAlunos.tsx components/TabelaDesempenhoEscolas.tsx)",
+      "Bash(find '/c/Users/CJ/Desktop/Alpha IA/SagRibamar-main' -name *[Dd]ashboard* -type f)",
+      "Bash(find '/c/Users/CJ/Desktop/Alpha IA/SagRibamar-main' -name *[Aa]luno* -type f)"
     ]
   }
 }

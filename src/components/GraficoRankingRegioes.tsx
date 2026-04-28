@@ -60,7 +60,8 @@ export const GraficoRankingRegioes = () => {
         if (filtros.escolaId) params.append("escola_id", filtros.escolaId);
         if (filtros.serie) params.append("serie", filtros.serie);
         if (filtros.turmaId) params.append("turma_id", filtros.turmaId);
-        if (filtros.provaId) params.append("prova_id", filtros.provaId); // ✅ corrigido
+        if (filtros.provaId) params.append("prova_id", filtros.provaId);
+        if (filtros.alunoId) params.append("aluno_id", filtros.alunoId);
 
         const res = await api.get(
           `/api/dashboard/regional-performance?${params.toString()}`
@@ -86,8 +87,16 @@ export const GraficoRankingRegioes = () => {
       {
         label: "Desempenho por Região",
         data: dadosRegioes.map((r) => r.media_desempenho),
-        backgroundColor: "rgba(251, 191, 36, 0.7)",
-        borderColor: "rgba(251, 191, 36, 1)",
+        backgroundColor: dadosRegioes.map((r) => {
+          if (r.media_desempenho >= 8) return "rgba(16, 185, 129, 0.7)"; // verde (bom)
+          if (r.media_desempenho >= 6) return "rgba(245, 158, 11, 0.7)"; // amarelo (razoável)
+          return "rgba(239, 68, 68, 0.7)"; // vermelho (crítico)
+        }),
+        borderColor: dadosRegioes.map((r) => {
+          if (r.media_desempenho >= 8) return "rgba(16, 185, 129, 1)";
+          if (r.media_desempenho >= 6) return "rgba(245, 158, 11, 1)";
+          return "rgba(239, 68, 68, 1)";
+        }),
         borderWidth: 0,
         borderRadius: 6,
       },

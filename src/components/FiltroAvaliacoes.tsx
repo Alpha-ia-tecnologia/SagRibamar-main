@@ -7,6 +7,7 @@ import { SelectSerie } from "./selects/SelectSerie";
 import { SelectTurma } from "./selects/SelectTurma";
 import { SelectResultado } from "./selects/SelectResultado";
 import { SelectProvas } from "./selects/SelectProvas";
+import { SelectAluno } from "./selects/SelectAluno";
 import { FunnelIcon, ArrowPathIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 export const FiltroAvaliacoes = () => {
@@ -17,6 +18,7 @@ export const FiltroAvaliacoes = () => {
   const [turmaIds, setTurmaIds] = useState<string[]>([]);
   const [provaIds, setProvaIds] = useState<string[]>([]);
   const [filtro, setFiltro] = useState<string[]>([]);
+  const [alunoIds, setAlunoIds] = useState<string[]>([]);
   const [isExpanded, setIsExpanded] = useState(true);
 
   const { setFiltros } = useFiltroDashboard();
@@ -30,6 +32,7 @@ export const FiltroAvaliacoes = () => {
       turmaId: turmaIds.join(","),
       provaId: provaIds.join(","),
       filtro: filtro.join(","),
+      alunoId: alunoIds.join(","),
     });
   };
 
@@ -41,10 +44,11 @@ export const FiltroAvaliacoes = () => {
     setTurmaIds([]);
     setProvaIds([]);
     setFiltro([]);
+    setAlunoIds([]);
     setFiltros({});
   };
 
-  const hasActiveFilters = regiaoIds.length > 0 || grupoIds.length > 0 || escolaIds.length > 0 || series.length > 0 || turmaIds.length > 0 || provaIds.length > 0 || filtro.length > 0;
+  const hasActiveFilters = regiaoIds.length > 0 || grupoIds.length > 0 || escolaIds.length > 0 || series.length > 0 || turmaIds.length > 0 || provaIds.length > 0 || filtro.length > 0 || alunoIds.length > 0;
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 transition-all duration-300">
@@ -89,6 +93,7 @@ export const FiltroAvaliacoes = () => {
             <SelectSerie escolaId={escolaIds.join(",")} value={series} onChange={setSeries} />
             <SelectTurma escolaId={escolaIds.join(",")} serie={series.join(",")} value={turmaIds} onChange={setTurmaIds} />
             <SelectProvas value={provaIds} onChange={setProvaIds} />
+            <SelectAluno escolaId={escolaIds.join(",")} turmaId={turmaIds.join(",")} value={alunoIds} onChange={setAlunoIds} />
             <SelectResultado value={filtro} onChange={setFiltro} />
 
             {/* Botões de Ação */}

@@ -6,8 +6,9 @@ interface Filtros {
   escolaId?: string;
   serie?: string;
   turmaId?: string;
-  filtro?: string; 
-   provaId?: string;
+  filtro?: string;
+  provaId?: string;
+  alunoId?: string;
 }
 
 
