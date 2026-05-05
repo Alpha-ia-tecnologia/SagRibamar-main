@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { LoginPage } from "./pages/Login";
+import { AutoLoginPage } from "./pages/AutoLogin";
 import { DashboardPage } from "./pages/DashboardPage";
 import DashboardProfessor from "./pages/DashboardProfessor";
 import EscolasPage from "./pages/EscolasPage";
@@ -19,6 +20,7 @@ function App() {
   if (!user) {
     return (
       <Routes>
+        <Route path="/auto-login" element={<AutoLoginPage />} />
         <Route path="*" element={<LoginPage />} />
       </Routes>
     );
@@ -32,6 +34,7 @@ function App() {
   <FiltroDashboardProvider>
     <Routes>
       <Route path="/" element={<LoginPage />} />
+      <Route path="/auto-login" element={<AutoLoginPage />} />
       <Route element={<AppLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
 

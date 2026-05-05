@@ -8,12 +8,16 @@ interface User {
   email: string;
   tipo_usuario: string;
   municipio?: string;
+  ativo?: boolean;
+  data_expiracao?: string | null;
+  ultimo_login?: string | null;
 }
 
 interface AuthContextProps {
   user: User | null;
   token: string | null;
   login: (email: string, senha: string) => Promise<boolean>;
+  consumeMagicLink: (magicToken: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
   error: string | null;
@@ -73,6 +77,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const consumeMagicLink = async (magicToken: string): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`${API_URL}/api/auth/consume-magic-link`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: magicToken }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Link inválido ou expirado");
+      }
+
+      const data = await res.json();
+      setUser(data.usuario);
+      setToken(data.token);
+
+      sessionStorage.setItem("currentUser", JSON.stringify(data.usuario));
+      localStorage.setItem("token", data.token);
+
+      return true;
+    } catch (err: any) {
+      setError(err.message || "Erro ao validar link de acesso");
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -81,7 +115,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, loading, error }}>
+    <AuthContext.Provider value={{ user, token, login, consumeMagicLink, logout, loading, error }}>
       {children}
     </AuthContext.Provider>
   );

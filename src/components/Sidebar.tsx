@@ -187,14 +187,6 @@ export const Sidebar = () => {
                 width={80}
               />
             </div>
-            <div className="bg-white/10 backdrop-blur-sm p-2 rounded-xl border border-white/20">
-              <img
-                src="/logos/maximiza.png"
-                alt="Logo Maximiza"
-                width={100}
-                className="object-contain"
-              />
-            </div>
           </div>
           <div className="text-center">
             <span className="font-bold text-lg tracking-tight">SAG</span>
@@ -259,15 +251,6 @@ export const Sidebar = () => {
                 alt={`Logo de ${municipalityName}`}
                 width={32}
                 height={32}
-              />
-            </div>
-            <div className="bg-white/10 p-2 rounded-lg border border-white/20">
-              <img
-                src="/logos/maximiza.png"
-                alt="Logo Maximiza"
-                width={32}
-                height={32}
-                className="rounded-sm object-contain"
               />
             </div>
             <div>
